@@ -297,10 +297,12 @@ describe("two-step sign-in", () => {
       return r.challenge;
     };
     const challenges = await Promise.all(Array.from({ length: 5 }, challenge));
-    // Twelve wrong codes over four challenges and the right one on the fifth, all at once: the lock wins.
-    const guesses = [...challenges.slice(0, 4).flatMap((ch, i) => [0, 1, 2].map((j) => [ch, String(100000 + i * 10 + j)])), [challenges[4]!, code(secret, 1)]];
-    const results = await Promise.all(guesses.map(([ch, c]) => iDeps.auth.verifyMfa(ch!, c!, {})));
-    expect(results.at(-1)!.ok).toBe(false);
+    // Twelve wrong codes over four challenges, all at once: every one counts, so the lock is on when they settle and
+    // the right code on the fifth challenge is refused.
+    const guesses = challenges.slice(0, 4).flatMap((ch, i) => [0, 1, 2].map((j) => [ch, String(100000 + i * 10 + j)] as const));
+    const results = await Promise.all(guesses.map(([ch, c]) => iDeps.auth.verifyMfa(ch, c, {})));
+    expect(results.every((r) => !r.ok)).toBe(true);
+    expect((await iDeps.auth.verifyMfa(challenges[4]!, code(secret, 1), {})).ok).toBe(false);
     // Locked: a right password still gets a challenge, but no code is tried until the lock ends.
     expect((await iDeps.auth.login(email, PW, {})).ok).toBe(false);
   });
