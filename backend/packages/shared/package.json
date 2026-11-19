@@ -20,11 +20,11 @@
   },
   "dependencies": {
     "@workspace/contracts": "workspace:*",
-    "pg": "8.13.1",
-    "ulid": "2.3.0"
+    "pg": "8.23.1",
+    "ulid": "2.4.0"
   },
   "devDependencies": {
-    "@types/pg": "8.11.10",
+    "@types/pg": "8.23.1",
     "@workspace/tsconfig": "workspace:*"
   }
 }
