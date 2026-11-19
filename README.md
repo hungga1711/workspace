@@ -34,9 +34,7 @@ without AI. English, Tiếng Việt, 中文 and Español.
 
 ## Video
 
-[![Product tour: pick a task, attach a workflow your team built, an AI agent runs it to review; then see whether AI pays off](docs/assets/tour.gif)](https://workspace.hungga1711.dev/media/tour.mp4)
-
-[Watch the full 65-second tour with sound](https://workspace.hungga1711.dev/media/tour.mp4)
+https://github.com/user-attachments/assets/2c138cb5-2642-4455-aca1-fa205fef1153
 
 ## Install
 

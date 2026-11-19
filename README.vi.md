@@ -26,9 +26,7 @@ Cho chủ doanh nghiệp: **Trang chủ** cho thấy ai đang kẹt và vì sao,
 **Tiến độ** cho thấy từng người và từng phòng ban. Không gì được gửi cho chúng tôi hay bên thứ ba; mọi tính năng chạy
 được khi không có AI. Có tiếng Anh, tiếng Việt, tiếng Trung và tiếng Tây Ban Nha.
 
-[![Giới thiệu sản phẩm: chọn một task, gắn workflow của đội, AI agent chạy tới bước review; rồi xem AI có thực sự hiệu quả không](docs/assets/tour.gif)](https://workspace.hungga1711.dev/media/tour.mp4)
-
-[Xem video giới thiệu đầy đủ 65 giây, có tiếng](https://workspace.hungga1711.dev/media/tour.mp4)
+https://github.com/user-attachments/assets/2c138cb5-2642-4455-aca1-fa205fef1153
 
 ## Cài đặt
 

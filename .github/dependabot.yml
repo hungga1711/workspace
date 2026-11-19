@@ -1,13 +1,17 @@
-# Weekly, grouped so a week's updates arrive as a few pull requests instead of dozens.
+# Grouped, and npm monthly, so updates arrive as a few pull requests instead of dozens.
 version: 2
 updates:
+  # Majors (Tiptap 2 → 3, Express 4 → 5) need code changes and a reviewed migration, not a bot pull request each:
+  # they are done by hand, so only minor and patch updates arrive, as one grouped pull request.
   - package-ecosystem: npm
     directory: /
     schedule:
-      interval: weekly
-      day: monday
-    open-pull-requests-limit: 10
+      interval: monthly
+    open-pull-requests-limit: 3
     labels: [dependencies]
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
     groups:
       minor-and-patch:
         update-types: [minor, patch]
@@ -15,9 +19,12 @@ updates:
   - package-ecosystem: npm
     directory: /website
     schedule:
-      interval: weekly
-      day: monday
+      interval: monthly
+    open-pull-requests-limit: 2
     labels: [dependencies, website]
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
     groups:
       minor-and-patch:
         update-types: [minor, patch]

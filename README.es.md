@@ -26,9 +26,7 @@ Para el responsable: **Inicio** muestra quién está bloqueado y por qué, qué 
 semana. **Avance** muestra cada persona y departamento. No se nos envía nada ni a nosotros ni a terceros; todo
 funciona sin IA. En inglés, vietnamita, chino y español.
 
-[![Recorrido del producto: elige una tarea, asígnale un flujo de trabajo de tu equipo, un agente de IA lo ejecuta hasta la revisión; luego mira si la IA compensa](docs/assets/tour.gif)](https://workspace.hungga1711.dev/media/tour.mp4)
-
-[Ver el recorrido completo de 65 segundos con sonido](https://workspace.hungga1711.dev/media/tour.mp4)
+https://github.com/user-attachments/assets/2c138cb5-2642-4455-aca1-fa205fef1153
 
 ## Instalación
 
