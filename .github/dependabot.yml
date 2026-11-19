@@ -36,6 +36,9 @@ updates:
       interval: weekly
       day: monday
     labels: [dependencies, infra]
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
   # Postgres, SeaweedFS, Caddy, LiveKit and PgBouncer pinned in the compose files; the templates and the demo pin the
   # same images, so they move in the same grouped pull request.
   - package-ecosystem: docker-compose
@@ -44,6 +47,11 @@ updates:
       interval: weekly
       day: monday
     labels: [dependencies, infra]
+    # A major version (Postgres 16 → 18, SeaweedFS 3 → 4) changes the data on disk or the config: it needs a migration
+    # plan and upgrade notes, never a routine bump.
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
     groups:
       images:
         patterns: ["*"]

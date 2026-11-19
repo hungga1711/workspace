@@ -6,7 +6,7 @@ const now = new Date("2026-10-09T09:00:00+07:00"); // a Friday
 describe("detectSignals", () => {
   it("finds explicit and relative deadlines only when there is a deadline cue", () => {
     expect(detectSignals("Gửi báo giá trước 20/11 nhé", now).deadline?.label).toBe("20/11");
-    expect(detectSignals("Hạn chót là thứ Hai", now).deadline?.iso).toBe(new Date("2026-10-12T17:00:00+07:00").toISOString());
+    expect(detectSignals("Hạn chót là thứ Hai", now).deadline?.iso).toBe(new Date(2026, 9, 12, 17, 0, 0).toISOString());
     expect(detectSignals("Deadline tomorrow", now).deadline?.label).toBe("tomorrow");
     expect(detectSignals("Deadline tomorrow", now, { today: "hôm nay", tomorrow: "ngày mai" }).deadline?.label).toBe("ngày mai");
     expect(detectSignals("Sinh nhật mình 20/11", now).deadline).toBeNull();
