@@ -173,8 +173,7 @@ export interface TriggerActivity {
 /** POST work/workflows/links/check: can a run read this link? */
 export type LinkKind = "gdoc" | "gsheet" | "gslides" | "gdrive" | "gfolder" | "web";
 export type LinkCheck =
-  | { ok: true; kind: LinkKind; chars: number; sample: string }
-  | { ok: false; kind: LinkKind; problem: "private" | "folder" | "unreachable" | "unreadable" | "refused" };
+  { ok: true; kind: LinkKind; chars: number; sample: string } | { ok: false; kind: LinkKind; problem: "private" | "folder" | "unreachable" | "unreadable" | "refused" };
 /**
  * How long a run should take. On a workflow (GET work/workflows/:id/estimate): `totalSec`, each step's seconds by key
  * and how many earlier runs it is drawn from (0 = typical times). On a run, also what is left and when it should be

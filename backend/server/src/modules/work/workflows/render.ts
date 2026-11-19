@@ -79,7 +79,7 @@ export function commandWithInputs(command: string, inputs: Record<string, string
   const re = /\{\{\s*input\.([a-zA-Z0-9_-]+)\s*\}\}/y;
   let out = "";
   let quote: "'" | '"' | null = null;
-  for (let i = 0; i < command.length; ) {
+  for (let i = 0; i < command.length;) {
     re.lastIndex = i;
     const m = re.exec(command);
     if (m) {

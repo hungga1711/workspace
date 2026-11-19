@@ -49,7 +49,9 @@ export async function serviceFetch(url: string, init: { method?: string; headers
     if (v === undefined) continue;
     for (const one of Array.isArray(v) ? v : [String(v)]) headers.append(k, one);
   }
-  return new Response(NO_BODY.has(out.status) ? null : out.body, { status: out.status, headers });
+  // TypeScript 5.9 types BodyInit's byte views over ArrayBuffer only; a Buffer (and the stream of them) is typed over
+  // ArrayBufferLike, though Response accepts it the same at run time.
+  return new Response(NO_BODY.has(out.status) ? null : (out.body as BodyInit | null), { status: out.status, headers });
 }
 
 /**
