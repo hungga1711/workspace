@@ -5,7 +5,6 @@
 <p align="center"><strong>Tasks, chat and your company's AI in one self-hosted app. See who does what, and whether AI helps.</strong></p>
 
 <p align="center">
-  <a href="https://github.com/hungga1711/workspace/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/hungga1711/workspace/actions/workflows/ci.yml/badge.svg"></a>
   <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/license-MIT-blue.svg"></a>
   <a href="https://github.com/hungga1711/workspace/pkgs/container/workspace"><img alt="Container image" src="https://img.shields.io/badge/ghcr.io-hungga1711%2Fworkspace-blue?logo=docker"></a>
 </p>
