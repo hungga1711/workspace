@@ -560,7 +560,11 @@ function ChatPanel({ messages, send }: { messages: ReturnType<typeof useChat>["c
   const t = useT();
   const [text, setText] = useState("");
   const end = useRef<HTMLDivElement>(null);
-  useEffect(() => end.current?.scrollIntoView({ block: "end" }), [messages.length]);
+  // A block, not `() => el.scrollIntoView()`: newer Chromium returns a promise from it, and React would call that
+  // promise as the effect's cleanup and crash the page.
+  useEffect(() => {
+    end.current?.scrollIntoView({ block: "end" });
+  }, [messages.length]);
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     const v = text.trim();

@@ -146,7 +146,9 @@ export default function TaskChat({
     [taskId],
   );
   useEffect(() => void open(), [open]);
-  useEffect(() => end.current?.scrollIntoView({ block: "end" }), [messages.length, busy]);
+  useEffect(() => {
+    end.current?.scrollIntoView({ block: "end" });
+  }, [messages.length, busy]);
 
   const fill = (v: string) => {
     setText(v);
@@ -624,7 +626,9 @@ function ConfirmAction({
   const [failed, setFailed] = useState(false);
   const card = useRef<HTMLDivElement>(null);
   // The card opens under the answer, often below the fold of the chat's scroll box.
-  useEffect(() => card.current?.scrollIntoView({ block: "nearest", behavior: "smooth" }), []);
+  useEffect(() => {
+    card.current?.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  }, []);
   const apply = async () => {
     setSaving(true);
     setFailed(false);

@@ -22,7 +22,9 @@ export function TaskOnlyChat({ admin, off = false }: { admin: boolean; off?: boo
   const [text, setText] = useState("");
   const end = useRef<HTMLDivElement>(null);
   const field = useRef<HTMLTextAreaElement>(null);
-  useEffect(() => end.current?.scrollIntoView({ block: "end" }), [turns.length]);
+  useEffect(() => {
+    end.current?.scrollIntoView({ block: "end" });
+  }, [turns.length]);
   const send = () => {
     const v = text.trim();
     if (!v) return;
