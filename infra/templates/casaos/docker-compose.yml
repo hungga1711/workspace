@@ -20,7 +20,7 @@ services:
       - proxy:/run/workspace-proxy
 
   postgres:
-    image: postgres:16.4-alpine
+    image: postgres:16.15-alpine
     restart: unless-stopped
     depends_on:
       init: { condition: service_completed_successfully }
@@ -89,7 +89,7 @@ services:
   # Routes /socket.io/, /storage/, /api/mcp and /api/docs to the server and the rest to the web app
   # (infra/templates/Caddyfile, copied into the `proxy` volume by `init`).
   proxy:
-    image: caddy:2.8.4-alpine
+    image: caddy:2.11.9-alpine
     restart: unless-stopped
     depends_on:
       init: { condition: service_completed_successfully }
