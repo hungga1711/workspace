@@ -15,7 +15,7 @@
     "task-sync:check": "tsx src/modules/work/task-sync/cli.ts"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "0.32.1",
+    "@anthropic-ai/sdk": "1.8.0",
     "@modelcontextprotocol/sdk": "1.12.1",
     "@nestjs/common": "10.4.15",
     "@nestjs/core": "10.4.15",
