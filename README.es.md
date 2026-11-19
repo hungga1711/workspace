@@ -1,4 +1,6 @@
-<h1 align="center">workspace</h1>
+<p align="center"><img src="docs/assets/logo.svg" width="72" height="72" alt="Workspace logo"></p>
+
+<h1 align="center">Workspace</h1>
 
 <p align="center"><strong>Tareas, chat y la IA de tu empresa en una sola aplicación autoalojada. Ve quién hace qué y si la IA ayuda.</strong></p>
 

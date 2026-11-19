@@ -1,4 +1,6 @@
-<h1 align="center">workspace</h1>
+<p align="center"><img src="docs/assets/logo.svg" width="72" height="72" alt="Workspace logo"></p>
+
+<h1 align="center">Workspace</h1>
 
 <p align="center"><strong>Việc, chat và AI của công ty trong một ứng dụng tự cài. Biết ai làm gì, và AI có giúp không.</strong></p>
 

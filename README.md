@@ -1,4 +1,6 @@
-<h1 align="center">workspace</h1>
+<p align="center"><img src="docs/assets/logo.svg" width="72" height="72" alt="Workspace logo"></p>
+
+<h1 align="center">Workspace</h1>
 
 <p align="center"><strong>Tasks, chat and your company's AI in one self-hosted app. See who does what, and whether AI helps.</strong></p>
 

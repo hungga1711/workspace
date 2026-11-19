@@ -1,4 +1,6 @@
-<h1 align="center">workspace</h1>
+<p align="center"><img src="docs/assets/logo.svg" width="72" height="72" alt="Workspace logo"></p>
+
+<h1 align="center">Workspace</h1>
 
 <p align="center"><strong>任务、频道和公司自己的 AI，集中在一个自托管应用里。看清谁在做什么，以及 AI 是否有帮助。</strong></p>
 
