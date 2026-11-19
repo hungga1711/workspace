@@ -14,6 +14,13 @@ updates:
         update-types: ["version-update:semver-major"]
       # 0.7+ re-sorts the Tailwind classes in some 350 files: a one-off reformat to do on purpose, not in a bump.
       - dependency-name: prettier-plugin-tailwindcss
+      # Next 15.5 router.refresh() can drop a fresh server render and leaves streamed copies of a page in the DOM for a
+      # moment (E2E: stale tables, duplicate matches). Next moves by hand, with the E2E suite, not in the monthly group.
+      - dependency-name: next
+      - dependency-name: eslint-config-next
+      - dependency-name: "@next/bundle-analyzer"
+      # Playwright 1.65's Chromium loses a co-editor's typing in doc-presence.spec; 1.49 passes the same build.
+      - dependency-name: "@playwright/test"
     groups:
       minor-and-patch:
         update-types: [minor, patch]
