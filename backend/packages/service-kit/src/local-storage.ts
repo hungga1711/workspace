@@ -101,7 +101,9 @@ export class LocalStorage implements ObjectStorage {
   async write(key: string, body: NodeJS.ReadableStream, contentType: string, maxBytes: number): Promise<number> {
     const target = this.path(key);
     await mkdir(dirname(target), { recursive: true });
-    const tmp = `${target}.${randomBytes(6).toString("hex")}.part`;
+    const part = randomBytes(6).toString("hex");
+    const tmp = `${target}.${part}.part`;
+    const metaTmp = `${target}.${part}.meta.part`;
     let size = 0;
     try {
       await pipeline(
@@ -116,10 +118,13 @@ export class LocalStorage implements ObjectStorage {
         createWriteStream(tmp, { mode: 0o640, flags: "wx" }),
       );
       await rename(tmp, target);
-      await writeFile(`${target}.meta.json`, JSON.stringify({ contentType, size } satisfies Meta));
+      // Created fresh like the data file (never through a link planted at the name), then moved into place.
+      await writeFile(metaTmp, JSON.stringify({ contentType, size } satisfies Meta), { mode: 0o640, flag: "wx" });
+      await rename(metaTmp, `${target}.meta.json`);
       return size;
     } catch (e) {
       await rm(tmp, { force: true });
+      await rm(metaTmp, { force: true });
       throw e;
     }
   }
