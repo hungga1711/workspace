@@ -18,9 +18,6 @@ export default defineConfig({
     timezoneId: "Asia/Ho_Chi_Minh",
     extraHTTPHeaders: { "accept-language": "vi-VN,vi;q=0.9" },
     headless: true,
-    // Headless Chromium on Linux reports no mouse (hover: none), and Tailwind's hover variants only apply with one, so
-    // the message toolbar never showed on CI. The specs drive a desktop with a mouse; say so.
-    launchOptions: { args: ["--blink-settings=primaryHoverType=2,availableHoverTypes=2,primaryPointerType=4,availablePointerTypes=4"] },
     trace: "retain-on-failure",
     screenshot: "only-on-failure",
   },

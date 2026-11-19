@@ -63,10 +63,13 @@ jobs:
         # fixed when the app is built (next.config.mjs), and the E2E specs for them go through the app's address.
         run: cd frontend/web && GATEWAY_URL=http://localhost:4100 NEXT_PUBLIC_CHAT_URL=http://localhost:4100 STORAGE_PUBLIC_ORIGIN="http://localhost:8333 http://localhost:4100" LIVEKIT_URL=ws://localhost:7880 pnpm build && pnpm budget
       - name: Browser E2E, performance and accessibility
+        # Headed on a virtual display: headless Chromium on Linux has no mouse, and every page served with
+        # Cross-Origin-Opener-Policy (all of the app's) then matches (hover: none), so hover-only controls such as the
+        # message toolbar never appear. Xvfb gives the browser a pointer, like the desktops the specs drive.
         run: |
           (cd frontend/web && TEST_FIXTURES=1 GATEWAY_URL=http://localhost:4100 WEB_DATABASE_URL=postgres://workspace_web:app_pw@localhost:5432/workspace_test pnpm start > web.log 2>&1 &)
           npx --yes wait-on@8.0.3 -t 120000 http://localhost:3000
-          cd frontend/web && npx playwright install --with-deps chromium && GATEWAY_URL=http://localhost:4100 MAIL_OUTBOX_DIR=$RUNNER_TEMP/mail npx playwright test
+          cd frontend/web && npx playwright install --with-deps chromium && GATEWAY_URL=http://localhost:4100 MAIL_OUTBOX_DIR=$RUNNER_TEMP/mail xvfb-run -a npx playwright test --headed
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: failure()
         with: { name: e2e-artifacts, path: "frontend/web/test-results\nserver.log" }
