@@ -172,15 +172,19 @@ describe("collab", () => {
       for (const u of all) Y.applyUpdate(copy, new Uint8Array(u));
       return { n: all.length, text: copy.getText("t").toString() };
     };
+    // Compaction runs after the updates are stored: wait for both, then check them.
     const end = Date.now() + 10_000;
     let last = await content();
-    while (last.text !== "x".repeat(450) && Date.now() < end) {
+    while ((last.text !== "x".repeat(450) || last.n >= 100) && Date.now() < end) {
       await new Promise((r) => setTimeout(r, 100));
       last = await content();
     }
-    expect(last.text).toBe("x".repeat(450));
-    expect(last.n).toBeLessThan(100);
-    await ask(a.s, "doc:leave", { docId: DOC, discard: true });
+    try {
+      expect(last.text).toBe("x".repeat(450));
+      expect(last.n).toBeLessThan(100);
+    } finally {
+      await ask(a.s, "doc:leave", { docId: DOC, discard: true });
+    }
   });
 
   it("keeps the draft of a page still open however long nobody types, so later edits are stored", async () => {
