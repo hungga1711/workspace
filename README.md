@@ -13,6 +13,8 @@
 
 <p align="center"><a href="README.vi.md">Tiếng Việt</a> · <a href="README.zh.md">中文</a> · <a href="README.es.md">Español</a></p>
 
+![AI adoption: tokens used in 30 days, whether AI helped finish tasks, who uses it, and where the tokens go by department, feature and model](docs/assets/screenshots/en/ai-adoption.png)
+
 ## What it is for
 
 One installation runs one company's work on its own server:

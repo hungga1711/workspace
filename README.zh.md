@@ -6,6 +6,8 @@
 
 <p align="center"><a href="README.md">English</a> · <a href="README.vi.md">Tiếng Việt</a> · <a href="README.es.md">Español</a></p>
 
+![AI 使用情况：30 天内的 token 用量、AI 是否帮助完成任务、谁在用，以及 token 按部门、功能和模型的去向](docs/assets/screenshots/en/ai-adoption.png)
+
 本译文概括 [README.md](README.md)；两者不一致时，以英文版为准。
 
 ## 用来做什么
