@@ -83,7 +83,8 @@ test("AI connect: one line connects a computer; workflows, answers, tokens and t
     const device = owner.getByTestId("connect-device");
     await expect(device).toBeVisible({ timeout: 30_000 });
     await expect(device.getByText("Đang kết nối")).toBeVisible();
-    await expect(device.getByText("Claude Code", { exact: true })).toBeVisible();
+    // The chip names the agent and how many of its models were found ("Claude Code · 3 model").
+    await expect(device.getByText(/^Claude Code\b/)).toBeVisible();
     await expect(owner.getByTestId("connect-command")).toBeHidden();
     await owner.reload();
     await expect(owner.getByTestId("connect-workflow").getByText("Sẵn sàng")).toBeVisible();

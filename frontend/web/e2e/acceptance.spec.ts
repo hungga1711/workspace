@@ -1,5 +1,5 @@
 import { expect, test, type BrowserContext, type Page } from "@playwright/test";
-import { PASSWORD, api, setupWorkspace } from "./helpers";
+import { PASSWORD, api, messageAction, setupWorkspace } from "./helpers";
 
 /**
  * End-to-end acceptance scenario through the real browser: the sign-in page, gateway, server modules, Postgres
@@ -104,8 +104,7 @@ test.describe.serial("Company A end-to-end", () => {
     await composer.press("Enter");
     await expect(ownerA.getByRole("log").getByText("We should move the campaign deadline to October 18")).toBeVisible();
     // Message actions appear on hover/focus (no permanent buttons under every message).
-    await ownerA.getByRole("log").getByText("We should move the campaign deadline to October 18").hover();
-    await ownerA.getByRole("button", { name: "Trả lời trong luồng" }).first().click();
+    await messageAction(ownerA.getByRole("log").getByRole("article").filter({ hasText: "We should move the campaign deadline to October 18" }), "Trả lời trong luồng");
     const reply = ownerA.getByLabel("Trả lời", { exact: true });
     await reply.fill(`<@${lanId}> please update the launch plan by 15/10`);
     await reply.press("Enter");

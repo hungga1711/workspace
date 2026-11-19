@@ -1,5 +1,5 @@
 import AxeBuilder from "@axe-core/playwright";
-import { expect, type Page } from "@playwright/test";
+import { expect, type Locator, type Page } from "@playwright/test";
 import { resetTestDatabase as reset } from "../../../tooling/scripts/test-db.mjs";
 
 /** Empties the test installation's database (tooling/scripts/test-db.mjs). */
@@ -58,4 +58,17 @@ export async function axe(page: Page, label: string) {
   const r = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"]).exclude("video").analyze();
   for (const v of r.violations) console.log(`A11Y ${label} ${v.id} (${v.impact}): ${v.nodes.length} nodes · ${v.nodes[0]?.target.join(" ")}`);
   expect(r.violations.filter((v) => v.impact === "serious" || v.impact === "critical")).toEqual([]);
+}
+
+/**
+ * Presses one of a chat message's hover actions. The bar shows while the pointer is over the message, and the
+ * message can move under a still pointer (a "Tin mới" divider, a suggestion chip, the sent copy replacing the
+ * pending one), so hover and press are tried together until the press lands.
+ */
+export async function messageAction(message: Locator, name: string) {
+  const button = message.getByRole("button", { name });
+  await expect(async () => {
+    await message.hover();
+    await button.click({ timeout: 2_000 });
+  }).toPass({ timeout: 30_000 });
 }

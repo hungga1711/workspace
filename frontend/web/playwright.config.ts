@@ -13,6 +13,9 @@ export default defineConfig({
   use: {
     baseURL: process.env.E2E_BASE_URL ?? "http://localhost:3000",
     locale: "vi-VN",
+    // The same Vietnamese company keeps Vietnamese time: /setup takes the browser's zone for the workspace, and the
+    // specs' dates and "Theo công ty" labels are written for it, whatever zone the machine running them is in.
+    timezoneId: "Asia/Ho_Chi_Minh",
     extraHTTPHeaders: { "accept-language": "vi-VN,vi;q=0.9" },
     headless: true,
     trace: "retain-on-failure",

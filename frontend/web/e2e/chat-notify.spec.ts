@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { setupWorkspace } from "./helpers";
+import { messageAction, setupWorkspace } from "./helpers";
 
 /** Chat: pin and save show their state and undo; notifications per conversation (level, timed mute). */
 test("pin and save toggle visibly; a conversation mutes for an hour and comes back", async ({ page }) => {
@@ -15,15 +15,12 @@ test("pin and save toggle visibly; a conversation mutes for an hour and comes ba
   await box.fill("Chốt lịch ra mắt ngày 20/11");
   await box.press("Enter");
   const msg = page.getByRole("article").filter({ hasText: "Chốt lịch ra mắt ngày 20/11" });
-  await msg.hover();
-  await msg.getByRole("button", { name: "Thêm thao tác với tin nhắn" }).click();
+  await messageAction(msg, "Thêm thao tác với tin nhắn");
   await page.getByRole("menuitem", { name: "Ghim vào kênh" }).click();
   await expect(msg.getByText("Đã ghim")).toBeVisible();
-  await msg.hover();
-  await msg.getByRole("button", { name: "Lưu tin nhắn" }).click();
+  await messageAction(msg, "Lưu tin nhắn");
   await expect(msg.getByRole("button", { name: "Bỏ lưu" })).toHaveAttribute("aria-pressed", "true");
-  await msg.hover();
-  await msg.getByRole("button", { name: "Thêm thao tác với tin nhắn" }).click();
+  await messageAction(msg, "Thêm thao tác với tin nhắn");
   await page.getByRole("menuitem", { name: "Bỏ ghim" }).click();
   await expect(msg.getByText("Đã ghim")).toHaveCount(0);
 

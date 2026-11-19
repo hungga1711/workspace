@@ -1,5 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
-import { PASSWORD, setupWorkspace } from "./helpers";
+import { PASSWORD, messageAction, setupWorkspace } from "./helpers";
 
 /** Forward a message with where it came from, and "Đã xem" in direct messages. */
 const run = Date.now().toString(36);
@@ -17,9 +17,8 @@ test("forward a message into a DM; the other person reading it shows Đã xem", 
 
   await owner.goto(`/app/chat/${ops.id}`);
   const convo = owner.getByRole("region", { name: "Cuộc trò chuyện van-hanh" });
-  const msg = convo.getByText("Khách đổi lịch giao hàng sang thứ Hai");
-  await msg.hover();
-  await convo.getByRole("button", { name: "Thêm thao tác với tin nhắn" }).last().click();
+  const msg = convo.getByRole("article").filter({ hasText: "Khách đổi lịch giao hàng sang thứ Hai" });
+  await messageAction(msg, "Thêm thao tác với tin nhắn");
   await owner.getByRole("menuitem", { name: "Chuyển tiếp" }).click();
   const dialog = owner.getByRole("dialog", { name: "Chuyển tiếp" });
   await dialog.getByLabel("Tìm kênh hoặc người").fill("Phan");
@@ -30,8 +29,7 @@ test("forward a message into a DM; the other person reading it shows Đã xem", 
   await expect(owner.getByText("Đã chuyển tiếp tới Phan Lan")).toBeVisible();
 
   // Nhắc tôi: a reminder at a chosen time, listed for the person until it fires.
-  await msg.hover();
-  await convo.getByRole("button", { name: "Nhắc tôi về tin này" }).last().click();
+  await messageAction(msg, "Nhắc tôi về tin này");
   await owner.getByRole("menuitem", { name: "Sau 20 phút" }).click();
   await expect(owner.getByText(/Sẽ nhắc bạn lúc/)).toBeVisible();
   const rem = await (await owner.request.get("/api/proxy/home/reminders", { headers: { "x-wos-csrf": "1" } })).json();
@@ -49,8 +47,7 @@ test("forward a message into a DM; the other person reading it shows Đã xem", 
   await expect(pending).toHaveCount(0);
 
   // Giao việc: the message becomes a task for Lan that the owner follows in Việc của tôi › Tôi giao.
-  await msg.hover();
-  await convo.getByRole("button", { name: "Thêm thao tác với tin nhắn" }).last().click();
+  await messageAction(msg, "Thêm thao tác với tin nhắn");
   await owner.getByRole("menuitem", { name: "Giao việc" }).click();
   const assign = owner.getByRole("dialog", { name: "Giao việc" });
   await expect(assign.getByLabel("Việc cần làm")).toHaveValue("Khách đổi lịch giao hàng sang thứ Hai");
