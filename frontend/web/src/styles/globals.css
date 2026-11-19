@@ -327,12 +327,14 @@
   --color-violet-wash: var(--violet-wash);
   --color-tint-3: var(--tint-3);
 
-  --font-sans: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC",
-    "Noto Sans SC", sans-serif;
+  --font-sans:
+    var(--font-geist-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", "Noto Sans SC",
+    sans-serif;
   /* Chinese has no web font: the system CJK faces after the Latin ones draw it (macOS, Windows, Linux/Android). */
   /* Geist (the landing page's face), self-hosted with its Vietnamese letters (layout.tsx). */
-  --font-display: var(--font-inter-tight-latin), var(--font-inter-tight-vi), var(--font-geist-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
-    "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", "Noto Sans SC", sans-serif;
+  --font-display:
+    var(--font-inter-tight-latin), var(--font-inter-tight-vi), var(--font-geist-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB",
+    "Microsoft YaHei", "Noto Sans CJK SC", "Noto Sans SC", sans-serif;
   --font-mono: var(--font-geist-mono);
 
   /* Radii (soft like the logo's round strokes): 6 (lozenges, small tiles), 10 (inputs, menu and nav

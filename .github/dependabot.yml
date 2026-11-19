@@ -12,6 +12,8 @@ updates:
     ignore:
       - dependency-name: "*"
         update-types: ["version-update:semver-major"]
+      # 0.7+ re-sorts the Tailwind classes in some 350 files: a one-off reformat to do on purpose, not in a bump.
+      - dependency-name: prettier-plugin-tailwindcss
     groups:
       minor-and-patch:
         update-types: [minor, patch]

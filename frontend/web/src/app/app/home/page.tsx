@@ -121,12 +121,10 @@ export default async function HomePage() {
   const teamP = safe(gw<Team>("/api/work/followup/team?brief=1"));
   const roleP = teamP.then((x) => homeRole(x?.scope));
   // Without it Home still renders (the workspace's own zone, announcements shown): one failed read never blanks the page.
-  const wsP = workspaceInfo<Workspace>().catch(
-    async (): Promise<Workspace> => ({
-      workspace: { name: "", created_at: new Date(0).toISOString() },
-      config: { timezone: await getTimeZone(), home: { sections: { announcements: true } } },
-    }),
-  );
+  const wsP = workspaceInfo<Workspace>().catch(async (): Promise<Workspace> => ({
+    workspace: { name: "", created_at: new Date(0).toISOString() },
+    config: { timezone: await getTimeZone(), home: { sections: { announcements: true } } },
+  }));
   // A feature the deployment left out (DISABLED_FEATURES): Home neither asks for it nor lists what is left of it
   // (a leave request or a meeting recorded before it was switched off).
   const hasP = wsP.then((w) => (feature: Feature | null) => !feature || w.features?.[feature] !== false);

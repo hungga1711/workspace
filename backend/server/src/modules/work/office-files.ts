@@ -127,6 +127,11 @@ export async function saveOfficeFile(
 }
 
 async function put(url: string, contentType: string, data: Buffer) {
-  const r = await fetch(url, { method: "PUT", headers: { "content-type": contentType, "content-length": String(data.length) }, body: data, signal: AbortSignal.timeout(60_000) });
+  const r = await fetch(url, {
+    method: "PUT",
+    headers: { "content-type": contentType, "content-length": String(data.length) },
+    body: data as BodyInit,
+    signal: AbortSignal.timeout(60_000),
+  });
   if (!r.ok) throw new Invalid(`storage refused the file (${r.status})`);
 }

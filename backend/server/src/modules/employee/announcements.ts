@@ -85,8 +85,7 @@ export class AnnouncementsController {
     return withTransaction(this.pool, async (c) => {
       const dept = await this.myDepartment(c, p.id);
       const a = (await c.query(`SELECT ${COLS} FROM announcements a WHERE a.id = $1 AND a.deleted_at IS NULL`, [id])).rows[0] as
-        | { departmentIds: string[]; publishAt: Date }
-        | undefined;
+        { departmentIds: string[]; publishAt: Date } | undefined;
       const visible = a && (this.canPublish(p) || ((a.departmentIds.length === 0 || (dept !== null && a.departmentIds.includes(dept))) && a.publishAt <= new Date()));
       if (!visible) throw new NotFoundException("announcement not found");
       return a;

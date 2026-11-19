@@ -261,7 +261,7 @@ describe("MCP OAuth", () => {
     expect(seen[0]!.principal).toMatchObject({ type: "user", id: ownerId });
     expect([...new Set(seen[0]!.principal.grants.map((g) => g.permission))].sort()).toEqual(["task.edit", "task.read"]);
     const res = await client.readResource({ uri: "workspace://tasks/WEB-1" });
-    expect(res.contents[0]!.text).toContain("WEB-1");
+    expect(res.contents[0]).toMatchObject({ text: expect.stringContaining("WEB-1") });
     await client.close();
   });
 

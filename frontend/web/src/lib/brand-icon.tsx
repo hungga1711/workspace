@@ -8,11 +8,9 @@ export function brandIcon(size: number, maskable = false): ImageResponse {
   const glyph = Math.round(size * (maskable ? 0.72 : 1));
   const radius = maskable ? 0 : size * 0.25;
   return new ImageResponse(
-    (
-      <div style={{ width: size, height: size, display: "flex", alignItems: "center", justifyContent: "center", background: MARK_ON_LIGHT.tile, borderRadius: radius }}>
-        <img src={`data:image/svg+xml;base64,${Buffer.from(markSvg({ ...MARK_ON_LIGHT, tile: "transparent" })).toString("base64")}`} width={glyph} height={glyph} alt="" />
-      </div>
-    ),
+    <div style={{ width: size, height: size, display: "flex", alignItems: "center", justifyContent: "center", background: MARK_ON_LIGHT.tile, borderRadius: radius }}>
+      <img src={`data:image/svg+xml;base64,${Buffer.from(markSvg({ ...MARK_ON_LIGHT, tile: "transparent" })).toString("base64")}`} width={glyph} height={glyph} alt="" />
+    </div>,
     { width: size, height: size },
   );
 }
