@@ -287,8 +287,12 @@ describe("passages for AI retrieval", () => {
     const task = (await w(minh, "POST", "/tasks", { title: `Order ${tag}toner`, description: "", assigneeId: "minh" })).body;
     await w(minh, "POST", `/tasks/${task.id}/comments`, { body: `Supplier says the ${tag}toner arrives on Friday.` });
     await eventually(async () => has(await ask(minh, `${tag}toner arrives Friday`), "task", task.id), "the comment");
-    await search.query("DELETE FROM search.search_passages");
-    expect(await ask(minh, `${tag}toner arrives Friday`)).toEqual([]);
+    // The task's own events can still be in flight and write their passage back after a single delete.
+    await eventually(async () => {
+      await search.query("DELETE FROM search.search_passages");
+      await new Promise((r) => setTimeout(r, 500));
+      return (await ask(minh, `${tag}toner arrives Friday`)).length === 0;
+    }, "the passages to stay deleted");
     const fetchPage = async (service: string, kind: string, after: string): Promise<FeedPage> =>
       service === "work"
         ? (await http(workUrl, service === "work" ? serviceP : serviceP, "GET", `/internal/search-feed/${kind}?after=${encodeURIComponent(after)}&limit=500`)).body
