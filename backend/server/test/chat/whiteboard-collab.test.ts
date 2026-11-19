@@ -168,14 +168,18 @@ describe("whiteboard relay", () => {
       for (const u of all) Y.applyUpdate(copy, new Uint8Array(u));
       return { n: all.length, v: (copy.getMap("elements").get("e9") as { version?: number } | undefined)?.version };
     };
+    // Compaction runs after the updates are stored: wait for both, then check them (as collab.test.ts does).
     const end = Date.now() + 10_000;
     let last = await content();
-    while (last.v !== 449 && Date.now() < end) {
+    while ((last.v !== 449 || last.n >= 100) && Date.now() < end) {
       await pause(100);
       last = await content();
     }
-    expect(last.v).toBe(449);
-    expect(last.n).toBeLessThan(100);
-    a.s.disconnect();
+    try {
+      expect(last.v).toBe(449);
+      expect(last.n).toBeLessThan(100);
+    } finally {
+      a.s.disconnect();
+    }
   });
 });
