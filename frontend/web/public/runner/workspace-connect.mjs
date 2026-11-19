@@ -712,7 +712,11 @@ async function fetchHelpers(cfg) {
     }
   }
   // Started from a download elsewhere and never fetched: keep a copy where the hook and autostart expect it.
-  if (!existsSync(SELF)) writeFileSync(SELF, readFileSync(fileURLToPath(import.meta.url)));
+  try {
+    writeFileSync(SELF, readFileSync(fileURLToPath(import.meta.url)), { flag: "wx" });
+  } catch {
+    // Already there.
+  }
 }
 
 async function main() {

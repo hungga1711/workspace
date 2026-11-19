@@ -54,7 +54,7 @@ function feedQuery(raw: unknown): { after: string; limit: number } {
 export async function readSearchFeed(req: Request, pool: Pool, sources: Record<string, FeedSource>, kind: string, raw: unknown): Promise<FeedPage> {
   const p = requireServicePermission(req, SEARCH_REINDEX_PERMISSION);
   const source = Object.prototype.hasOwnProperty.call(sources, kind) ? sources[kind] : undefined;
-  if (!source) throw new NotFoundException(`no search feed "${kind}"`);
+  if (typeof source !== "function") throw new NotFoundException(`no search feed "${kind}"`);
   const q = feedQuery(raw);
   return runWithContext({ actorId: `service:${p.id}`, requestId: req.requestId ?? "search-feed" }, () => withTransaction(pool, (c) => source(c, q.after, q.limit)));
 }

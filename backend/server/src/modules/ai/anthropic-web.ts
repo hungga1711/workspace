@@ -143,7 +143,7 @@ export async function callWithWebTools(client: Anthropic, model: string, params:
   const calls = all.filter((b) => b.type === "tool_use").map((b) => ({ id: String(b.id), name: String(b.name), input: (b.input ?? {}) as Record<string, unknown> }));
   if (calls.length && written && live) live.reset();
   // The answer is what it wrote after its last search or read; what it said before ("let me look") is not.
-  const lastTool = all.map((b) => /server_tool_use|_tool_result$/.test(b.type)).lastIndexOf(true);
+  const lastTool = all.map((b) => b.type === "server_tool_use" || b.type.endsWith("_tool_result")).lastIndexOf(true);
   const after = all.slice(lastTool + 1).filter((b) => b.type === "text");
   const text = (after.length ? after : all.filter((b) => b.type === "text")).map((b) => String(b.text ?? "")).join("");
   return { text, toolCalls: calls, usage, model, pages: pagesOf(all) };

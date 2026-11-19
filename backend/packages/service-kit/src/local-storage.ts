@@ -113,7 +113,7 @@ export class LocalStorage implements ObjectStorage {
             yield chunk;
           }
         },
-        createWriteStream(tmp, { mode: 0o640 }),
+        createWriteStream(tmp, { mode: 0o640, flags: "wx" }),
       );
       await rename(tmp, target);
       await writeFile(`${target}.meta.json`, JSON.stringify({ contentType, size } satisfies Meta));

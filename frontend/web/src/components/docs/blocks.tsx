@@ -116,7 +116,7 @@ export const Toc = Node.create({
 export function htmlToMarkdown(html: string): string {
   const doc = new DOMParser().parseFromString(`<div>${html}</div>`, "text/html");
   const inline = (n: ChildNode): string => {
-    if (n.nodeType === 3) return (n.textContent ?? "").replace(/([*_`[\]])/g, "\\$1");
+    if (n.nodeType === 3) return (n.textContent ?? "").replace(/([\\*_`[\]|])/g, "\\$1");
     if (n.nodeType !== 1) return "";
     const el = n as HTMLElement;
     const kids = [...el.childNodes].map(inline).join("");
@@ -186,7 +186,7 @@ export function htmlToMarkdown(html: string): string {
         return items.join("") + (depth ? "" : "\n");
       }
       case "TABLE": {
-        const rows = [...el.querySelectorAll("tr")].map((tr) => [...tr.children].map((c) => inline(c).replace(/\|/g, "\\|").trim()));
+        const rows = [...el.querySelectorAll("tr")].map((tr) => [...tr.children].map((c) => inline(c).trim()));
         if (!rows.length) return "";
         const head = rows[0]!;
         return [`| ${head.join(" | ")} |`, `| ${head.map(() => "---").join(" | ")} |`, ...rows.slice(1).map((r) => `| ${r.join(" | ")} |`)].join("\n") + "\n\n";

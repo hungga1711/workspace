@@ -8,7 +8,7 @@
 //      chat realtime and LiveKit; HSTS and upgrade-insecure-requests when APP_URL is https://);
 //   2. replaces the build placeholders for APP_URL and NEXT_PUBLIC_CHAT_URL in the built files.
 // Files are rewritten in place; a new container starts again from the image's placeholders.
-import { readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
+import { readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 
 const webRoot = "/app/web/frontend/web";
@@ -56,10 +56,10 @@ const replacements = [
 const textFile = /\.(js|mjs|cjs|json|html|rsc|body|meta|txt|xml|webmanifest)$/;
 let files = 0;
 function walk(dir) {
-  for (const name of readdirSync(dir)) {
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    const name = entry.name;
     const p = join(dir, name);
-    const st = statSync(p);
-    if (st.isDirectory()) {
+    if (entry.isDirectory()) {
       if (name !== "cache") walk(p);
     } else if (textFile.test(name)) {
       const before = readFileSync(p, "utf8");

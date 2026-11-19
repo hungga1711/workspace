@@ -37,7 +37,7 @@ test("the Gantt shows scheduled work, moves a bar by dragging and fixes a broken
   await page.mouse.down();
   await page.mouse.move(box.x + box.width / 2 - 36, box.y + box.height / 2, { steps: 6 });
   await page.mouse.up();
-  await expect.poll(async () => (await (await page.request.get(`/api/proxy/work/tasks/${api.id}`, h)).json()).task.startAt).toBe(day(-1, 9).replace(".000Z", ".000Z"));
+  await expect.poll(async () => (await (await page.request.get(`/api/proxy/work/tasks/${api.id}`, h)).json()).task.startAt).toBe(day(-1, 9));
 
   // The fix pushes "Làm giao diện" after "Viết API".
   await page.getByRole("button", { name: "Dời các việc phụ thuộc" }).click();

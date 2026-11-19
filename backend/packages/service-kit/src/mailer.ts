@@ -78,7 +78,7 @@ export function smtpMailer(url = process.env.SMTP_URL, from = process.env.MAIL_F
     configured: true,
     async send(mail) {
       await transport.sendMail({ from, ...mail, headers: { "X-Request-Id": currentRequestId() ?? "" } });
-      logger.info({ to: mail.to.replace(/(^.).*(@.*$)/, "$1***$2"), subject: mail.subject }, "email sent");
+      logger.info({ to: maskAddress(mail.to), subject: mail.subject }, "email sent");
     },
   };
 }
@@ -134,7 +134,7 @@ export function appMailer(): Mailer {
       if (!saved) return fallback.send(mail);
       savedTransport ??= nodemailer.createTransport(mailTransportOptions(saved));
       await savedTransport.sendMail({ from: saved.from, ...mail, headers: { "X-Request-Id": currentRequestId() ?? "" } });
-      logger.info({ to: mail.to.replace(/(^.).*(@.*$)/, "$1***$2"), subject: mail.subject }, "email sent");
+      logger.info({ to: maskAddress(mail.to), subject: mail.subject }, "email sent");
     },
   };
 }
@@ -180,4 +180,10 @@ ${action ? `<p style="margin:22px 0"><a href="${esc(action.url)}" style="backgro
 </div></body></html>`;
   const text = `${title}\n\n${body}${action ? `\n\n${action.label}: ${action.url}` : ""}`;
   return { html, text };
+}
+
+/** An address as logs show it: the first letter and the domain ("m***@acme.vn"). */
+function maskAddress(to: string): string {
+  const at = to.lastIndexOf("@");
+  return at > 0 ? `${to[0]}***${to.slice(at)}` : "***";
 }

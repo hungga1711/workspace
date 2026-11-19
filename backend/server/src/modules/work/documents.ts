@@ -157,19 +157,19 @@ export function readableHtml(content: string, format: Format): string {
   return sanitizeDoc(format === "html" ? content : (marked.parse(content, { async: false, gfm: true }) as string));
 }
 
+const TEXT_ENTITIES: Record<string, string> = { nbsp: " ", amp: "&", lt: "<", gt: ">", quot: '"', "#39": "'" };
+
 /** Plain text of a page, for search, AI and previews. */
 export function docText(content: string, format: Format): string {
   if (format !== "html") return content;
   const blocks = content.replace(/<\/(p|h[1-6]|li|tr|div|blockquote|pre)>/gi, "$&\n").replace(/<br\s*\/?>/gi, "\n");
-  return sanitizeHtml(blocks, { allowedTags: [], allowedAttributes: {} })
-    .replace(/&nbsp;/g, " ")
-    .replace(/&amp;/g, "&")
-    .replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">")
-    .replace(/&quot;/g, '"')
-    .replace(/&#39;/g, "'")
-    .replace(/\n{3,}/g, "\n\n")
-    .trim();
+  return (
+    sanitizeHtml(blocks, { allowedTags: [], allowedAttributes: {} })
+      // One pass, so "&amp;lt;" stays the text "&lt;" instead of becoming "<".
+      .replace(/&(nbsp|amp|lt|gt|quot|#39);/g, (_m, e: string) => TEXT_ENTITIES[e]!)
+      .replace(/\n{3,}/g, "\n\n")
+      .trim()
+  );
 }
 
 function payload(d: DocRow, content: string, format: Format) {

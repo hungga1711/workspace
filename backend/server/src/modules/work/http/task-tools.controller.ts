@@ -48,10 +48,15 @@ export class TaskToolsController extends WorkControllerBase {
   async estimate(@Req() req: Request, @Query("title") title = "", @Query("project") project?: string, @Query("assignee") assignee?: string, @Query("from") from?: string) {
     const p = requirePrincipal(req);
     assertAllowed(p, "task.read");
-    const start = from && !Number.isNaN(Date.parse(from)) ? new Date(from) : undefined;
+    const start = typeof from === "string" && !Number.isNaN(Date.parse(from)) ? new Date(from) : undefined;
     return guard(() =>
       withTransaction(this.pool, async (c) =>
-        estimate(c, p, { title: title.slice(0, 300), projectId: project ? await resolveRef(c, "project", project) : undefined, assigneeId: assignee || undefined, from: start }),
+        estimate(c, p, {
+          title: typeof title === "string" ? title.slice(0, 300) : "",
+          projectId: typeof project === "string" && project ? await resolveRef(c, "project", project) : undefined,
+          assigneeId: typeof assignee === "string" && assignee ? assignee : undefined,
+          from: start,
+        }),
       ),
     );
   }

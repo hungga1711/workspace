@@ -54,7 +54,8 @@ const LOCKED: [RegExp, string, RegExp][] = [
 ];
 
 export function demoLocked(method: string, service: string, path: string): boolean {
-  const p = path.replace(/\?.*$/, "");
+  const q = path.indexOf("?");
+  const p = q < 0 ? path : path.slice(0, q);
   return LOCKED.some(([m, s, re]) => m.test(method) && s === service && re.test(p));
 }
 

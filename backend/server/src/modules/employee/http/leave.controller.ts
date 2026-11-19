@@ -148,7 +148,7 @@ export class LeaveController extends EmployeeControllerBase {
                 coalesce((SELECT sum(days) FROM leave_requests l WHERE l.user_id = e.user_id AND l.leave_type = $2 AND l.status = 'pending' AND extract(year FROM l.start_date) = $1), 0)::float AS pending
            FROM employees e LEFT JOIN leave_balances b ON b.user_id = e.user_id AND b.leave_type = $2 AND b.year = $1
           WHERE e.active AND ($3::text IS NULL OR e.user_id = $3) ORDER BY e.display_name LIMIT 2000`,
-          [year, t, userIdQ && userIdQ.length <= 64 ? userIdQ : null],
+          [year, t, typeof userIdQ === "string" && userIdQ.length <= 64 ? userIdQ : null],
         )
       ).rows,
     }));

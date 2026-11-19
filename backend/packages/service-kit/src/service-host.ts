@@ -39,7 +39,7 @@ export function moduleRouter(modules: HostedModule[]): RequestListener {
     }
     const prefix = `/${path.split("/")[1] ?? ""}`;
     const handler = byPrefix.get(prefix);
-    if (!handler) {
+    if (typeof handler !== "function") {
       const [status, headers, body] = json(404, { error: "not found" });
       return void res.writeHead(status, headers).end(body);
     }

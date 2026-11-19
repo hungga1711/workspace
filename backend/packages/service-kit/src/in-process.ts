@@ -10,7 +10,11 @@ import { Socket } from "node:net";
  */
 const local = new Map<string, RequestListener>();
 
-const trimSlash = (url: string) => url.replace(/\/+$/, "");
+const trimSlash = (url: string) => {
+  let end = url.length;
+  while (end > 0 && url[end - 1] === "/") end--;
+  return url.slice(0, end);
+};
 
 /** Serves `baseUrl` from this process: requests under it go to `handler` with the base path removed. */
 export function serveInProcess(baseUrl: string, handler: RequestListener): void {

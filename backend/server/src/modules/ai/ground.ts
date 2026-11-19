@@ -44,7 +44,7 @@ const NOT_A_PERSON =
 /** A trailing "ở/trong/của phòng X", "in X", "X team" after a late question: the department to narrow to. */
 function departmentIn(q: string): string | undefined {
   const m =
-    /(?:^|\s)(?:ở|trong|của|tại|thuộc)\s+(?:phòng(?:\s+ban)?|bộ phận|nhóm|team|đội)?\s*([A-ZÀ-Ỹa-zà-ỹ0-9&][\p{L}\p{N}& .-]{1,40}?)\s*(?:tuần này|hôm nay|tháng này)?\s*\??\s*$/u.exec(
+    /(?:^|\s)(?:ở|trong|của|tại|thuộc)\s+(?:phòng(?:\s+ban)?|bộ phận|nhóm|team|đội)?\s*([\p{L}\p{N}&][\p{L}\p{N}& .-]{1,40}?)\s*(?:tuần này|hôm nay|tháng này)?\s*\??\s*$/u.exec(
       q,
     ) ?? /\b(?:in|from|on)\s+(?:the\s+)?([A-Z][\p{L}\p{N}& .-]{1,40}?)(?:\s+(?:team|department|dept))?\s*(?:this week|today)?\s*\??\s*$/u.exec(q);
   const zh = /([\p{L}\p{N}&]{2,20}?)(?:部门|部|团队|组)/u.exec(q)?.[1];

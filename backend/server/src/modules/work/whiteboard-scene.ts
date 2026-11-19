@@ -236,7 +236,20 @@ export function boardText(scene: Pick<Scene, "elements">, maxChars = SCENE_LIMIT
 export function checkThumbnail(svg: string): string {
   const s = svg.trim();
   if (s.length > SCENE_LIMITS.thumbnail) throw new SceneError("thumbnail too large (200 KB at most)");
-  if (!/^(<\?xml[^>]*\?>\s*)?(<!--[\s\S]*?-->\s*)*<svg[\s>]/i.test(s)) throw new SceneError("thumbnail must be an SVG document");
+  if (!/^<svg[\s>]/i.test(afterSvgProlog(s))) throw new SceneError("thumbnail must be an SVG document");
   if (/<script|<foreignObject|<iframe|<object|<embed|\son[a-z]+\s*=|javascript:|data:text\/html/i.test(s)) throw new SceneError("thumbnail contains active content");
+  return s;
+}
+
+/** What follows an SVG file's prolog: the XML declaration, comments and a doctype, skipped without backtracking. */
+function afterSvgProlog(text: string): string {
+  let s = text.trimStart();
+  if (s.startsWith("<?xml")) s = s.slice(s.indexOf(">") + 1).trimStart();
+  while (s.startsWith("<!--")) {
+    const end = s.indexOf("-->");
+    if (end < 0) return "";
+    s = s.slice(end + 3).trimStart();
+  }
+  if (/^<!DOCTYPE svg/i.test(s)) s = s.slice(s.indexOf(">") + 1).trimStart();
   return s;
 }

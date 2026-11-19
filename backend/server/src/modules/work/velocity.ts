@@ -208,6 +208,7 @@ export function flowOf(
 /** Parses `project:<id>`, `person:<id>`, `department:<id or name>`, `workspace`. */
 export function parseScope(s: string | undefined): { kind: "project" | "person" | "department"; id: string } | { kind: "workspace" } | null {
   if (!s || s === "workspace") return { kind: "workspace" };
+  if (typeof s !== "string") return null;
   const i = s.indexOf(":");
   if (i < 1) return null;
   const kind = s.slice(0, i);

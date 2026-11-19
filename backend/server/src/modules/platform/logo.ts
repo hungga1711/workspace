@@ -30,10 +30,7 @@ export function logoMatches(contentType: string, b: Buffer): boolean {
   if (contentType === "image/png") return b.length > 8 && b.subarray(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]));
   if (contentType === "image/webp") return b.length > 12 && b.subarray(0, 4).toString("latin1") === "RIFF" && b.subarray(8, 12).toString("latin1") === "WEBP";
   const text = b.toString("utf8");
-  return (
-    /^\s*(<\?xml[^>]*>\s*)?(<!--[\s\S]*?-->\s*)*(<!DOCTYPE svg[^>]*>\s*)?<svg[\s>]/i.test(text) &&
-    !/<script|<foreignObject|\son[a-z]+\s*=|javascript:|(?:href|src)\s*=\s*["']\s*(?:https?:|\/\/|data:)/i.test(text)
-  );
+  return /^<svg[\s>]/i.test(afterSvgProlog(text)) && !/<script|<foreignObject|\son[a-z]+\s*=|javascript:|(?:href|src)\s*=\s*["']\s*(?:https?:|\/\/|data:)/i.test(text);
 }
 
 /** Points config.branding.logoUrl at the current logo (or none), as a new config version other modules follow. */
@@ -97,4 +94,17 @@ export class LogoController {
     if (!row) throw new NotFoundException({ error: "no_logo" });
     return { contentType: row.content_type, data: row.image.toString("base64"), version: row.version };
   }
+}
+
+/** What follows an SVG file's prolog: the XML declaration, comments and a doctype, skipped without backtracking. */
+function afterSvgProlog(text: string): string {
+  let s = text.trimStart();
+  if (s.startsWith("<?xml")) s = s.slice(s.indexOf(">") + 1).trimStart();
+  while (s.startsWith("<!--")) {
+    const end = s.indexOf("-->");
+    if (end < 0) return "";
+    s = s.slice(end + 3).trimStart();
+  }
+  if (/^<!DOCTYPE svg/i.test(s)) s = s.slice(s.indexOf(">") + 1).trimStart();
+  return s;
 }

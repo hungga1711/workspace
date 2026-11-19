@@ -76,7 +76,7 @@ export class PeopleController {
     const p = requirePrincipal(req);
     assertAllowed(p, "attendance.read");
     const tz = await workspaceTz(this.pool);
-    const m = month && /^\d{4}-(0[1-9]|1[0-2])$/.test(month) ? month : localDay(tz).slice(0, 7);
+    const m = typeof month === "string" && /^\d{4}-(0[1-9]|1[0-2])$/.test(month) ? month : localDay(tz).slice(0, 7);
     const first = `${m}-01`;
     const last = new Date(Date.UTC(Number(m.slice(0, 4)), Number(m.slice(5, 7)), 0)).toISOString().slice(0, 10);
     return withTransaction(this.pool, async (c) => {

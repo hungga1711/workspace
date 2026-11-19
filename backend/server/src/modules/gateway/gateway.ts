@@ -789,13 +789,19 @@ export function keyForbiddenPath(path: string): boolean {
   return /^\/api\/identity\/(api-keys|oauth|me\/(password|mfa|sessions|api-keys|oauth)|workspace\/owner)(\/|$)/.test(p) || p === "/api/realtime/ticket";
 }
 
+/** A path without its query or fragment. */
+function beforeQuery(path: string): string {
+  const q = path.search(/[?#]/);
+  return q < 0 ? path : path.slice(0, q);
+}
+
 /**
  * A path as a router will match it, for the checks above: Express routes ignore case and trailing slashes, and the
  * gateway forwards Express's decoded params, so `/ME/API-KEYS/` and `/me%2Fapi-keys` reach the same handler as
  * `/me/api-keys`. Decoded, without query, lower-case, single slashes, no trailing slash.
  */
 function routeKey(path: string): string {
-  let p = path.replace(/[?#].*$/, "");
+  let p = beforeQuery(path);
   for (let i = 0; i < 3 && p.includes("%"); i++) {
     try {
       p = decodeURIComponent(p);
@@ -803,8 +809,7 @@ function routeKey(path: string): string {
       break;
     }
   }
-  p = p
-    .replace(/[?#].*$/, "")
+  p = beforeQuery(p)
     .toLowerCase()
     .replace(/\/{2,}/g, "/");
   return p.length > 1 ? p.replace(/\/$/, "") : p;

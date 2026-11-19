@@ -62,10 +62,9 @@ export const baseContentType = (contentType: string) => contentType.split(";")[0
 
 /** Every extension of a name, last first ("report.pdf.exe" → ["exe", "pdf"]); a trailing dot or space is Windows' way to hide one. */
 function extensions(name: string): string[] {
-  const parts = name
-    .toLowerCase()
-    .replace(/[\s.]+$/, "")
-    .split(".");
+  let end = name.length;
+  while (end > 0 && (name[end - 1] === "." || /\s/.test(name[end - 1]!))) end--;
+  const parts = name.slice(0, end).toLowerCase().split(".");
   return parts.slice(1).reverse();
 }
 

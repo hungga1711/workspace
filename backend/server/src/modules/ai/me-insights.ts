@@ -321,7 +321,7 @@ export class MeInsightsController {
   async searchTasks(@Req() req: Request, @Query("q") q?: string) {
     const p = person(req);
     return this.d.services.work
-      .request<{ tasks: TaskBrief[] }>("GET", `/me/tasks/match?mode=search&q=${encodeURIComponent((q ?? "").slice(0, 120))}`, undefined, p)
+      .request<{ tasks: TaskBrief[] }>("GET", `/me/tasks/match?mode=search&q=${encodeURIComponent((typeof q === "string" ? q : "").slice(0, 120))}`, undefined, p)
       .catch(() => ({ tasks: [] as TaskBrief[] }));
   }
 

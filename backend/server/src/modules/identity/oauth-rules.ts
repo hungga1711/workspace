@@ -80,6 +80,7 @@ export function redirectMatches(registered: readonly string[], sent: string): bo
 
 /** What the consent page shows for "where you will be sent back": the host, or the app scheme. */
 export function redirectLabel(uri: string): string {
+  if (typeof uri !== "string") return "";
   try {
     const u = new URL(uri);
     return u.host || u.protocol.replace(/:$/, "");
