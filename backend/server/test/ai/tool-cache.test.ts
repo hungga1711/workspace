@@ -35,6 +35,21 @@ let base = "";
 let relay: OutboxRelay;
 let consumer: EventConsumer;
 
+/**
+ * The task's events reach this test's bus. In CI the test server shares this database and its relay may claim them
+ * first; those rows are then read back (published, still in the outbox) and dispatched here as the relay would.
+ */
+async function deliver(taskId: string) {
+  await relay.flush();
+  if (cachedRead(ctx, "list_my_tasks", {}) === undefined) return;
+  const { rows } = await pool.query<{ id: string; aggregatetype: string; payload: unknown }>(
+    "SELECT id, aggregatetype, payload FROM outbox WHERE aggregateid = $1 AND published_at IS NOT NULL ORDER BY created_at",
+    [taskId],
+  );
+  expect(rows.length).toBeGreaterThan(0);
+  for (const r of rows) await bus.dispatch(`workspace.${r.aggregatetype}`, r.id, JSON.stringify(r.payload));
+}
+
 async function call(method: string, path: string, body?: unknown) {
   const res = await fetch(`${base}${path}`, {
     method,
@@ -88,7 +103,7 @@ describe("the AI's tool cache and changes made in the UI", () => {
 
     const moved = await call("PATCH", `/tasks/${created.body.id}`, { expectedVersion: created.body.version, status: "in_progress" });
     expect(moved.status, JSON.stringify(moved.body)).toBe(200);
-    expect(await relay.flush()).toBeGreaterThan(0);
+    await deliver(created.body.id);
     expect(cachedRead(ctx, "list_my_tasks", {})).toBeUndefined();
   });
 });

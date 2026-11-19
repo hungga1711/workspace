@@ -159,11 +159,12 @@ export class WhiteboardCollab {
         // Viewers' and oversized updates are dropped, not relayed: nobody sees an edit that was not allowed.
         if (!me?.edit || !u) return;
         const boardId = m.boardId as string;
-        socket.to(room(boardId)).emit("wb:update", { boardId, u });
+        // Stored before it is relayed: someone joining in between reads it from the draft instead of missing it.
         await this.db(p, async (c) => {
           await c.query("INSERT INTO whiteboard_updates (board_id, u) VALUES ($1, $2)", [boardId, u]);
           await c.query(`UPDATE whiteboard_drafts SET expires_at = now() + interval '${KEEP}' WHERE board_id = $1 AND expires_at < now() + interval '23 hours'`, [boardId]);
         });
+        socket.to(room(boardId)).emit("wb:update", { boardId, u });
         const n = (this.counts.get(boardId) ?? 0) + 1;
         this.counts.set(boardId, n);
         if (n >= COMPACT_AT) await this.compact(p, boardId);

@@ -31,7 +31,10 @@ const lan: Principal = {
 const lanKey: Principal = { ...lan, grants: T("task.read", "task.edit", "project.read") };
 const RUNNER = fileURLToPath(new URL("../../../../frontend/web/public/runner/workspace-runner.mjs", import.meta.url));
 const IMAGE = "alpine:latest";
-const docker = spawnSync("docker", ["image", "inspect", IMAGE], { stdio: "ignore", timeout: 10_000 }).status === 0;
+/** What the runner reports: a Docker daemon it can reach. */
+const daemon = spawnSync("docker", ["version", "--format", "{{.Server.Version}}"], { stdio: "ignore", timeout: 10_000 }).status === 0;
+/** The container test also needs its image already pulled (no download in a test). */
+const docker = daemon && spawnSync("docker", ["image", "inspect", IMAGE], { stdio: "ignore", timeout: 10_000 }).status === 0;
 
 let app: INestApplication;
 let base: string;
@@ -205,7 +208,7 @@ describe("the runner script", () => {
     expect(existsSync(join(dir, "sandbox", run.id))).toBe(false);
     expect(printed).toContain("✓ done");
     // The runner showed up as a connected computer.
-    expect((await call("GET", "/workflows")).body.runners.find((r: { device: string }) => r.device === "test-box")).toMatchObject({ mine: true, docker });
+    expect((await call("GET", "/workflows")).body.runners.find((r: { device: string }) => r.device === "test-box")).toMatchObject({ mine: true, docker: daemon });
   }, 120_000);
 
   it.skipIf(process.platform === "win32")(
