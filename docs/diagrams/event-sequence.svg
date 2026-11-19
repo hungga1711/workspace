@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 1280 1040" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="event-sequence-title event-sequence-desc" id="event-sequence-root">
+          <title id="event-sequence-title">Task assigned → notification on Home</title>
+          <desc id="event-sequence-desc">Sequence of one domain event: the work module creates a task and writes work.task.created.v1 to its outbox in the same transaction, its relay is woken by NOTIFY and hands the event to the consumer groups in the same process, the home module&#x27;s group projects it into home_items and notifications (or records it in dead_events after five attempts), the relay marks the row published, and the assignee is told by Web Push and the TopBar poll.</desc>
+          <defs>
+      <style>@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&amp;family=Geist:wght@400;500;600&amp;family=Geist+Mono:wght@400;500;600&amp;family=Noto+Serif:ital@0;1&amp;family=Noto+Sans+KR:wght@400;500;600&amp;family=Noto+Serif+KR:wght@400&amp;family=Noto+Sans+TC:wght@400;500;600&amp;family=Noto+Serif+TC:wght@400&amp;display=swap');
+      #event-sequence-root { --color-paper:   #f5f5f5;
+      --color-ink:     #2d3142;
+      --color-muted:   #4f5d75;
+      --color-accent:  #bf4520;
+      --font-sans:     'Geist', system-ui, sans-serif;
+      --font-serif:    'Instrument Serif', 'Noto Serif', serif;
+      --font-mono:     'Geist Mono', ui-monospace, monospace; }
+      #event-sequence-root { font-family: var(--font-sans); color: var(--color-ink); }
+      #event-sequence-root .diagram-container { width: 100%; overflow-x: auto; }
+      #event-sequence-root .diagram-container { overflow-x: visible; }</style>
+            <marker id="event-sequence-arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#4f5d75"/></marker>
+            <marker id="event-sequence-arrow-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#bf4520"/></marker>
+            <marker id="event-sequence-arrow-link" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#2e5aa8"/></marker>
+            <marker id="event-sequence-arrow-open" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+              <polyline points="0 0, 8 3, 0 6" fill="none" stroke="#4f5d75" stroke-width="1.2"/>
+            </marker>
+            <pattern id="event-sequence-dots" width="22" height="22" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="0.9" fill="#2d3142" fill-opacity="0.10"/></pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="#f5f5f5"/>
+          <rect width="100%" height="100%" fill="url(#event-sequence-dots)" opacity="0.55"/>
+          <line x1="140" y1="96" x2="140" y2="920" stroke="#2d3142" stroke-width="1" stroke-dasharray="3,3" stroke-opacity="0.22"/>
+          <line x1="390" y1="96" x2="390" y2="920" stroke="#2d3142" stroke-width="1" stroke-dasharray="3,3" stroke-opacity="0.22"/>
+          <line x1="640" y1="96" x2="640" y2="920" stroke="#2d3142" stroke-width="1" stroke-dasharray="3,3" stroke-opacity="0.22"/>
+          <line x1="890" y1="96" x2="890" y2="920" stroke="#2d3142" stroke-width="1" stroke-dasharray="3,3" stroke-opacity="0.22"/>
+          <line x1="1140" y1="96" x2="1140" y2="920" stroke="#2d3142" stroke-width="1" stroke-dasharray="3,3" stroke-opacity="0.22"/>
+          <rect x="862" y="540" width="374" height="192" rx="4" fill="#2d3142" stroke="#2d3142" stroke-width="1" fill-opacity="0.02" stroke-opacity="0.22"/>
+          <rect x="862" y="540" width="40" height="16" rx="2" fill="#f5f5f5" stroke="#2d3142" stroke-width="1" stroke-opacity="0.22"/>
+          <text x="882" y="552" fill="#4f5d75" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.12em">ALT</text>
+          <text x="910" y="552" fill="#4f5d75" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.04em">[handler succeeds]</text>
+          <line x1="870" y1="648" x2="1228" y2="648" stroke="#2d3142" stroke-width="1" stroke-dasharray="4,3" stroke-opacity="0.20"/>
+          <text x="874" y="662" fill="#4f5d75" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.04em">[fails 5 attempts]</text>
+          <rect x="386" y="160" width="8" height="196" fill="#2d3142" stroke="#4f5d75" stroke-width="0.8" fill-opacity="0.06"/>
+          <rect x="636" y="208" width="8" height="224" fill="#2d3142" stroke="#4f5d75" stroke-width="0.8" fill-opacity="0.06"/>
+          <rect x="886" y="400" width="8" height="112" fill="#2d3142" stroke="#4f5d75" stroke-width="0.8" fill-opacity="0.06"/>
+          <rect x="1136" y="512" width="8" height="200" fill="#2d3142" stroke="#4f5d75" stroke-width="0.8" fill-opacity="0.06"/>
+          <rect x="1136" y="848" width="8" height="48" fill="#2d3142" stroke="#4f5d75" stroke-width="0.8" fill-opacity="0.06"/>
+          <line x1="140" y1="160" x2="386" y2="160" stroke="#2e5aa8" stroke-width="1.2" marker-end="url(#event-sequence-arrow-link)"/>
+          <rect x="187.1" y="128" width="151.8" height="24" rx="2" fill="#f5f5f5"/>
+          <text x="263.0" y="138" fill="#2e5aa8" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.06em">CREATE TASK</text>
+          <text x="263.0" y="150" fill="#5a6580" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">POST /api/work/… · assigneeId</text>
+          <line x1="394" y1="208" x2="636" y2="208" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#event-sequence-arrow)"/>
+          <rect x="449.0" y="176" width="132.0" height="24" rx="2" fill="#f5f5f5"/>
+          <text x="515.0" y="186" fill="#4f5d75" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.06em">SIGNED PRINCIPAL</text>
+          <text x="515.0" y="198" fill="#5a6580" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">+ requestId</text>
+          <path d="M 644,240 H 674 Q 680,240 680,246 V 262 Q 680,268 674,268 H 644" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#event-sequence-arrow)"/>
+          <rect x="684.0" y="238" width="161.8" height="48" rx="2" fill="#f5f5f5"/>
+          <text x="688" y="248" fill="#4f5d75" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.06em">CREATETASK TX</text>
+          <text x="688" y="260" fill="#5a6580" font-size="8" font-family="'Geist Mono', ui-monospace, monospace">withTransaction · INSERT task</text>
+          <text x="688" y="272" fill="#5a6580" font-size="8" font-family="'Geist Mono', ui-monospace, monospace">emit work.task.created.v1</text>
+          <text x="688" y="284" fill="#5a6580" font-size="8" font-family="'Geist Mono', ui-monospace, monospace">outbox INSERT · COMMIT · NOTIFY</text>
+          <line x1="636" y1="320" x2="394" y2="320" stroke="#4f5d75" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#event-sequence-arrow)"/>
+          <rect x="502.8" y="300" width="24.3" height="12" rx="2" fill="#f5f5f5"/>
+          <text x="515.0" y="310" fill="#4f5d75" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.06em">201</text>
+          <line x1="386" y1="356" x2="140" y2="356" stroke="#4f5d75" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#event-sequence-arrow)"/>
+          <rect x="229.1" y="336" width="67.8" height="12" rx="2" fill="#f5f5f5"/>
+          <text x="263.0" y="346" fill="#4f5d75" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.06em">201 CREATED</text>
+          <line x1="644" y1="400" x2="886" y2="400" stroke="#4f5d75" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#event-sequence-arrow-open)"/>
+          <rect x="691.8" y="368" width="146.4" height="24" rx="2" fill="#f5f5f5"/>
+          <text x="765.0" y="378" fill="#4f5d75" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.06em">RELAY · DISPATCH</text>
+          <text x="765.0" y="390" fill="#5a6580" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">workspace.work.task</text>
+          <path d="M 894,432 H 924 Q 930,432 930,438 V 454 Q 930,460 924,460 H 894" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#event-sequence-arrow)"/>
+          <rect x="934.0" y="430" width="188.0" height="36" rx="2" fill="#f5f5f5"/>
+          <text x="938" y="440" fill="#4f5d75" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.06em">DELIVER</text>
+          <text x="938" y="452" fill="#5a6580" font-size="8" font-family="'Geist Mono', ui-monospace, monospace">to every subscribed group</text>
+          <text x="938" y="464" fill="#5a6580" font-size="8" font-family="'Geist Mono', ui-monospace, monospace">row marked once all handled</text>
+          <line x1="894" y1="512" x2="1136" y2="512" stroke="#4f5d75" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#event-sequence-arrow-open)"/>
+          <rect x="939.2" y="480" width="151.6" height="24" rx="2" fill="#f5f5f5"/>
+          <text x="1015.0" y="490" fill="#4f5d75" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.06em">HANDLE</text>
+          <text x="1015.0" y="502" fill="#5a6580" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">group home-projector</text>
+          <path d="M 1136,576 H 1106 Q 1100,576 1100,582 V 598 Q 1100,604 1106,604 H 1136" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#event-sequence-arrow)"/>
+          <rect x="918.4" y="574" width="177.6" height="60" rx="2" fill="#f5f5f5"/>
+          <text x="1092" y="584" fill="#4f5d75" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="end" letter-spacing="0.06em">PROJECT + NOTIFY</text>
+          <text x="1092" y="596" fill="#5a6580" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="end">processed_events (dedupe)</text>
+          <text x="1092" y="608" fill="#5a6580" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="end">upsert home_items · task</text>
+          <text x="1092" y="620" fill="#5a6580" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="end">INSERT notifications</text>
+          <text x="1092" y="632" fill="#5a6580" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="end">push_outbox · COMMIT</text>
+          <line x1="1136" y1="712" x2="894" y2="712" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#event-sequence-arrow)"/>
+          <rect x="949.6" y="680" width="130.8" height="24" rx="2" fill="#f5f5f5"/>
+          <text x="1015.0" y="690" fill="#4f5d75" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.06em">DEAD LETTER</text>
+          <text x="1015.0" y="702" fill="#5a6580" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">home dead_events</text>
+          <line x1="1140" y1="792" x2="140" y2="792" stroke="#4f5d75" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#event-sequence-arrow-open)"/>
+          <rect x="204.0" y="760" width="122.1" height="24" rx="2" fill="#f5f5f5"/>
+          <text x="265" y="770" fill="#4f5d75" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.06em">WEB PUSH</text>
+          <text x="265" y="782" fill="#5a6580" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">instant-push job · 15 s</text>
+          <line x1="140" y1="848" x2="1136" y2="848" stroke="#2e5aa8" stroke-width="1.2" marker-end="url(#event-sequence-arrow-link)"/>
+          <rect x="196.5" y="816" width="137.0" height="24" rx="2" fill="#f5f5f5"/>
+          <text x="265" y="826" fill="#2e5aa8" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.06em">GET NOTIFICATIONS</text>
+          <text x="265" y="838" fill="#5a6580" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">TopBar · 60 s or tab focus</text>
+          <line x1="1136" y1="896" x2="140" y2="896" stroke="#bf4520" stroke-width="1.4" marker-end="url(#event-sequence-arrow-accent)"/>
+          <rect x="214.8" y="876" width="100.5" height="12" rx="2" fill="#f5f5f5"/>
+          <text x="265" y="886" fill="#bf4520" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.06em">BADGE · NEEDS YOU</text>
+          <rect x="44" y="40" width="192" height="56" rx="6" fill="#f5f5f5"/>
+          <rect x="44" y="40" width="192" height="56" rx="6" fill="#4f5d75" stroke="#5a6580" stroke-width="1" fill-opacity="0.10"/>
+          <rect x="52" y="48" width="28" height="12" rx="2" fill="none" stroke="#2d3142" stroke-width="0.8" stroke-opacity="0.22"/>
+          <text x="66.0" y="57" fill="#5a6580" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.08em">USR</text>
+          <text x="140.0" y="74" fill="#2d3142" font-size="12" font-family="'Geist', system-ui, sans-serif" text-anchor="middle" font-weight="600">Browsers</text>
+          <text x="140.0" y="88" fill="#4f5d75" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">creator · assignee</text>
+          <rect x="294" y="40" width="192" height="56" rx="6" fill="#f5f5f5"/>
+          <rect x="294" y="40" width="192" height="56" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+          <rect x="302" y="48" width="24" height="12" rx="2" fill="none" stroke="#2d3142" stroke-width="0.8" stroke-opacity="0.22"/>
+          <text x="314.0" y="57" fill="#5a6580" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.08em">GW</text>
+          <text x="390.0" y="74" fill="#2d3142" font-size="12" font-family="'Geist', system-ui, sans-serif" text-anchor="middle" font-weight="600">server · gateway</text>
+          <text x="390.0" y="88" fill="#4f5d75" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">auth · signed principal</text>
+          <rect x="544" y="40" width="192" height="56" rx="6" fill="#f5f5f5"/>
+          <rect x="544" y="40" width="192" height="56" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+          <rect x="552" y="48" width="28" height="12" rx="2" fill="none" stroke="#2d3142" stroke-width="0.8" stroke-opacity="0.22"/>
+          <text x="566.0" y="57" fill="#5a6580" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.08em">SVC</text>
+          <text x="640.0" y="74" fill="#2d3142" font-size="12" font-family="'Geist', system-ui, sans-serif" text-anchor="middle" font-weight="600">work module</text>
+          <text x="640.0" y="88" fill="#4f5d75" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">work schema · outbox</text>
+          <rect x="794" y="40" width="192" height="56" rx="6" fill="#f5f5f5"/>
+          <rect x="794" y="40" width="192" height="56" rx="6" fill="#2d3142" stroke="#4f5d75" stroke-width="1" fill-opacity="0.05"/>
+          <rect x="802" y="48" width="28" height="12" rx="2" fill="none" stroke="#2d3142" stroke-width="0.8" stroke-opacity="0.22"/>
+          <text x="816.0" y="57" fill="#5a6580" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.08em">BUS</text>
+          <text x="890.0" y="74" fill="#2d3142" font-size="12" font-family="'Geist', system-ui, sans-serif" text-anchor="middle" font-weight="600">Outbox relay</text>
+          <text x="890.0" y="88" fill="#4f5d75" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">EventBus · in process</text>
+          <rect x="1044" y="40" width="192" height="56" rx="6" fill="#f5f5f5"/>
+          <rect x="1044" y="40" width="192" height="56" rx="6" fill="#bf4520" stroke="#bf4520" stroke-width="1" fill-opacity="0.08"/>
+          <rect x="1052" y="48" width="28" height="12" rx="2" fill="none" stroke="#bf4520" stroke-width="0.8" stroke-opacity="0.50"/>
+          <text x="1066.0" y="57" fill="#bf4520" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.08em">SVC</text>
+          <text x="1140.0" y="74" fill="#2d3142" font-size="12" font-family="'Geist', system-ui, sans-serif" text-anchor="middle" font-weight="600">home module</text>
+          <text x="1140.0" y="88" fill="#4f5d75" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">group home-projector</text>
+          <text x="1236" y="956" fill="#2d3142" font-size="14" font-family="'Instrument Serif', 'Noto Serif', serif" text-anchor="end" font-style="italic">platform-webhooks, platform-audit, ai-tool-cache and search-indexer receive the same event in their own groups.</text>
+          <line x1="40" y1="976" x2="1240" y2="976" stroke="#2d3142" stroke-width="0.8" stroke-opacity="0.10"/>
+          <text x="40" y="992" fill="#4f5d75" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.18em">LEGEND</text>
+          <rect x="40" y="1004" width="16" height="10" rx="2" fill="#bf4520" stroke="#bf4520" stroke-width="1" fill-opacity="0.08"/>
+          <text x="62" y="1012" fill="#4f5d75" font-size="9" font-family="'Geist', system-ui, sans-serif">Focal consumer</text>
+          <rect x="169.6" y="1000" width="6" height="16" fill="#2d3142" stroke="#4f5d75" stroke-width="0.8" fill-opacity="0.06"/>
+          <text x="183.6" y="1012" fill="#4f5d75" font-size="9" font-family="'Geist', system-ui, sans-serif">Activation</text>
+          <line x1="265.6" y1="1009" x2="293.6" y2="1009" stroke="#2e5aa8" stroke-width="1.2" marker-end="url(#event-sequence-arrow-link)"/>
+          <text x="301.6" y="1012" fill="#4f5d75" font-size="9" font-family="'Geist', system-ui, sans-serif">HTTP request</text>
+          <line x1="394.40000000000003" y1="1009" x2="422.40000000000003" y2="1009" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#event-sequence-arrow)"/>
+          <text x="430.40000000000003" y="1012" fill="#4f5d75" font-size="9" font-family="'Geist', system-ui, sans-serif">Call</text>
+          <line x1="480.00000000000006" y1="1009" x2="508.00000000000006" y2="1009" stroke="#4f5d75" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#event-sequence-arrow)"/>
+          <text x="516.0" y="1012" fill="#4f5d75" font-size="9" font-family="'Geist', system-ui, sans-serif">Return</text>
+          <line x1="576.4" y1="1009" x2="604.4" y2="1009" stroke="#4f5d75" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#event-sequence-arrow-open)"/>
+          <text x="612.4" y="1012" fill="#4f5d75" font-size="9" font-family="'Geist', system-ui, sans-serif">Async / event</text>
+          <line x1="710.6" y1="1009" x2="738.6" y2="1009" stroke="#bf4520" stroke-width="1.2" marker-end="url(#event-sequence-arrow-accent)"/>
+          <text x="746.6" y="1012" fill="#4f5d75" font-size="9" font-family="'Geist', system-ui, sans-serif">Assignee sees it</text>
+          <rect x="861.0" y="1003" width="22" height="12" rx="2" fill="#2d3142" stroke="#2d3142" stroke-width="1" fill-opacity="0.02" stroke-opacity="0.22"/>
+          <text x="889.0" y="1012" fill="#4f5d75" font-size="9" font-family="'Geist', system-ui, sans-serif">Alternative</text>
+        </svg>

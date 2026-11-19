@@ -1,0 +1,20 @@
+# LiveKit SFU for local dev (video meetings). Media flows browser ⇄ SFU directly; the backend only signs join
+# tokens, so call bandwidth never touches the server. Dev-only key; never reuse.
+port: 7880
+bind_addresses: [""]
+rtc:
+  tcp_port: 7881
+  port_range_start: 50000
+  port_range_end: 50060
+  use_external_ip: false
+  # Two kinds of clients locally: the recorder (Egress) on the compose network uses the container's
+  # own address; browsers on this machine use the loopback candidate through the published ports.
+  enable_loopback_candidate: true
+keys:
+  workspace_dev: workspace-dev-livekit-secret-change-me-32b
+room:
+  empty_timeout: 300
+  departure_timeout: 20
+  max_participants: 100
+logging:
+  level: info

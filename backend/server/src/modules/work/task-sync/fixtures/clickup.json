@@ -1,0 +1,39 @@
+{
+  "team": { "teams": [{ "id": "t1", "name": "Acme" }] },
+  "spaces": { "spaces": [{ "id": "s1", "name": "Product" }] },
+  "folders": { "folders": [{ "id": "f1", "name": "Mobile", "lists": [{ "id": "L2", "name": "Sprint 12" }] }] },
+  "lists": { "lists": [{ "id": "L1", "name": "Backlog" }] },
+  "tasks": {
+    "tasks": [
+      {
+        "id": "86b1x2y3z",
+        "custom_id": null,
+        "name": "Fix login redirect",
+        "url": "https://app.clickup.com/t/86b1x2y3z",
+        "status": { "status": "complete", "type": "closed" },
+        "date_created": "1793500000000",
+        "date_updated": "1794000000000",
+        "date_closed": "1793990000000",
+        "date_done": "1793990000000",
+        "start_date": "1793600000000",
+        "due_date": "1794100000000",
+        "assignees": [{ "email": "lily@brightline.test" }]
+      },
+      {
+        "id": "86b9q8w7e",
+        "custom_id": "dev-42",
+        "name": "Ship offline mode",
+        "url": "https://app.clickup.com/t/86b9q8w7e",
+        "status": { "status": "in review", "type": "custom" },
+        "date_created": "1793500000000",
+        "date_updated": "1794010000000",
+        "date_closed": null,
+        "date_done": null,
+        "start_date": null,
+        "due_date": null,
+        "assignees": []
+      }
+    ],
+    "last_page": true
+  }
+}

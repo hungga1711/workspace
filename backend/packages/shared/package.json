@@ -1,0 +1,30 @@
+{
+  "name": "@workspace/shared",
+  "description": "Domain primitives: request context, transactions, authorization, ids, outbox",
+  "license": "MIT",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit && tsc -p tsconfig.test.json",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@workspace/contracts": "workspace:*",
+    "pg": "8.13.1",
+    "ulid": "2.3.0"
+  },
+  "devDependencies": {
+    "@types/pg": "8.11.10",
+    "@workspace/tsconfig": "workspace:*"
+  }
+}

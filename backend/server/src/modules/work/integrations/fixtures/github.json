@@ -1,0 +1,115 @@
+{
+  "check": { "routes": { "/user$": { "login": "octo-bot" } }, "account": "octo-bot" },
+  "noMatch": ["https://github.com/acme/web", "https://github.com/acme/web/tree/main", "https://gist.github.com/acme/1/pull/2", "https://example.com/acme/web/pull/128"],
+  "cases": [
+    {
+      "url": "https://github.com/acme/web/pull/128/files",
+      "key": "acme/web#128",
+      "routes": {
+        "/repos/acme/web/pulls/128$": {
+          "title": "WEB-42 Loading and disabled states for the primary button",
+          "html_url": "https://github.com/acme/web/pull/128",
+          "state": "open",
+          "draft": false,
+          "merged": false,
+          "user": { "login": "lily" },
+          "updated_at": "2026-11-12T09:30:00Z",
+          "additions": 184,
+          "deletions": 23,
+          "comments": 2,
+          "review_comments": 5,
+          "head": { "ref": "feature/web-42-button-states", "sha": "abc123" },
+          "base": { "ref": "main" },
+          "labels": [{ "name": "ui" }],
+          "requested_reviewers": [{ "login": "minh" }]
+        },
+        "/pulls/128/reviews": [
+          { "user": { "login": "anh" }, "state": "CHANGES_REQUESTED" },
+          { "user": { "login": "anh" }, "state": "APPROVED" },
+          { "user": { "login": "minh" }, "state": "COMMENTED" }
+        ],
+        "/commits/abc123/check-runs": {
+          "check_runs": [
+            { "status": "completed", "conclusion": "success" },
+            { "status": "in_progress", "conclusion": null }
+          ]
+        }
+      },
+      "card": {
+        "kind": "review",
+        "title": "WEB-42 Loading and disabled states for the primary button",
+        "ref": "acme/web#128",
+        "state": "open",
+        "author": "lily",
+        "updatedAt": "2026-11-12T09:30:00.000Z",
+        "labels": ["ui"],
+        "branch": "feature/web-42-button-states",
+        "target": "main",
+        "additions": 184,
+        "deletions": 23,
+        "comments": 7,
+        "checks": "pending",
+        "reviewers": [
+          { "name": "anh", "state": "approved" },
+          { "name": "minh", "state": "pending" }
+        ]
+      }
+    },
+    {
+      "url": "https://github.com/acme/web/issues/77",
+      "key": "acme/web#77",
+      "routes": {
+        "/repos/acme/web/issues/77$": {
+          "title": "Button flickers on slow networks",
+          "state": "closed",
+          "state_reason": "completed",
+          "user": { "login": "huy" },
+          "updated_at": "2026-11-10T08:00:00Z",
+          "comments": 3,
+          "labels": []
+        }
+      },
+      "card": {
+        "kind": "issue",
+        "title": "Button flickers on slow networks",
+        "ref": "acme/web#77",
+        "state": "done",
+        "author": "huy",
+        "updatedAt": "2026-11-10T08:00:00.000Z",
+        "comments": 3
+      }
+    }
+  ],
+  "repos": {
+    "routes": { "/user/repos": [{ "full_name": "acme/web" }, { "full_name": "acme/api" }] },
+    "list": [
+      { "id": "acme/web", "name": "acme/web" },
+      { "id": "acme/api", "name": "acme/api" }
+    ]
+  },
+  "reviews": {
+    "repo": "acme/web",
+    "since": "2026-11-11T00:00:00Z",
+    "routes": {
+      "/repos/acme/web/pulls\\?": [
+        {
+          "title": "WEB-42 Button states",
+          "html_url": "https://github.com/acme/web/pull/128",
+          "state": "open",
+          "updated_at": "2026-11-12T09:30:00Z",
+          "head": { "ref": "feature/web-42-button-states", "sha": "a" },
+          "base": { "ref": "main" }
+        },
+        {
+          "title": "Old one",
+          "html_url": "https://github.com/acme/web/pull/90",
+          "state": "closed",
+          "updated_at": "2026-11-01T09:30:00Z",
+          "head": { "ref": "fix/old", "sha": "b" },
+          "base": { "ref": "main" }
+        }
+      ]
+    },
+    "seen": [{ "url": "https://github.com/acme/web/pull/128", "title": "WEB-42 Button states", "branch": "feature/web-42-button-states", "updatedAt": "2026-11-12T09:30:00Z" }]
+  }
+}

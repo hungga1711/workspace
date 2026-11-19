@@ -1,0 +1,95 @@
+{
+  "check": { "routes": { "/api/v4/user$": { "username": "ci-reader" } }, "account": "ci-reader" },
+  "noMatch": ["https://gitlab.com/acme/platform/web", "https://gitlab.com/acme/platform/web/-/tree/main", "https://github.com/acme/web/-/merge_requests/3"],
+  "cases": [
+    {
+      "url": "https://gitlab.com/acme/platform/web/-/merge_requests/57/diffs",
+      "key": "acme/platform/web!57",
+      "routes": {
+        "/projects/acme%2Fplatform%2Fweb/merge_requests/57$": {
+          "title": "Draft: T-077 checkout totals",
+          "web_url": "https://gitlab.com/acme/platform/web/-/merge_requests/57",
+          "state": "opened",
+          "draft": true,
+          "author": { "name": "Trinh Vo", "username": "trinh" },
+          "updated_at": "2026-11-12T11:00:00Z",
+          "source_branch": "t-077-checkout-totals",
+          "target_branch": "main",
+          "user_notes_count": 4,
+          "labels": ["backend", "checkout"],
+          "reviewers": [
+            { "name": "Minh Tran", "username": "minh" },
+            { "name": "Anh Tran", "username": "anh" }
+          ],
+          "head_pipeline": { "status": "failed" }
+        },
+        "/merge_requests/57/approvals": { "approved_by": [{ "user": { "name": "Anh Tran", "username": "anh" } }] }
+      },
+      "card": {
+        "kind": "review",
+        "title": "Draft: T-077 checkout totals",
+        "ref": "acme/platform/web!57",
+        "state": "draft",
+        "author": "Trinh Vo",
+        "updatedAt": "2026-11-12T11:00:00.000Z",
+        "labels": ["backend", "checkout"],
+        "branch": "t-077-checkout-totals",
+        "target": "main",
+        "comments": 4,
+        "checks": "failing",
+        "reviewers": [
+          { "name": "Minh Tran", "state": "pending" },
+          { "name": "Anh Tran", "state": "approved" }
+        ]
+      }
+    },
+    {
+      "url": "https://gitlab.com/acme/platform/web/-/issues/12",
+      "key": "acme/platform/web#12",
+      "routes": {
+        "/projects/acme%2Fplatform%2Fweb/issues/12$": {
+          "title": "Totals are off by a cent",
+          "state": "opened",
+          "author": { "name": "Huy Le" },
+          "updated_at": "2026-11-09T07:00:00Z",
+          "user_notes_count": 1,
+          "labels": []
+        }
+      },
+      "card": {
+        "kind": "issue",
+        "title": "Totals are off by a cent",
+        "ref": "acme/platform/web#12",
+        "state": "open",
+        "author": "Huy Le",
+        "updatedAt": "2026-11-09T07:00:00.000Z",
+        "comments": 1
+      }
+    }
+  ],
+  "repos": { "routes": { "/api/v4/projects\\?": [{ "path_with_namespace": "acme/platform/web" }] }, "list": [{ "id": "acme/platform/web", "name": "acme/platform/web" }] },
+  "reviews": {
+    "repo": "acme/platform/web",
+    "since": "2026-11-11T00:00:00Z",
+    "routes": {
+      "/projects/acme%2Fplatform%2Fweb/merge_requests\\?.*updated_after=2026-11-11": [
+        {
+          "title": "Draft: T-077 checkout totals",
+          "web_url": "https://gitlab.com/acme/platform/web/-/merge_requests/57",
+          "state": "opened",
+          "updated_at": "2026-11-12T11:00:00Z",
+          "source_branch": "t-077-checkout-totals",
+          "target_branch": "main"
+        }
+      ]
+    },
+    "seen": [
+      {
+        "url": "https://gitlab.com/acme/platform/web/-/merge_requests/57",
+        "title": "Draft: T-077 checkout totals",
+        "branch": "t-077-checkout-totals",
+        "updatedAt": "2026-11-12T11:00:00Z"
+      }
+    ]
+  }
+}

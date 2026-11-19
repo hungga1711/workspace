@@ -1,0 +1,66 @@
+# Reverse proxy of the production stack (docker-compose.yml): HTTPS with automatic Let's Encrypt certificates for
+# every configured name, renewed by Caddy itself. Addresses come from caddy/run.sh: `name` (HTTPS), `http://name`
+# (TLS=off, or localhost) or `http://<x>.invalid` for a domain left empty (never answered, no certificate asked for).
+# LETSENCRYPT_EMAIL, when set, receives certificate notices. Your own certificate: add `tls /certs/fullchain.pem /certs/privkey.pem` to a site and mount the files at /certs.
+{
+	admin off
+	{$WX_ACME_EMAIL}
+}
+
+# Compressed responses (JSON, HTML, JS, CSS, SVG): 5-8x smaller over the network. Streams (text/event-stream, the
+# AI's answers) are left out so every token is sent as it comes; anything already compressed is passed as it is.
+(compress) {
+	encode {
+		zstd
+		gzip
+		match {
+			header Content-Type application/json*
+			header Content-Type text/html*
+			header Content-Type text/plain*
+			header Content-Type text/css*
+			header Content-Type text/csv*
+			header Content-Type application/javascript*
+			header Content-Type text/javascript*
+			header Content-Type image/svg+xml*
+		}
+	}
+}
+
+# The app domain: the web app; Socket.IO, local files, MCP (with its OAuth metadata, registration, token and
+# revocation endpoints), the API docs, the workflow runner and the token collector go to the server.
+# /oauth/authorize is the web app's consent page.
+{$WX_APP} {
+	import compress
+	@server path /socket.io/* /storage/* /api/mcp /api/mcp/* /api/docs /api/docs/* /api/work/runner/* /api/hooks/* /api/ai/local-usage /api/ai/local-usage/* /api/ai/local/* /.well-known/oauth-* /oauth/token /oauth/register /oauth/revoke
+	handle @server {
+		reverse_proxy app:4000
+	}
+	# API-key integrations (Authorization: Bearer wos_…) may use the app domain as their API base: straight to the server.
+	@apikey {
+		path /api/*
+		header_regexp Authorization ^Bearer\swos_
+	}
+	handle @apikey {
+		reverse_proxy app:4000
+	}
+	handle {
+		reverse_proxy app:3000
+	}
+}
+
+# Public API for API-key integrations (PUBLIC_API_URL): the gateway.
+{$WX_API} {
+	import compress
+	reverse_proxy app:4000
+}
+
+# Bundled S3 (--profile s3): presigned URLs are signed for this host, which Caddy passes through unchanged.
+{$WX_FILES} {
+	header X-Content-Type-Options nosniff
+	reverse_proxy s3:8333
+}
+
+# Video meetings (--profile meet): LiveKit signalling over WebSocket; media goes to TCP 7881 and UDP 50000-50100.
+{$WX_MEET} {
+	reverse_proxy livekit:7880
+}

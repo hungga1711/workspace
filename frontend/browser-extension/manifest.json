@@ -1,0 +1,96 @@
+{
+  "manifest_version": 3,
+  "name": "__MSG_extName__",
+  "version": "1.0.0",
+  "description": "__MSG_extDescription__",
+  "default_locale": "en",
+  "permissions": ["storage", "scripting"],
+  "host_permissions": [
+    "https://chatgpt.com/*",
+    "https://chat.openai.com/*",
+    "https://claude.ai/*",
+    "https://gemini.google.com/*",
+    "https://copilot.microsoft.com/*",
+    "https://copilot.com/*",
+    "https://www.copilot.com/*",
+    "https://m365.cloud.microsoft/*",
+    "https://copilot.cloud.microsoft/*",
+    "https://www.perplexity.ai/*",
+    "https://perplexity.ai/*",
+    "https://chat.deepseek.com/*",
+    "https://grok.com/*",
+    "https://www.meta.ai/*",
+    "https://meta.ai/*",
+    "https://poe.com/*",
+    "https://chat.qwen.ai/*",
+    "https://www.kimi.com/*",
+    "https://kimi.com/*",
+    "https://kimi.moonshot.cn/*",
+    "https://www.kimi.ai/*",
+    "https://kimi.ai/*",
+    "https://www.doubao.com/*",
+    "https://doubao.com/*",
+    "https://you.com/*",
+    "https://www.you.com/*",
+    "https://huggingface.co/chat/*",
+    "https://chat.z.ai/*",
+    "https://duck.ai/*"
+  ],
+  "optional_host_permissions": ["https://*/*", "http://*/*"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://chatgpt.com/*",
+        "https://chat.openai.com/*",
+        "https://claude.ai/*",
+        "https://gemini.google.com/*",
+        "https://copilot.microsoft.com/*",
+        "https://copilot.com/*",
+        "https://www.copilot.com/*",
+        "https://m365.cloud.microsoft/*",
+        "https://copilot.cloud.microsoft/*",
+        "https://www.perplexity.ai/*",
+        "https://perplexity.ai/*",
+        "https://chat.deepseek.com/*",
+        "https://grok.com/*",
+        "https://www.meta.ai/*",
+        "https://meta.ai/*",
+        "https://poe.com/*",
+        "https://chat.qwen.ai/*",
+        "https://www.kimi.com/*",
+        "https://kimi.com/*",
+        "https://kimi.moonshot.cn/*",
+        "https://www.kimi.ai/*",
+        "https://kimi.ai/*",
+        "https://www.doubao.com/*",
+        "https://doubao.com/*",
+        "https://you.com/*",
+        "https://www.you.com/*",
+        "https://huggingface.co/chat/*",
+        "https://chat.z.ai/*",
+        "https://duck.ai/*"
+      ],
+      "js": ["sites.js", "content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "options_page": "options.html",
+  "action": {
+    "default_title": "__MSG_extName__",
+    "default_popup": "options.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icon128.png"
+  },
+  "homepage_url": "https://github.com/hungga1711/workspace/tree/main/frontend/browser-extension"
+}

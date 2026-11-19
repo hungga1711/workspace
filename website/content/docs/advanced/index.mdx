@@ -1,0 +1,74 @@
+---
+title: Contributor guide
+description: Everything a developer needs to change Workspace with confidence, from the system's shape down to the tables and the first pull request.
+---
+
+This section is for developers who want to work on Workspace itself: fix a bug, add a feature, or understand
+why something is built the way it is. Read it in order the first time; afterwards each page stands on its own.
+
+## The system in one paragraph
+
+Workspace is **one company per installation**. A Next.js 15 web app (the UI and a backend-for-frontend) sits in
+front of **one Node 22 server process** that hosts nine modules: gateway, identity, platform, chat, work, home,
+employee, ai and search. Each module owns a folder, a **Postgres schema and login role**, its migrations and an HTTP
+API. Modules never import each other's code: they call each other's API in memory, as the caller, or react to
+**events delivered from a transactional outbox**. Caddy, the app container and Postgres are the whole deployment.
+
+<Diagram name="containers" caption="Three containers: Caddy, the app (web and server) and Postgres." />
+
+## Reading order
+
+<Cards>
+  <Card title="1. System design" href="/docs/advanced/system-design" description="Containers, the nine modules, data and messaging, and the five rules." />
+  <Card title="2. Request path and security" href="/docs/advanced/request-path" description="Sessions, the gateway, principals and scopes, the AI gateway." />
+  <Card title="3. Code structure" href="/docs/advanced/code-structure" description="Where everything lives and the anatomy of a module." />
+  <Card title="4. Database design" href="/docs/advanced/database" description="Schemas and roles, migrations, ids and codes, the core tables." />
+  <Card title="5. Events" href="/docs/advanced/events" description="Outbox, relay, consumer groups, idempotency, dead letters." />
+  <Card title="6. Agent workflows" href="/docs/advanced/workflows" description="Workflows, runs, runners, approvals and questions." />
+  <Card title="7. Your first change" href="/docs/advanced/first-change" description="A feature end to end, the tests to write and the checks CI runs." />
+</Cards>
+
+## The non-negotiables
+
+Every pull request is read against these. They are also in
+[AGENTS.md](https://github.com/hungga1711/workspace/blob/main/AGENTS.md), which coding agents read first.
+
+1. **Every feature works without AI.** Generative endpoints answer `503 ai_not_configured` and the UI hides them.
+2. **No SaaS concepts.** No billing, plans, trials, seat limits or platform admin.
+3. **One workspace.** No workspace column, row-level security or workspace id anywhere; a second company is a second
+   installation ([ADR-0023](https://github.com/hungga1711/workspace/blob/main/docs/adr/0023-one-workspace-data-model.md)).
+4. **Fast and light.** Route JavaScript budgets are gated in CI; heavy client code loads on demand.
+5. **Chat and tasks are the product.** Docs, whiteboards, calendar, time and AI can be left out with
+   `DISABLED_FEATURES`, and every screen must still make sense without them
+   ([ADR-0026](https://github.com/hungga1711/workspace/blob/main/docs/adr/0026-deploy-time-feature-flags.md)).
+
+## Running it from source
+
+You need Node.js 22, pnpm 10 (`corepack enable`) and Docker with Compose v2.
+
+```bash
+pnpm install
+cp .env.example .env
+pnpm infra:up                         # Postgres, S3 (SeaweedFS), LiveKit
+pnpm build:packages                   # once per clone, and after changing backend/packages
+pnpm migrate
+pnpm dev:server                       # every backend module in one process, :4000
+pnpm --filter @workspace/web dev      # http://localhost:3000, in a second terminal
+```
+
+Create the company at `/setup`, then fill it with realistic data (people, departments, projects, tasks, documents,
+meetings, chat and eight weeks of AI history):
+
+```bash
+SEED_OWNER_EMAIL=<owner e-mail> SEED_OWNER_PASSWORD=<owner password> pnpm seed:demo
+```
+
+## Where the full reference lives
+
+The pages here orient you and show how the parts fit. The repository is the source of truth and goes deeper:
+[system design](https://github.com/hungga1711/workspace/blob/main/docs/architecture/system-design.md),
+[database](https://github.com/hungga1711/workspace/blob/main/docs/database/README.md) (one page per schema, every
+table), [events](https://github.com/hungga1711/workspace/blob/main/docs/events/README.md) and the generated
+[event catalog](https://github.com/hungga1711/workspace/blob/main/docs/events/catalog.md), and the
+[architecture decision records](https://github.com/hungga1711/workspace/blob/main/docs/adr/README.md). When a
+page here and the code disagree, the code is right and the page has a bug: please open an issue.

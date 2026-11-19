@@ -1,0 +1,118 @@
+---
+title: Quick start
+description: Install Workspace on your own server in about five minutes, or try it on a laptop first.
+---
+
+Workspace runs as three containers from `infra/production/docker-compose.yml`: PostgreSQL, one `app` container (the
+web app and the server) and Caddy for HTTPS. One installation holds one company.
+
+## What you need
+
+| | Minimum | Recommended |
+|---|---|---|
+| CPU | 1 vCPU | 2 vCPU |
+| RAM | 1 GB | 2 GB |
+| Disk | 20 GB SSD | 50 GB+ SSD, files grow with use |
+
+- Linux (x86_64 or arm64) with Docker Engine 24+ and the Compose plugin 2.24+.
+- A domain pointing at the server, with ports 80 and 443 open. No domain yet? See
+  [Domain, IP and HTTPS](/docs/self-hosting/domain-and-https) for running on a bare IP.
+- Video meetings also need TCP 7881 and UDP 50000 to 50100.
+
+A fresh installation idles at about 300 MB of RAM. Load-tested on 2 CPU / 4 GB, before the backend became one
+process (not re-run since): about **875 people working at the same time** in a 6,000-person workspace, and **1,000
+or more** in a workspace of up to 2,000 people.
+
+## Install on a server
+
+<Steps>
+<Step>
+
+### Run the installer
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/hungga1711/workspace/main/infra/production/install.sh | sh
+```
+
+It asks for your domain, an optional second domain for file storage (leave it empty to keep files on the server's
+disk), an e-mail for the Let's Encrypt certificate and an optional mail server (SMTP). Then it writes every secret
+into `.env`, starts the stack and prints the `/setup` address with a one-time token. Running it again keeps `.env`
+and its secrets.
+
+Unattended: `./install.sh --non-interactive --app-domain work.example.com --email it@example.com`.
+
+</Step>
+<Step>
+
+### Open `/setup`
+
+Enter the company name, the owner account and the **setup token** the installer printed (also `SETUP_TOKEN` in
+`.env`, or `docker compose logs app | grep "setup token"`). The token keeps anyone who reaches the server before
+you from becoming its owner. `/setup` closes after that.
+
+</Step>
+<Step>
+
+### Invite your team
+
+Admin › Members › Invite. Without an SMTP server, copy each activation link from the same screen. AI stays off until
+you decide otherwise: [Turn AI on or off](/docs/ai-insights/turn-on-off).
+
+</Step>
+</Steps>
+
+## Try it on a laptop
+
+```bash
+git clone https://github.com/hungga1711/workspace.git
+cd workspace/infra/production
+docker compose up -d
+```
+
+No `.env` is needed: secrets are generated on first start. Without `WORKSPACE_IMAGE` the first start builds the
+image from source, which takes several minutes; `WORKSPACE_IMAGE=ghcr.io/hungga1711/workspace:1.0.0 docker compose up -d`
+pulls the published one instead. Open `http://localhost` and take the setup token from
+`docker compose logs app | grep "setup token"`.
+
+## What is optional
+
+Everything below can be added later without reinstalling. Settings for each are in
+[Configuration](/docs/self-hosting/configuration).
+
+| Without | What happens |
+|---|---|
+| SMTP | No invitation or reset e-mails; admins hand over activation links instead |
+| S3 storage | Files live on the server's disk, with the same signed, expiring links |
+| An AI provider | AI features stay hidden; AI Insights still works |
+| LiveKit | Meetings keep agenda, minutes and action items, without video |
+| Web Push | In-app notifications only |
+
+## Install by hand
+
+```bash title="infra/production"
+cp .env.example .env
+for v in INTERNAL_TOKEN_SECRET SESSION_SECRET AUTH_SECRET POSTGRES_PASSWORD PG_OWNER_PASSWORD PG_APP_PASSWORD; do
+  sed -i "s|^$v=.*|$v=$(openssl rand -hex 32)|" .env
+done
+nano .env                                   # APP_URL, APP_DOMAIN, LETSENCRYPT_EMAIL
+WORKSPACE_IMAGE=ghcr.io/hungga1711/workspace:1.0.0 docker compose pull   # or: docker compose build
+docker compose up -d
+```
+
+A secret left empty is generated once into the `secrets` volume; a value in `.env` always wins. Start order is
+handled by health checks: secrets, then Postgres, then `app` (which runs the migrations), then Caddy.
+
+## Hosting platforms
+
+Platforms that deploy a compose file themselves have ready templates in
+[infra/templates](https://github.com/hungga1711/workspace/blob/main/infra/templates/README.md): plain Compose,
+Coolify, Portainer, Railway, Unraid and CasaOS. All use one image and three containers, with nothing to bind-mount;
+the platform's own proxy terminates TLS in front.
+
+## Next
+
+<Cards>
+  <Card title="Domain, IP and HTTPS" href="/docs/self-hosting/domain-and-https" description="DNS, certificates, a bare IP, your own proxy." />
+  <Card title="Configuration" href="/docs/self-hosting/configuration" description="SMTP, storage, AI, video." />
+  <Card title="Operations" href="/docs/self-hosting/operations" description="Backups, restore and upgrades." />
+</Cards>

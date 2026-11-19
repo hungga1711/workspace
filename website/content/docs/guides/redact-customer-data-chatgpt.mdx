@@ -1,0 +1,39 @@
+---
+title: "Redact customer data before it reaches ChatGPT"
+description: "Stop card numbers, ID numbers and customer contact details from being pasted into ChatGPT, Claude or Gemini — warn, hide or block in the browser before the prompt is sent."
+---
+
+The safest customer data is data that never leaves the browser. Workspace's browser extension checks each prompt on
+the approved AI sites **before it is sent** and applies the company's rule for sensitive data.
+
+## Three modes
+
+| Mode | What the person sees | What is sent |
+|---|---|---|
+| Warn | A notice naming what was found; they can edit or send anyway | The prompt as written; the event is logged |
+| Hide (redact) | The prompt with matches replaced by placeholders such as `[EMAIL]` | The redacted prompt |
+| Block | The send is stopped with the reason | Nothing |
+
+Admins choose the mode in Admin › System › AI connections › Privacy. Every warning, redaction and block is counted in the weekly report,
+so you can see whether people need a reminder or a better tool.
+
+## What it looks for
+
+Email addresses, phone numbers, payment card numbers (checked with the Luhn rule), bank account formats, and national
+ID formats such as US SSNs, UK National Insurance numbers and Vietnamese citizen IDs, plus keywords your company adds
+(project code names, customer names). Patterns for more countries are added over time; check the
+[extension documentation](/docs/ai-insights/extension) for the current list.
+
+## Why in the browser
+
+Network tools see encrypted traffic, or require breaking it open. The extension runs where the text is typed, only
+on the AI sites listed, only after the person connects it, and with a notice on every page. It never sends your data
+to the Workspace project: events go to your own server.
+
+## Pair it with a policy
+
+Tools catch patterns; people catch context. Publish a one-page
+[AI usage policy](/docs/guides/ai-usage-policy-template) that says what never goes into AI, and use the weekly
+report to follow up.
+
+[Install Workspace](/docs/quick-start)

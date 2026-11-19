@@ -1,0 +1,59 @@
+{
+  "workspaces": { "data": [{ "gid": "111", "name": "Acme" }] },
+  "projects": {
+    "data": [
+      { "gid": "1201", "name": "Website relaunch" },
+      { "gid": "1202", "name": "Q4 campaign" }
+    ],
+    "next_page": null
+  },
+  "tasks_page1": {
+    "data": [
+      {
+        "gid": "9001",
+        "name": "Write launch email",
+        "completed": true,
+        "completed_at": "2026-11-03T15:20:00.000Z",
+        "created_at": "2026-10-28T09:00:00.000Z",
+        "modified_at": "2026-11-03T15:20:01.000Z",
+        "due_on": "2026-11-04",
+        "due_at": null,
+        "assignee": { "email": "Lily@Brightline.test" },
+        "permalink_url": "https://app.asana.com/0/1201/9001",
+        "memberships": [{ "project": { "gid": "1201" }, "section": { "name": "Done" } }]
+      },
+      {
+        "gid": "9002",
+        "name": "Design hero section",
+        "completed": false,
+        "completed_at": null,
+        "created_at": "2026-11-01T10:00:00.000Z",
+        "modified_at": "2026-11-06T11:00:00.000Z",
+        "due_on": null,
+        "due_at": "2026-11-12T16:00:00.000Z",
+        "assignee": { "email": "nobody@elsewhere.test" },
+        "permalink_url": "https://app.asana.com/0/1201/9002",
+        "memberships": [{ "project": { "gid": "1201" }, "section": { "name": "In progress" } }]
+      }
+    ],
+    "next_page": { "offset": "abc" }
+  },
+  "tasks_page2": {
+    "data": [
+      {
+        "gid": "9003",
+        "name": "Copy review",
+        "completed": false,
+        "completed_at": null,
+        "created_at": "2026-11-02T10:00:00.000Z",
+        "modified_at": "2026-11-07T08:00:00.000Z",
+        "due_on": null,
+        "due_at": null,
+        "assignee": null,
+        "permalink_url": "https://app.asana.com/0/1201/9003",
+        "memberships": [{ "project": { "gid": "1201" }, "section": { "name": "Waiting for review" } }]
+      }
+    ],
+    "next_page": null
+  }
+}

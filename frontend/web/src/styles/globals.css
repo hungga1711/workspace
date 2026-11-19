@@ -1,0 +1,660 @@
+/*
+ * Design tokens (the source of truth is /DESIGN.md). Semantic CSS variables switch with the theme; @theme inline
+ * exposes them as Tailwind utilities (bg-surface, text-ink-2, bg-signal-wash, ...).
+ *
+ * Light by default; dark when the person picks it (or "system" on a dark device), set as data-theme on <html>
+ * (lib/theme.ts). A subtree can opt in too: the in-call stage of a video meeting is always dark.
+ */
+@import "tailwindcss";
+
+:root {
+  /* The landing page's palette (website/src/app/global.css, light): Geist greys, ink #171717, hairlines
+     #ebebeb, blue #2563EB; every surface is a 1px ring, never a drop shadow. Blue: links in context, progress and
+     "needs you"; red only for late/blocked/destructive. */
+  --ground: #fafafa;
+  --surface: #ffffff;
+  /* The content canvas: a cool light grey under white cards, so each block of a screen reads as
+     a block at a glance instead of text on one white sheet. Bars, the sidebar and full-bleed screens stay white. */
+  --panel: #fafafa;
+  /* The sidebar is white like the top bar, so the grey canvas alone marks where content is. `ground` is the grey of
+     the sign-in screens. */
+  --frame: #fafafa;
+  --panel-edge: rgb(0 0 0 / 0.06); /* the panel's 1px border */
+  --ink: #171717; /* softer than black */
+  --ink-soft: #4d4d4d;
+  --ink-2: #666666;
+  --hairline: #ebebeb;
+  --divider: #ebebeb;
+  --divider-soft: #f2f2f2;
+  --edge: #e0e0e0; /* form fields and outline controls: a visible edge (enterprise forms read as forms) */
+  --hover: #f5f5f5;
+  --selected: #f2f2f2;
+  --brand: #171717; /* primary fills: near-black */
+  --on-brand: #ffffff;
+  --brand-text: #1d4ed8;
+  --brand-wash: #eff4ff;
+  --accent: #2563eb;
+  --accent-text: #1d4ed8;
+  --accent-wash: #eff4ff;
+  /* The selected nav row (sidebar, admin nav): a step deeper than accent-wash so it reads on the grey ground; its
+     icon and label are accent-text (5.6:1 on it). */
+  --nav-active: #ffffff;
+  /* Kanban lanes: a step darker than the canvas (cards inside are white with a hairline). */
+  --lane: #f2f2f2;
+  --signal: #2563eb;
+  --signal-text: #1d4ed8;
+  --signal-wash: #eff4ff;
+  --block: #c81e1e;
+  --block-wash: #fdecec;
+  --ok: #157a3a; /* 4.7:1 on ok-wash (#15803d fell to 4.4:1 there, WCAG AA fails for chip text) */
+  --ok-wash: #e3f4ea;
+  --warn: #a14a07;
+  --warn-wash: #fff4e5;
+  --mark-blue: #7da2ff; /* the logo's blue arm on the near-black tile (lib/brand-mark.ts) */
+  --logo-tile: #ffffff; /* the logo tile (lib/brand-mark.ts): white, dark in the dark theme */
+  --logo-ring: rgb(24 24 27 / 0.12);
+  --mark-from: #3b6bff; /* the mark's gradient, blue into violet */
+  --mark-to: #8b5cf6;
+  --danger-fill: #c81e1e;
+  /* Bright fills for bars, dots and icon tiles (never text): green for done/on track, orange for at risk. */
+  --ok-fill: #22a06b;
+  --warn-fill: #e5732d;
+  /* Progress is the accent blue on a neutral track (2563EB on F0F0EE: 4.5:1, WCAG 1.4.11). */
+  --progress: #2563eb;
+  --progress-track: #f2f2f2;
+  --tangerine: #e5732d;
+  --tangerine-text: #a14a07;
+  --tangerine-wash: #fff4e5;
+  --rose: #d6537f;
+  --rose-text: #b0245a;
+  --rose-wash: #fdecf2;
+  --sky: #2563eb;
+  --sky-text: #1d4ed8;
+  --sky-wash: #eff4ff;
+  --violet: #7c6cd9;
+  --violet-text: #5b4bc4;
+  --violet-wash: #efedfb;
+  --tint-3: #fbedf2;
+  /* Identity colours: eight flat hues, one per department (lib/identity.ts,
+     picked by the department's name), also used for avatars (per person) and channel pictures (per letter).
+     Fill: white bold letters on it ≥ 4.6:1. -text: ≥ 5.2:1 on its -wash and ≥ 6.3:1 on white. Never for status:
+     blue is the accent and progress, red late/blocked. */
+  --art-0: #5b5fd6; /* indigo */
+  --art-0-text: #3b4fb8;
+  --art-0-wash: #e8eefc;
+  --art-1: #1f7f95; /* teal */
+  --art-1-text: #1f6b45;
+  --art-1-wash: #e3f4ea;
+  --art-2: #b85a26; /* tangerine */
+  --art-2-text: #9a4a1a;
+  --art-2-wash: #fde7d9;
+  --art-3: #c23f73; /* rose */
+  --art-3-text: #9c2f5a;
+  --art-3-wash: #fbe4ec;
+  --art-4: #9b3fa0; /* plum */
+  --art-4-text: #7a3b8a;
+  --art-4-wash: #f1e6f6;
+  --art-5: #7650c8; /* violet */
+  --art-5-text: #5b45b3;
+  --art-5-wash: #ebe6fa;
+  --art-6: #4d7c2a; /* moss */
+  --art-6-text: #4e6a1f;
+  --art-6-wash: #e9f0dc;
+  --art-7: #8b5e3c; /* cinnamon */
+  --art-7-text: #7a5636;
+  --art-7-wash: #f3ebe3;
+  /* Elevation: cards are a hairline, no shadow. The frame is white, so a white popup over it needs real depth to
+     read as a layer: `popover` (menus, pickers, dialogs, the palette) carries a 1px ring and a deep, wide shadow;
+     `soft` (floating bars, toasts in cards) is a step lighter; `drawer` throws its shadow to the left. */
+  --shadow-panel: 0 0 0 1px #ebebeb;
+  --shadow-raised: 0 0 0 1px #ebebeb;
+  --shadow-soft: 0 0 0 1px #ebebeb, 0 8px 24px -12px rgb(0 0 0 / 0.18);
+  /* Menus and pickers float over white pages: a darker ring and a real shadow (on #ebebeb alone a
+     picker's list read as part of the page). */
+  --shadow-popover: 0 0 0 1px rgb(0 0 0 / 0.09), 0 2px 4px rgb(0 0 0 / 0.04), 0 12px 32px -8px rgb(0 0 0 / 0.18), 0 28px 56px -20px rgb(0 0 0 / 0.16);
+  --shadow-drawer: 0 0 0 1px #ebebeb, -16px 0 48px -16px rgb(0 0 0 / 0.16);
+  /* A raised card (enterprise elevation): a 1px shade under it and a faint outline, the way work tools lift a card. */
+  --shadow-card: 0 0 0 1px #ebebeb;
+  --shadow-float: 0 0 0 1px #ebebeb, 0 20px 40px -12px rgb(0 0 0 / 0.2); /* cards laid over screenshots */
+  --chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236b6b72' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); /* native <select> arrow, ink-2 */
+  /* Buttons: a 1px lift under white buttons; the primary gets a faint top highlight. */
+  --shadow-button: none;
+  --shadow-primary: none;
+  /* Home (the landing page's depth translated to the app): a card lifts on hover to a
+     darker ring and a long soft shadow; the hero sits a step higher at rest. `dot` is the dot-grid texture, `spot` the
+     pointer's light inside a card and `spot-ring` its brighter edge (utility `spot`). */
+  --shadow-lift: 0 0 0 1px #e0e0e0, 0 1px 2px rgb(0 0 0 / 0.04), 0 24px 48px -24px rgb(0 0 0 / 0.16);
+  --shadow-hero: 0 0 0 1px #ebebeb, 0 1px 2px rgb(0 0 0 / 0.03), 0 32px 64px -40px rgb(0 0 0 / 0.14);
+  --dot: rgb(0 0 0 / 0.08);
+  --spot: rgb(37 99 235 / 0.05);
+  --spot-ring: rgb(0 0 0 / 0.16);
+  --glow-mix: 24%;
+  /* A terminal (Workflow › runner setup): a dark code block in both themes, its prompt and flags quieter. */
+  --term: #161616;
+  --term-ink: #ededed;
+  --term-2: #8f8f8f;
+  --term-key: #93c5fd;
+  --term-ring: rgb(0 0 0 / 0.9);
+  color-scheme: light;
+}
+
+:root[data-theme="dark"],
+[data-theme="dark"] {
+  /* shadcn neutral dark: the whole app when chosen (lib/theme.ts), or a subtree that opts in (the call stage). */
+  --ground: #0a0a0a;
+  --surface: #171717;
+  --panel: #171717;
+  --frame: #171717;
+  --panel-edge: rgb(255 255 255 / 0.06);
+  --ink: #fafafa;
+  --ink-soft: #d4d4d4;
+  --ink-2: #a3a3a3;
+  --hairline: #2a2a2a;
+  --divider: #262626;
+  --divider-soft: #212121;
+  --edge: #333333;
+  --hover: #212121;
+  --selected: #2a2a2a;
+  --brand: #fafafa;
+  --on-brand: #171717;
+  --brand-text: #fafafa;
+  --brand-wash: #212121;
+  --accent: #60a5fa;
+  --accent-text: #93c5fd;
+  --accent-wash: #172036;
+  --nav-active: #1c2a47;
+  --lane: #1f1f1f;
+  --signal: #60a5fa;
+  --signal-text: #93c5fd;
+  --signal-wash: #172036;
+  --block: #f87171;
+  --block-wash: #2c1414;
+  --logo-tile: #1c1c21;
+  --logo-ring: rgb(255 255 255 / 0.1);
+  --mark-from: #5b84ff;
+  --mark-to: #a07bff;
+  --danger-fill: #dc2626; /* white label 4.8:1; the light red `block` is for text on dark */
+  --ok: #86efac;
+  --ok-wash: #10261d;
+  --warn: #fbbf24;
+  --warn-wash: #2b2210;
+  --tint-3: #2a1b22;
+  --progress: #60a5fa;
+  --progress-track: #2a2a2a;
+  --tangerine: #fb923c;
+  --tangerine-text: #fdba74;
+  --tangerine-wash: #2c1d10;
+  --rose: #f472b6;
+  --rose-text: #f9a8d4;
+  --rose-wash: #2c1520;
+  --sky: #60a5fa;
+  --sky-text: #93c5fd;
+  --sky-wash: #13223a;
+  --violet: #a78bfa;
+  --violet-text: #c4b5fd;
+  --violet-wash: #1f1838;
+  --shadow-panel: 0 1px 3px rgb(0 0 0 / 0.4);
+  --shadow-raised: 0 1px 2px rgb(0 0 0 / 0.5), 0 0 0 1px rgb(255 255 255 / 0.06);
+  --shadow-soft: 0 0 0 1px rgb(255 255 255 / 0.08), 0 10px 20px -4px rgb(0 0 0 / 0.55), 0 4px 8px -4px rgb(0 0 0 / 0.4);
+  --shadow-popover: 0 0 0 1px rgb(255 255 255 / 0.1), 0 4px 10px -2px rgb(0 0 0 / 0.5), 0 20px 48px -8px rgb(0 0 0 / 0.75);
+  --shadow-drawer: 0 0 0 1px rgb(255 255 255 / 0.08), -8px 0 24px -4px rgb(0 0 0 / 0.5), -24px 0 64px -8px rgb(0 0 0 / 0.7);
+  --shadow-card: 0 0 0 1px var(--hairline);
+  --shadow-float: 0 0 0 1px rgb(255 255 255 / 0.08), 0 20px 25px -5px rgb(0 0 0 / 0.6);
+  --chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23a3a3a3' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  /* Identity hues in the dark: the fills a step lighter, light text, washes as deep tints (avatars, project tiles). */
+  --art-0: #7b7fe8;
+  --art-0-text: #a5b4fc;
+  --art-0-wash: #23264a;
+  --art-1: #3aa3bb;
+  --art-1-text: #86d4b0;
+  --art-1-wash: #143029;
+  --art-2: #d9783f;
+  --art-2-text: #f5b183;
+  --art-2-wash: #3a2416;
+  --art-3: #e0628f;
+  --art-3-text: #f5a3c0;
+  --art-3-wash: #3a1a28;
+  --art-4: #bd62c2;
+  --art-4-text: #e2a6e8;
+  --art-4-wash: #321a36;
+  --art-5: #9575e0;
+  --art-5-text: #c4b5fd;
+  --art-5-wash: #261f42;
+  --art-6: #74a64a;
+  --art-6-text: #b5d98e;
+  --art-6-wash: #1e2a14;
+  --art-7: #b4835c;
+  --art-7-text: #dfbf9f;
+  --art-7-wash: #2e2219;
+  --ok-fill: #22a06b;
+  --warn-fill: #e5732d;
+  --mark-blue: #7da2ff;
+  --shadow-lift: 0 0 0 1px #333333, inset 0 1px 0 rgb(255 255 255 / 0.04), 0 24px 48px -24px rgb(0 0 0 / 0.9);
+  --shadow-hero: 0 0 0 1px #2a2a2a, inset 0 1px 0 rgb(255 255 255 / 0.04), 0 40px 80px -40px rgb(0 0 0 / 0.9);
+  --dot: rgb(255 255 255 / 0.07);
+  --spot: rgb(96 165 250 / 0.07);
+  --spot-ring: rgb(255 255 255 / 0.22);
+  --glow-mix: 16%;
+  --term: #0b0b0b;
+  --term-ink: #ededed;
+  --term-2: #8a8a8a;
+  --term-key: #93c5fd;
+  --term-ring: #2a2a2a;
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-term: var(--term);
+  --color-term-ink: var(--term-ink);
+  --color-term-2: var(--term-2);
+  --color-term-key: var(--term-key);
+  --color-term-ring: var(--term-ring);
+  --color-ground: var(--ground);
+  --color-surface: var(--surface);
+  --color-panel: var(--panel);
+  --color-frame: var(--frame);
+  --color-panel-edge: var(--panel-edge);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-ink-2: var(--ink-2);
+  --color-hairline: var(--hairline);
+  --color-divider: var(--divider);
+  --color-divider-soft: var(--divider-soft);
+  --color-edge: var(--edge);
+  --color-hover: var(--hover);
+  --color-selected: var(--selected);
+  --color-brand: var(--brand);
+  --color-on-brand: var(--on-brand);
+  --color-brand-text: var(--brand-text);
+  --color-brand-wash: var(--brand-wash);
+  --color-accent: var(--accent);
+  --color-accent-text: var(--accent-text);
+  --color-accent-wash: var(--accent-wash);
+  --color-nav-active: var(--nav-active);
+  --color-lane: var(--lane);
+  --color-ok-fill: var(--ok-fill);
+  --color-warn-fill: var(--warn-fill);
+  --color-signal: var(--signal);
+  --color-signal-text: var(--signal-text);
+  --color-signal-wash: var(--signal-wash);
+  --color-block: var(--block);
+  --color-block-wash: var(--block-wash);
+  --color-ok: var(--ok);
+  --color-ok-wash: var(--ok-wash);
+  --color-warn: var(--warn);
+  --color-warn-wash: var(--warn-wash);
+  --color-mark-blue: var(--mark-blue);
+  --color-logo-tile: var(--logo-tile);
+  --color-logo-ring: var(--logo-ring);
+  --color-danger-fill: var(--danger-fill);
+  --color-progress: var(--progress);
+  --color-progress-track: var(--progress-track);
+  --color-art-0: var(--art-0);
+  --color-art-0-text: var(--art-0-text);
+  --color-art-0-wash: var(--art-0-wash);
+  --color-art-1: var(--art-1);
+  --color-art-1-text: var(--art-1-text);
+  --color-art-1-wash: var(--art-1-wash);
+  --color-art-2: var(--art-2);
+  --color-art-2-text: var(--art-2-text);
+  --color-art-2-wash: var(--art-2-wash);
+  --color-art-3: var(--art-3);
+  --color-art-3-text: var(--art-3-text);
+  --color-art-3-wash: var(--art-3-wash);
+  --color-art-4: var(--art-4);
+  --color-art-4-text: var(--art-4-text);
+  --color-art-4-wash: var(--art-4-wash);
+  --color-art-5: var(--art-5);
+  --color-art-5-text: var(--art-5-text);
+  --color-art-5-wash: var(--art-5-wash);
+  --color-art-6: var(--art-6);
+  --color-art-6-text: var(--art-6-text);
+  --color-art-6-wash: var(--art-6-wash);
+  --color-art-7: var(--art-7);
+  --color-art-7-text: var(--art-7-text);
+  --color-art-7-wash: var(--art-7-wash);
+  --color-tangerine: var(--tangerine);
+  --color-tangerine-text: var(--tangerine-text);
+  --color-tangerine-wash: var(--tangerine-wash);
+  --color-rose: var(--rose);
+  --color-rose-text: var(--rose-text);
+  --color-rose-wash: var(--rose-wash);
+  --color-sky: var(--sky);
+  --color-sky-text: var(--sky-text);
+  --color-sky-wash: var(--sky-wash);
+  --color-violet: var(--violet);
+  --color-violet-text: var(--violet-text);
+  --color-violet-wash: var(--violet-wash);
+  --color-tint-3: var(--tint-3);
+
+  --font-sans: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC",
+    "Noto Sans SC", sans-serif;
+  /* Chinese has no web font: the system CJK faces after the Latin ones draw it (macOS, Windows, Linux/Android). */
+  /* Geist (the landing page's face), self-hosted with its Vietnamese letters (layout.tsx). */
+  --font-display: var(--font-inter-tight-latin), var(--font-inter-tight-vi), var(--font-geist-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+    "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", "Noto Sans SC", sans-serif;
+  --font-mono: var(--font-geist-mono);
+
+  /* Radii (soft like the logo's round strokes): 6 (lozenges, small tiles), 10 (inputs, menu and nav
+     rows), 14 (popovers, small cards), 18 (cards, tables), 22–28 (dialogs, sheets). Buttons, avatars, dots, badges
+     and toggles are round. */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 18px;
+  --radius-2xl: 22px;
+  --radius-3xl: 28px;
+  --radius-pill: 9999px;
+
+  --shadow-panel: var(--shadow-panel);
+  --shadow-raised: var(--shadow-raised);
+  --shadow-popover: var(--shadow-popover);
+  --shadow-drawer: var(--shadow-drawer);
+  --shadow-soft: var(--shadow-soft);
+  --shadow-card: var(--shadow-card);
+  --shadow-float: var(--shadow-float);
+  --shadow-button: var(--shadow-button);
+  --shadow-primary: var(--shadow-primary);
+  --shadow-lift: var(--shadow-lift);
+  --shadow-hero: var(--shadow-hero);
+  --ease-out-soft: cubic-bezier(0.2, 0.7, 0.2, 1);
+
+  --animate-rise: rise 200ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  /* A signal travelling along a pipeline's line (Workflow's hero): set `left` from 0 to 100%; hidden at rest. */
+  --animate-travel: travel 3.2s cubic-bezier(0.55, 0, 0.35, 1) infinite;
+  @keyframes travel {
+    0% {
+      left: 0%;
+      opacity: 0;
+    }
+    12% {
+      opacity: 1;
+    }
+    88% {
+      opacity: 1;
+    }
+    100% {
+      left: 100%;
+      opacity: 0;
+    }
+  }
+  /* Motion: one easing, short durations. A page fades up 6px on arrival; its blocks follow 35ms apart
+     (`stagger`); bars and progress fills grow from zero once; buttons press down 2%; skeletons shimmer. All of it
+     is off under prefers-reduced-motion (the base layer kills every animation and transition). */
+  --animate-page: page-in 260ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  --animate-grow-x: grow-x 700ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  --animate-grow-y: grow-y 600ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  /* A progress ring drawn with pathLength="100" fills from empty once (Home's "Việc hôm nay"). */
+  --animate-ring: ring-fill 900ms cubic-bezier(0.2, 0.7, 0.2, 1) 120ms both;
+  @keyframes ring-fill {
+    from {
+      stroke-dashoffset: 100;
+    }
+  }
+  @keyframes page-in {
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes grow-x {
+    from {
+      transform: scaleX(0);
+    }
+    to {
+      transform: scaleX(1);
+    }
+  }
+  @keyframes grow-y {
+    from {
+      transform: scaleY(0);
+    }
+    to {
+      transform: scaleY(1);
+    }
+  }
+  @keyframes shimmer {
+    from {
+      background-position: 200% 0;
+    }
+    to {
+      background-position: -200% 0;
+    }
+  }
+  /* Motion (DESIGN.md › Motion): popovers pop in, completion draws a check, cards lift while dragged. */
+  --animate-pop: pop 120ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  --animate-check: check-draw 180ms ease-out both;
+  @keyframes pop {
+    from {
+      opacity: 0;
+      transform: translateY(-2px) scale(0.98);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes check-draw {
+    from {
+      stroke-dashoffset: 24;
+    }
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+  /* Meeting reactions: rise and fade over four seconds. */
+  --animate-float-up: float-up 4s ease-out forwards;
+  @keyframes float-up {
+    0% {
+      opacity: 0;
+      transform: translateY(0) scale(0.8);
+    }
+    10% {
+      opacity: 1;
+      transform: translateY(-20px) scale(1);
+    }
+    80% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(-260px);
+    }
+  }
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(4px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+}
+
+/* A container whose direct children arrive one after another (cards, sections, tiles). */
+@utility stagger {
+  & > * {
+    animation: rise 320ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+  }
+  & > :nth-child(2) {
+    animation-delay: 35ms;
+  }
+  & > :nth-child(3) {
+    animation-delay: 70ms;
+  }
+  & > :nth-child(4) {
+    animation-delay: 105ms;
+  }
+  & > :nth-child(5) {
+    animation-delay: 140ms;
+  }
+  & > :nth-child(6) {
+    animation-delay: 175ms;
+  }
+  & > :nth-child(7) {
+    animation-delay: 210ms;
+  }
+  & > :nth-child(8) {
+    animation-delay: 245ms;
+  }
+  & > :nth-child(n + 9) {
+    animation-delay: 280ms;
+  }
+}
+/* A dot-grid texture (the landing page's ground), for a corner of a hero card; mask it to fade. */
+@utility dot-grid {
+  background-image: radial-gradient(var(--dot) 1px, transparent 1px);
+  background-size: 18px 18px;
+}
+/* A soft round light in the colour set as --glow (e.g. `[--glow:var(--violet)]`), behind a card's content. */
+@utility glow {
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--glow, var(--signal)) var(--glow-mix), transparent), transparent);
+}
+/* A card that lights up around the pointer: a faint wash and a brighter edge (the landing page's Spotlight). The
+   pointer position comes from --mx/--my, set by one listener on the page (Home's board); hover-capable devices only. */
+@utility spot {
+  position: relative;
+  isolation: isolate;
+  &::before,
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 300ms ease;
+  }
+  &::before {
+    z-index: -1;
+    background: radial-gradient(360px circle at var(--mx, 50%) var(--my, 0%), var(--spot), transparent 65%);
+  }
+  &::after {
+    padding: 1px;
+    background: radial-gradient(220px circle at var(--mx, 50%) var(--my, 0%), var(--spot-ring), transparent 70%);
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+  }
+  @media (hover: hover) {
+    &:hover::before,
+    &:hover::after {
+      opacity: 1;
+    }
+  }
+}
+/* A loading placeholder that sweeps instead of blinking. */
+@utility shimmer {
+  background: linear-gradient(90deg, var(--hover) 0%, var(--selected) 50%, var(--hover) 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.6s linear infinite;
+}
+/* Horizontal scrollers (tab rows) without a visible scrollbar. */
+@utility no-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+/* A card being dragged: lifted off the page. */
+@utility lift {
+  transform: scale(1.02) rotate(-0.5deg);
+  box-shadow: var(--shadow-float);
+  cursor: grabbing;
+}
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+    /* The scrollbar gutter shows the root's background: white like the content, so no strip shows beside it. */
+    background: var(--panel);
+    /* The page (the panel's scroller) keeps its scrollbar's room whether or not it scrolls, so opening a
+       Peek, a dialog that locks scrolling or a short page never shifts the layout sideways. */
+    scrollbar-gutter: stable;
+  }
+  body {
+    @apply bg-panel text-ink font-sans text-sm/[1.5] antialiased;
+    /* Inter's contextual alternates and the open digits read crisper at UI sizes. */
+    font-feature-settings: "calt";
+  }
+  /* Focus: a 2px ink ring 2px off the element, so the page shows between ring and fill: visible on white
+     controls and on the near-black primary alike (a ring touching a dark button disappears). */
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+  /* Inside lists of rows (sidebar, menus, tab bars, pickers) the ring sits inside the row, in a quieter ink, so it
+     never collides with the neighbouring row or gets clipped by a scrolling container. */
+  nav :is(a, button):focus-visible,
+  aside :is(a, button, [tabindex]):focus-visible,
+  [role="menu"] :focus-visible,
+  [role="listbox"] :focus-visible,
+  [role="radiogroup"] :focus-visible {
+    outline-color: var(--ink-2);
+    outline-offset: -2px;
+  }
+  ::selection {
+    background: #dbe6ff;
+    color: var(--ink);
+  }
+  /* Links inside text are underlined (WCAG 1.4.1: not color alone); nav items and buttons opt out with no-underline. */
+  a {
+    color: var(--brand-text);
+    text-decoration-line: underline;
+    text-decoration-thickness: 1px;
+    text-decoration-color: color-mix(in srgb, currentColor 45%, transparent);
+    text-underline-offset: 3px;
+  }
+  a:hover {
+    text-decoration-color: currentColor;
+  }
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation: none !important;
+      transition: none !important;
+    }
+  }
+}
+
+/*
+ * Every single-line <select> gets one arrow with room around it: the native arrow sits flush against the
+ * border and differs per browser. Unlayered so it beats the `px-3` of `control`.
+ */
+select:not([multiple]):not([size]) {
+  appearance: none;
+  padding-right: 2.25rem;
+  background-image: var(--chevron);
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 1rem;
+  text-overflow: ellipsis;
+}
+
+/*
+ * Phones: 12px text is the floor on desktop but too small held at arm's length; below md every
+ * `text-xs` (meta, helper text, small links) renders at 13px. Unlayered, so it beats Tailwind's theme layer.
+ */
+@media (max-width: 47.99rem) {
+  :root {
+    --text-xs: 0.8125rem;
+    --text-xs--line-height: 1.45;
+  }
+}
+
+/* Body and controls are 14px everywhere , meta 12px (13px on phones). */

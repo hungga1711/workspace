@@ -1,0 +1,225 @@
+<!doctype html>
+<!--
+  Source of docs/assets/social-preview.png (the GitHub social preview, 1280×640). Colours, fonts and the mark follow
+  DESIGN.md (Round 5): grey ground, one white panel, Inter / Inter Tight, ink text, one blue accent, no gradients.
+  Regenerate: node tooling/scripts/social-preview.mjs
+-->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>workspace social preview</title>
+    <style>
+      @font-face {
+        font-family: "Inter";
+        src: url("../../frontend/web/src/fonts/inter-latin.woff2") format("woff2");
+        font-weight: 100 900;
+      }
+      @font-face {
+        font-family: "Inter Tight";
+        src: url("../../frontend/web/src/fonts/inter-tight-latin.woff2") format("woff2");
+        font-weight: 100 900;
+      }
+      :root {
+        --ground: #f3f3f1;
+        --panel: #ffffff;
+        --text: #18181b;
+        --text-soft: #3f3f46;
+        --text-muted: #6b6b72;
+        --hairline: #ecece9;
+        --hover: #f5f5f3;
+        --accent: #2563eb;
+        --accent-text: #1d4ed8;
+        --accent-wash: #eff4ff;
+        --track: #f0f0ee;
+        --success: #15803d;
+        --success-wash: #ecfdf5;
+        --warning: #a14a07;
+        --warning-wash: #fef3c7;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        width: 1280px;
+        height: 640px;
+        background: var(--ground);
+        font-family: "Inter", sans-serif;
+        color: var(--text);
+        -webkit-font-smoothing: antialiased;
+      }
+      .panel {
+        position: absolute;
+        inset: 24px;
+        background: var(--panel);
+        border-radius: 16px;
+        box-shadow:
+          0 1px 2px rgba(24, 24, 27, 0.04),
+          0 8px 24px rgba(24, 24, 27, 0.05);
+        display: grid;
+        grid-template-columns: 1fr 360px;
+        gap: 48px;
+        padding: 56px 64px;
+      }
+      .lead {
+        align-self: center;
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+      .brand svg {
+        width: 56px;
+        height: 56px;
+      }
+      .wordmark {
+        font-family: "Inter Tight", sans-serif;
+        font-weight: 700;
+        font-size: 34px;
+        letter-spacing: -0.035em;
+      }
+      h1 {
+        font-family: "Inter Tight", sans-serif;
+        font-weight: 600;
+        font-size: 50px;
+        line-height: 1.1;
+        letter-spacing: -0.03em;
+        margin: 44px 0 0;
+      }
+      h1 em {
+        font-style: normal;
+        color: var(--accent);
+      }
+      .sub {
+        margin-top: 22px;
+        font-size: 19px;
+        line-height: 1.45;
+        color: var(--text-muted);
+      }
+      .chips {
+        display: flex;
+        gap: 10px;
+        margin-top: 24px;
+      }
+      .chip {
+        background: var(--hover);
+        border-radius: 9999px;
+        padding: 8px 16px;
+        font-size: 16px;
+        font-weight: 500;
+        color: var(--text-soft);
+      }
+      .card {
+        align-self: center;
+        border: 1px solid var(--hairline);
+        border-radius: 14px;
+        padding: 26px 28px;
+      }
+      .card .label {
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--text-muted);
+      }
+      .card .title {
+        font-size: 19px;
+        font-weight: 600;
+        margin-top: 4px;
+      }
+      .row {
+        margin-top: 22px;
+      }
+      .row .top {
+        display: flex;
+        justify-content: space-between;
+        font-size: 15px;
+        color: var(--text-soft);
+      }
+      .row .num {
+        font-family: "Inter Tight", sans-serif;
+        font-weight: 600;
+        font-variant-numeric: tabular-nums;
+        color: var(--text);
+      }
+      .bar {
+        height: 8px;
+        border-radius: 9999px;
+        background: var(--track);
+        margin-top: 8px;
+        overflow: hidden;
+      }
+      .bar > i {
+        display: block;
+        height: 100%;
+        border-radius: 9999px;
+        background: var(--accent);
+      }
+      .bar.muted > i {
+        background: #a1a1aa;
+      }
+      .foot {
+        display: flex;
+        gap: 8px;
+        margin-top: 24px;
+        flex-wrap: wrap;
+      }
+      .pill {
+        border-radius: 9999px;
+        padding: 5px 12px;
+        font-size: 13px;
+        font-weight: 500;
+      }
+      .ok {
+        background: var(--success-wash);
+        color: var(--success);
+      }
+      .warn {
+        background: var(--warning-wash);
+        color: var(--warning);
+      }
+      .info {
+        background: var(--accent-wash);
+        color: var(--accent-text);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="panel">
+      <div class="lead">
+        <div class="brand">
+          <svg viewBox="0 0 40 40" aria-hidden="true" ><defs><linearGradient id="spm" gradientUnits="userSpaceOnUse" x1="6" y1="8" x2="34" y2="32"><stop offset="0" stop-color="#3b6bff"/><stop offset="1" stop-color="#8b5cf6"/></linearGradient></defs><rect width="40" height="40" rx="10" fill="#ffffff"/><rect x=".5" y=".5" width="39" height="39" rx="9.5" fill="none" stroke="#18181b" stroke-opacity=".12"/><path d="M10 17 C11.5 30 16 30 17.6 22.5 C18.6 18 21.4 18 22.4 22.5 C24 30 28.5 30 30 17" fill="none" stroke="url(#spm)" stroke-width="4.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M18.2 12.6 H21.8 L20 15.2z" fill="url(#spm)" stroke="url(#spm)" stroke-width=".8" stroke-linejoin="round"/></svg>
+          <span class="wordmark">workspace</span>
+        </div>
+        <h1>The open-source workspace that shows whether <em>AI is actually helping</em> your team get work done.</h1>
+        <div class="sub">Tasks, goals, docs, chat, meetings and HR, plus AI Insights.</div>
+        <div class="chips">
+          <span class="chip">Self-hosted</span>
+          <span class="chip">MIT</span>
+          <span class="chip">Works without AI</span>
+        </div>
+      </div>
+      <div class="card">
+        <div class="label">AI Insights · this week</div>
+        <div class="title">Did AI help get work done?</div>
+        <div class="row">
+          <div class="top"><span>Days to done, with AI help</span><span class="num">4.1</span></div>
+          <div class="bar"><i style="width: 46%"></i></div>
+        </div>
+        <div class="row">
+          <div class="top"><span>Days to done, without</span><span class="num">6.3</span></div>
+          <div class="bar muted"><i style="width: 70%"></i></div>
+        </div>
+        <div class="row">
+          <div class="top"><span>Staff who said "it helped"</span><span class="num">72%</span></div>
+          <div class="bar"><i style="width: 72%"></i></div>
+        </div>
+        <div class="foot">
+          <span class="pill ok">Consent first</span>
+          <span class="pill info">Staff see their own data</span>
+          <span class="pill warn">2 redacted sends</span>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

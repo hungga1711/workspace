@@ -1,0 +1,30 @@
+{
+  "tasks": [
+    {
+      "id": "86c1",
+      "custom_id": "WEB-12",
+      "name": "Sửa lỗi đăng nhập",
+      "text_content": "Người dùng bị đăng xuất sau 5 phút",
+      "status": { "status": "shipped", "type": "closed" },
+      "priority": { "priority": "urgent" },
+      "assignees": [{ "username": "huy", "email": "huy@congty.vn" }],
+      "due_date": "1793318400000",
+      "tags": [{ "name": "bug" }],
+      "parent": null,
+      "list": { "name": "Website" }
+    },
+    {
+      "id": "86c2",
+      "custom_id": null,
+      "name": "Viết test cho phiên đăng nhập",
+      "status": { "status": "in progress", "type": "custom" },
+      "priority": null,
+      "assignees": [],
+      "due_date": null,
+      "tags": [],
+      "parent": "86c1",
+      "list": { "name": "Website" }
+    },
+    { "id": "86c3", "name": "  ", "status": { "status": "to do" } }
+  ]
+}

@@ -1,0 +1,34 @@
+---
+title: Operations
+description: Back up, restore and upgrade a self-hosted Workspace with one script each, plus the day-to-day Docker commands and what to monitor.
+---
+
+Run these in `infra/production/`.
+
+| Task | Command |
+|---|---|
+| Back up (database, files, `.env`, secrets) | `./backup.sh /var/backups/workspace` |
+| Restore onto empty volumes | `./restore.sh /var/backups/workspace/workspace-<date> --yes` |
+| Upgrade (backs up, migrates, rolls back on failure) | `./upgrade.sh 1.0.0` |
+| Roll back the last upgrade | `./upgrade.sh "$(cat .upgrade-previous)" --no-backup` |
+| Logs | `docker compose logs -f app` |
+| Status | `docker compose ps` |
+| Failed events | `docker compose exec app /app/infra/production/entrypoint.sh dlq list` |
+| Rebuild search | `docker compose exec app /app/infra/production/entrypoint.sh reindex` |
+
+<Callout type="warn">
+  A backup holds every secret of the installation. Copy it off the server and keep it encrypted. Run it nightly
+  from cron and test a restore on a spare machine once a month.
+</Callout>
+
+Read `CHANGELOG.md` before upgrading; the app is down for about a minute. Run one `app` container per installation:
+events, caches and live connections live in its memory.
+
+Full procedures, in the repository:
+
+- [Backup and restore](https://github.com/hungga1711/workspace/blob/main/docs/runbooks/backup-restore.md): what
+  holds state, the cron line, what a restore does, testing a restore.
+- [Upgrade](https://github.com/hungga1711/workspace/blob/main/docs/runbooks/upgrade.md): each step of
+  `upgrade.sh`, rolling back, building from source.
+- [Operations runbook](https://github.com/hungga1711/workspace/blob/main/docs/runbooks/operations.md): health
+  checks, rotating secrets, logs, incidents, dead letters, retention.

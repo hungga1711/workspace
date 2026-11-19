@@ -1,0 +1,187 @@
+{
+  "extName": {
+    "message": "workspace AI Insights"
+  },
+  "extDescription": {
+    "message": "Descubre cómo tu equipo usa ChatGPT, Claude, Gemini y Copilot en el trabajo, con un aviso visible y un filtro que detiene los datos sensibles antes de enviarlos."
+  },
+  "optIntro": {
+    "message": "AI Insights: registra cómo se usa la IA en el trabajo según la política de tu empresa, y avisa, oculta o bloquea los datos sensibles antes de enviarlos."
+  },
+  "optCodeLabel": {
+    "message": "Código de conexión"
+  },
+  "optCodePlaceholder": {
+    "message": "Pega el código de workspace › Yo › IA"
+  },
+  "optConnect": {
+    "message": "Conectar"
+  },
+  "optDisconnect": {
+    "message": "Desconectar"
+  },
+  "optNote1": {
+    "message": "Solo se registra cuando pulsas enviar, y solo en estos sitios de IA: $sites$.",
+    "placeholders": {
+      "sites": {
+        "content": "$1"
+      }
+    }
+  },
+  "optNote2": {
+    "message": "Cada página de IA muestra un pequeño aviso en la esquina."
+  },
+  "optNote3": {
+    "message": "Puedes ver lo que se registró en workspace › Yo › IA."
+  },
+  "optWhatSent": {
+    "message": "Qué envía esta extensión, campo por campo"
+  },
+  "statusExpired": {
+    "message": "Este código ya no es válido. Crea uno nuevo en workspace."
+  },
+  "statusConnected": {
+    "message": "Conectado a $host$",
+    "placeholders": {
+      "host": {
+        "content": "$1"
+      }
+    }
+  },
+  "statusLastSent": {
+    "message": " · último envío $when$",
+    "placeholders": {
+      "when": {
+        "content": "$1"
+      }
+    }
+  },
+  "statusNone": {
+    "message": "No conectado."
+  },
+  "statusBadCode": {
+    "message": "Ese código no es válido. Vuelve a copiar el código completo desde workspace."
+  },
+  "noticeOn": {
+    "message": "AI Insights: tu empresa registra el uso de IA en esta página"
+  },
+  "noticeOff": {
+    "message": "workspace AI Insights no está conectado"
+  },
+  "noticeWhatPrompts": {
+    "message": "Lo que envías se guarda en workspace para que la empresa vea en qué ayuda la IA. No se registra nada hasta que pulsas enviar."
+  },
+  "noticeWhatBoth": {
+    "message": "Lo que envías y las respuestas de la IA se guardan en workspace para que la empresa vea en qué ayuda la IA. No se registra nada hasta que pulsas enviar."
+  },
+  "noticePolicy": {
+    "message": "Ver la política y lo que se registró"
+  },
+  "noticeConnect": {
+    "message": "Abre la extensión y pega el código de conexión de workspace › Yo › IA."
+  },
+  "confirmSensitive": {
+    "message": "Este mensaje parece contener $kinds$.\n\nEnviarlo a una IA externa puede incumplir las normas de la empresa. ¿Enviar de todos modos?",
+    "placeholders": {
+      "kinds": {
+        "content": "$1"
+      }
+    }
+  },
+  "kindPersonalId": {
+    "message": "un número de DNI o pasaporte"
+  },
+  "kindCard": {
+    "message": "un número de tarjeta"
+  },
+  "kindSecret": {
+    "message": "una contraseña o clave API"
+  },
+  "kindContacts": {
+    "message": "datos de contacto (correos, teléfonos)"
+  },
+  "kindBankAccount": {
+    "message": "un número de cuenta bancaria"
+  },
+  "optHint": {
+    "message": "Sugerir la tarea que tengo abierta en workspace"
+  },
+  "optHintNote": {
+    "message": "Un mensaje enviado en las 2 horas siguientes a abrir una tarea en workspace se sugiere para esa tarea; tú lo confirmas en Yo › IA. La extensión solo lee el ID de la tarea, nada más."
+  },
+  "optHintDenied": {
+    "message": "El navegador no permitió que la extensión leyera la página de workspace, así que las sugerencias están desactivadas."
+  },
+  "noticeRedact": {
+    "message": "Los datos sensibles se ocultan antes de enviar."
+  },
+  "noticeBlock": {
+    "message": "Los mensajes con datos sensibles no se enviarán."
+  },
+  "kindKeyword": {
+    "message": "una palabra clave de la empresa"
+  },
+  "redactTitle": {
+    "message": "Datos sensibles ocultados"
+  },
+  "redactBody": {
+    "message": "Tu empresa pide ocultar $kinds$ antes de enviar a una IA externa. Esto es lo que se enviará:",
+    "placeholders": {
+      "kinds": {
+        "content": "$1"
+      }
+    }
+  },
+  "redactSend": {
+    "message": "Enviar el texto ocultado"
+  },
+  "redactCancel": {
+    "message": "Cancelar"
+  },
+  "blockTitle": {
+    "message": "Este mensaje no se envió"
+  },
+  "blockBody": {
+    "message": "Este mensaje contiene $kinds$. Tu empresa no permite enviar este tipo de datos a una IA externa. Quítalo y vuelve a enviar.",
+    "placeholders": {
+      "kinds": {
+        "content": "$1"
+      }
+    }
+  },
+  "blockOk": {
+    "message": "Entendido"
+  },
+  "feedbackAsk": {
+    "message": "¿Te ayudó la IA?"
+  },
+  "feedbackYes": {
+    "message": "Sí"
+  },
+  "feedbackPartly": {
+    "message": "En parte"
+  },
+  "feedbackNo": {
+    "message": "No"
+  },
+  "feedbackDismiss": {
+    "message": "Cerrar"
+  },
+  "linkAsk": {
+    "message": "¿Vincular este chat a $code$ en workspace?",
+    "placeholders": {
+      "code": {
+        "content": "$1"
+      }
+    }
+  },
+  "linkYes": {
+    "message": "Vincular"
+  },
+  "linkNo": {
+    "message": "No es esta tarea"
+  },
+  "statusPaused": {
+    "message": "Tu empresa ha desactivado AI Insights. No se registra nada."
+  }
+}

@@ -1,0 +1,73 @@
+---
+title: AI Insights overview
+description: What your team does with AI, with what data, and whether the work gets better. The opposite of employee monitoring.
+---
+
+AI Insights covers the company's own AI inside Workspace and popular AI chat tools in the browser, recorded by the
+Workspace extension. The rules behind it are in
+[ADR 0020](https://github.com/hungga1711/workspace/blob/main/docs/adr/0020-ai-insights-principles.md); notice and
+policy templates are in
+[docs/ai-insights/templates](https://github.com/hungga1711/workspace/tree/main/docs/ai-insights/templates).
+
+## Recorded and never recorded
+
+| Recorded | Never recorded |
+|---|---|
+| The prompt, when the person presses send | Screenshots or screen video |
+| The answer, only if the policy captures answers (off by default) | Keystrokes, typing speed, mouse movement |
+| Site, time, topic, sensitive-data kinds | Idle time or "productivity" scores |
+| The task it served, once the person confirms | Other websites, tabs or history |
+| "Did AI help?" answers | Text the safety net redacted or blocked |
+
+## Turn it on
+
+Off by default. An admin switches it on and sets the policy; each person connects the
+[extension](/docs/ai-insights/extension) with their own code, and nothing is recorded before that. Step by step:
+[Turn AI on or off](/docs/ai-insights/turn-on-off).
+
+## Who sees what
+
+| Screen | Who | Shows |
+|---|---|---|
+| **Me › AI** | Each person | Their week by topic, tasks AI helped with, their own warnings, every recorded conversation and who opened it; export (JSON) and deletion request |
+| **AI › AI adoption › Usage** | Managers (their reporting line), admins (everyone) | Tools, topics, people, departments, cost, safety-net counts, and tasks done with AI help against without |
+
+Managers read only what the policy allows: `topic`, a one-line `summary` (default) or `full` text. Opening a full
+conversation is logged and shown to the person.
+
+## Safety net
+
+The extension checks each prompt in the browser before it is sent, for personal ID numbers, card and bank details,
+secrets, contact lists and the company's own keywords, and acts as the company chose:
+
+| Mode | What the person sees |
+|---|---|
+| `warn` (default) | A warning; send anyway or cancel |
+| `redact` | Sensitive parts replaced with `[CCCD]`, `[CARD]`, `[EMAIL]`, `[SECRET]`… before sending |
+| `block` | The prompt is not sent |
+
+Only the event is stored (person, site, action, kinds, count), never the redacted text. Detection is heuristic: it
+catches common patterns, not everything.
+
+## Does AI help?
+
+Conversations are linked to tasks by the person, by a hint from the task they had open (confirmed by the person),
+or by a full-text suggestion. AI › AI adoption › Usage then compares tasks done with AI help against the rest: done, on time,
+median days to done. After a conversation the extension asks "Did AI help? yes / no / partly", one tap, optional.
+This is a correlation, and the page says so.
+
+## Also included
+
+Topics (keyword-based, refined by a connected model), a shared prompt library, a skills map of likely mentors, import
+of usage exports from AI vendors' admin consoles, and a one-page weekly report. Everything works without an AI
+model; with one connected, it adds one-line summaries and model-based topics.
+
+## Retention and deletion
+
+Conversations older than the policy's retention are deleted hourly. Each person can export their data and ask for
+deletion in Me › AI. Admins can delete all AI Insights data in Admin › System › AI connections › Danger zone.
+
+Full reference, in the repository:
+[docs/ai-insights.md](https://github.com/hungga1711/workspace/blob/main/docs/ai-insights.md): what each screen
+shows, every detector and placeholder, the three ways conversations link to tasks, topics, the prompt library and
+skills map, provider import, the weekly report, and retention of the side tables.

@@ -1,0 +1,43 @@
+---
+title: Configuration
+description: Every environment variable, what runs next to Workspace (Postgres required; S3, SMTP, LiveKit, push optional) and what you lose without each.
+---
+
+All settings are environment variables in `infra/production/.env`;
+[`.env.example`](https://github.com/hungga1711/workspace/blob/main/infra/production/.env.example) documents each one.
+Apply a change with `docker compose up -d`.
+
+## Core
+
+| Variable | Meaning |
+|---|---|
+| `APP_URL`, `APP_DOMAIN` | Public address, used in e-mails, links and cookies |
+| `LETSENCRYPT_EMAIL` | Certificate expiry notices |
+| `COMPOSE_PROFILES` | Optional parts started by default: `s3`, `meet`, `pgbouncer` |
+| `WORKSPACE_IMAGE` | Image to run, e.g. `ghcr.io/hungga1711/workspace:1.0.0` |
+| `SETUP_TOKEN` | One-time token for `/setup`; generated when empty |
+| `TRUSTED_PROXY_HOPS` | Proxies in front of the app, for per-IP limits |
+| `DISABLED_FEATURES` | Parts to leave out, comma-separated: `docs`, `whiteboards`, `calendar`, `time`, `ai`. Chat and tasks are always on |
+
+Secrets (`INTERNAL_TOKEN_SECRET`, `SESSION_SECRET`, `AUTH_SECRET`, the Postgres passwords, `AI_SECRETS_KEY`) left
+empty are generated once. Set `AI_SECRETS_KEY` explicitly so saved AI keys survive a rotation of
+`INTERNAL_TOKEN_SECRET`. What changing each secret breaks:
+[operations runbook §5](https://github.com/hungga1711/workspace/blob/main/docs/runbooks/operations.md#5-rotating-secrets).
+
+## Optional features
+
+| Feature | Settings | Without it |
+|---|---|---|
+| E-mail | `SMTP_URL=smtp://user:password@smtp.example.com:587`, `MAIL_FROM` | Admins hand over activation links and temporary passwords |
+| Bundled S3 | `COMPOSE_PROFILES=s3`, `FILES_DOMAIN`, `S3_ENDPOINT=https://<files domain>` | Files on the server's disk |
+| Your S3 / R2 | `S3_ENDPOINT`, `S3_REGION`, `S3_BUCKET`, keys; CORS `PUT`/`GET` from `APP_URL` | Files on the server's disk |
+| AI | Admin › System › AI connections, no restart; or `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, `GEMINI_API_KEY`, `OPENAI_BASE_URL` | AI hidden ([Turn AI on or off](/docs/ai-insights/turn-on-off)) |
+| Video meetings | `LIVEKIT_URL`, `LIVEKIT_API_KEY`, `LIVEKIT_API_SECRET`, `MEET_DOMAIN`; TCP 7881, UDP 50000–50100; `--profile meet` | Agendas, minutes and action items, no video |
+| Web Push | `VAPID_*`, then rebuild the image | In-app notifications only |
+
+<Callout type="error">
+  `WEBHOOK_ALLOW_PRIVATE` is for development only.
+</Callout>
+
+Full reference, in the repository:
+[infra/production/README.md §2 and §6](https://github.com/hungga1711/workspace/blob/main/infra/production/README.md#6-optional-features).

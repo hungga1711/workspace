@@ -1,0 +1,142 @@
+# CasaOS custom app (App Store › Custom Install › Import, or a community app store). Same stack as
+# infra/templates/docker-compose.yml with CasaOS metadata (x-casaos); keep the two in step.
+name: workspace
+
+x-app: &app
+  image: ${WORKSPACE_IMAGE:-ghcr.io/hungga1711/workspace:latest}
+  restart: unless-stopped
+
+services:
+  init:
+    <<: *app
+    command: ["init-secrets"]
+    restart: "no"
+    # Root: the volumes may have been created by another container first (owned by root).
+    user: "0:0"
+    environment:
+      PROXY_CONF_DIR: /run/workspace-proxy
+    volumes:
+      - secrets:/run/workspace
+      - proxy:/run/workspace-proxy
+
+  postgres:
+    image: postgres:16.4-alpine
+    restart: unless-stopped
+    depends_on:
+      init: { condition: service_completed_successfully }
+    # The generated passwords live next to the bootstrap script the init job copied (00-workspace-init.sh).
+    entrypoint:
+      - sh
+      - -c
+      - |
+        while IFS='=' read -r k v; do [ -n "$$k" ] && export "$$k=$$v"; done < /docker-entrypoint-initdb.d/secrets.env
+        exec docker-entrypoint.sh postgres -c max_connections=200
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_DB: postgres
+    volumes:
+      - secrets:/docker-entrypoint-initdb.d:ro
+      - pgdata:/var/lib/postgresql/data
+    # Over TCP: the socket already answers while the first start runs the init scripts on a temporary server.
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U postgres -d postgres"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+
+  # The web app and the server (every module in one process) in one container; migrations run on every start.
+  app:
+    <<: *app
+    command: ["app"]
+    depends_on:
+      postgres: { condition: service_healthy }
+    environment:
+      NODE_ENV: production
+      APP_URL: ${APP_URL:-http://localhost:8080}
+      WEB_ORIGIN: ${APP_URL:-http://localhost:8080}
+      STORAGE_DRIVER: local
+      STORAGE_LOCAL_DIR: /data/files
+      SMTP_URL: ${SMTP_URL:-}
+      MAIL_FROM: ${MAIL_FROM:-}
+      TRUST_PROXY: loopback, uniquelocal
+      SETUP_TOKEN_FILE: /data/setup-token
+      # Features to leave out, e.g. "whiteboards,calendar" (docs, whiteboards, calendar, time, ai). Empty: everything.
+      DISABLED_FEATURES: ${DISABLED_FEATURES:-}
+      # Passwords are filled in from the generated secrets when the container starts (entrypoint.sh).
+      IDENTITY_DATABASE_URL: postgres://workspace_identity:@postgres:5432/workspace
+      PLATFORM_DATABASE_URL: postgres://workspace_platform:@postgres:5432/workspace
+      SEARCH_DATABASE_URL: postgres://workspace_search:@postgres:5432/workspace
+      CHAT_DATABASE_URL: postgres://workspace_chat:@postgres:5432/workspace
+      HOME_DATABASE_URL: postgres://workspace_home:@postgres:5432/workspace
+      CHAT_SEARCH_DATABASE_URL: postgres://workspace_chat:@postgres:5432/workspace
+      WORK_DATABASE_URL: postgres://workspace_work:@postgres:5432/workspace
+      EMPLOYEE_DATABASE_URL: postgres://workspace_employee:@postgres:5432/workspace
+      AI_DATABASE_URL: postgres://workspace_ai:@postgres:5432/workspace
+      WEB_DATABASE_URL: postgres://workspace_web:@postgres:5432/workspace
+      OWNER_DATABASE_URL: postgres://workspace_owner:@postgres:5432/workspace
+      GATEWAY_URL: http://127.0.0.1:4000
+      TRUSTED_PROXY_HOPS: ${TRUSTED_PROXY_HOPS:-2}
+    volumes:
+      - data:/data
+      - secrets:/run/workspace:ro
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:4000/health && wget -q -O /dev/null http://127.0.0.1:3000/robots.txt"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
+
+  # Routes /socket.io/, /storage/, /api/mcp and /api/docs to the server and the rest to the web app
+  # (infra/templates/Caddyfile, copied into the `proxy` volume by `init`).
+  proxy:
+    image: caddy:2.8.4-alpine
+    restart: unless-stopped
+    depends_on:
+      init: { condition: service_completed_successfully }
+    x-casaos:
+      ports:
+        - container: "80"
+          description:
+            en_us: workspace web interface
+    ports:
+      - "8080:80"
+    volumes:
+      - proxy:/etc/caddy:ro
+      - proxydata:/data
+
+volumes:
+  secrets:
+  proxy:
+  proxydata:
+  pgdata:
+  data:
+
+x-casaos:
+  architectures:
+    - amd64
+    - arm64
+  main: proxy
+  author: workspace
+  developer: workspace
+  category: Productivity
+  icon: https://raw.githubusercontent.com/hungga1711/workspace/main/frontend/browser-extension/icon128.png
+  title:
+    en_us: workspace
+    vi_vn: workspace
+  tagline:
+    en_us: Tasks, goals, docs, chat, meetings and HR in one self-hosted app, with AI Insights
+    vi_vn: Công việc, mục tiêu, tài liệu, chat, họp và nhân sự trong một ứng dụng tự host, kèm AI Insights
+  description:
+    en_us: >-
+      The open-source workspace that shows whether AI is actually helping your team get work done.
+      Open the app, enter the setup token (docker logs workspace-app-1 | grep "setup token") and create the workspace.
+    vi_vn: >-
+      Không gian làm việc mã nguồn mở cho thấy AI có thật sự giúp đội của bạn làm việc tốt hơn không.
+      Mở ứng dụng, nhập mã cài đặt (docker logs workspace-app-1 | grep "setup token") và tạo công ty.
+  index: /setup
+  port_map: "8080"
+  tips:
+    before_install:
+      en_us: >-
+        Set APP_URL to the address people will open (for example http://casaos.local:8080) in the app's settings
+        before the first start: links in e-mails and cookies use it.

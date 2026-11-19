@@ -1,0 +1,10 @@
+**/dist/**
+**/.next/**
+**/node_modules/**
+pnpm-lock.yaml
+**/coverage/**
+**/playwright-report/**
+**/test-results/**
+*.md
+**/src-tauri/target/**
+**/.next-*/**

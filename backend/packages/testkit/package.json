@@ -1,0 +1,9 @@
+{
+  "name": "@workspace/testkit",
+  "description": "HTTP helpers for the server's integration tests",
+  "license": "MIT",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts"
+}

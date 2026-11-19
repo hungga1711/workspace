@@ -1,0 +1,73 @@
+---
+title: System design
+description: Three containers, one server process hosting nine modules, and one Postgres database with a schema per module.
+---
+
+Workspace runs as three containers: **Caddy** for HTTPS, one **app** container (a Next.js web app and one Node 22
+server hosting every module) and **PostgreSQL**. No message broker, no cache server. One installation holds one
+company; it scales up on a bigger server, not out to more containers.
+
+<Diagram name="system-context" caption="Who uses Workspace and what it talks to." />
+
+<Diagram name="containers" caption="Containers: Caddy, the app container (web and server) and Postgres." />
+
+## Modules
+
+The backend is one process (`backend/server`). Each module owns a folder, a Postgres schema, a login role, its
+migrations and an HTTP API. A lint rule refuses imports between modules; they call each other's API in memory or
+react to events. The web app (`frontend/web`, Next.js 15) is the BFF in front of the gateway.
+
+| Module | Owns |
+|---|---|
+| **gateway** | Verifies sessions and API keys, rate limits, routes `/api/<module>/*`; MCP and the extension intake |
+| **identity** | Sign-in (passwords, tokens, two-step), members, roles, teams, API keys, audit |
+| **platform** | The workspace, first-run setup, master data, outbound webhooks |
+| **chat** | Channels, DMs, threads, files, calls; Socket.IO realtime and live co-editing |
+| **work** | Projects, tasks, documents, drive, calendar and meetings, approvals, goals, outcomes |
+| **home** | The "Needs you" feed, notifications, reminders, daily digest, Web Push |
+| **employee** | Profiles, departments and reporting lines, attendance, leave, announcements |
+| **ai** | Model gateway, assistant, usage and budgets, AI Insights intake, policy and retention |
+| **search** | Full-text index in Postgres, rebuilt from events |
+
+<Diagram name="containers-data" caption="Data and messaging: one Postgres, a schema per module, events in process." />
+
+State changes other modules care about are written to an **outbox in the same transaction** and delivered in
+process, at least once, to every consumer. A failed event retries, then waits in a dead-letter table for a replay.
+Files go to local disk or S3 through signed URLs; search is a Postgres full-text index that can be rebuilt from the
+modules' own data.
+
+## Five rules behind every change
+
+1. **No module reads another module's schema.** Its Postgres role cannot. Data moves through module APIs (in
+   memory) or events.
+2. **One workspace.** No workspace column, row-level security or workspace id anywhere; a second company is a
+   second installation.
+3. **Authorization is `authorize(principal, permission, resource)`** in the owning module, for people, API keys and
+   AI agents alike.
+4. **State changes others care about go through the outbox**, in the same transaction.
+5. **Nothing may require AI.** Generative endpoints answer `503 ai_not_configured` and the UI hides them.
+
+## Why it is built this way
+
+Each decision is an architecture decision record in
+[docs/adr](https://github.com/hungga1711/workspace/blob/main/docs/adr/README.md), never rewritten: a changed decision
+gets a new record that supersedes the old one. Three explain most of what you see here:
+
+- [0020](https://github.com/hungga1711/workspace/blob/main/docs/adr/0020-ai-insights-principles.md): the AI
+  Insights principles (consent, self-view, no surveillance, audited full text, data stays on the server, off by
+  default).
+- [0021](https://github.com/hungga1711/workspace/blob/main/docs/adr/0021-one-server-no-valkey.md): one server
+  process for every module, one app container behind Caddy.
+- [0023](https://github.com/hungga1711/workspace/blob/main/docs/adr/0023-one-workspace-data-model.md): one
+  workspace in the data model, no workspace column or row-level security.
+
+## Full reference
+
+In the repository:
+[system design](https://github.com/hungga1711/workspace/blob/main/docs/architecture/system-design.md) (goals,
+containers, each module's endpoints and topics, realtime, search, files, meetings, failure modes, testing),
+[database](https://github.com/hungga1711/workspace/blob/main/docs/database/README.md) (schemas, roles, migrations,
+one page per module) and [events](https://github.com/hungga1711/workspace/blob/main/docs/events/README.md) (outbox,
+relay, consumer groups, the catalog of every event).
+
+Next: [Request path, security and AI gateway](/docs/advanced/request-path).

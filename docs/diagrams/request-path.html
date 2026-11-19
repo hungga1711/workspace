@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Request path: browser to database</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&family=Noto+Serif:ital@0;1&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      :root {
+        --color-paper: #f5f5f5;
+        --color-ink: #2d3142;
+        --color-muted: #4f5d75;
+        --color-accent: #bf4520;
+        --font-sans: "Geist", system-ui, sans-serif;
+        --font-serif: "Instrument Serif", "Noto Serif", serif;
+        --font-mono: "Geist Mono", ui-monospace, monospace;
+      }
+      body {
+        font-family: var(--font-sans);
+        background: var(--color-paper);
+        color: var(--color-ink);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 3rem 2rem;
+      }
+      .frame {
+        max-width: 1280px;
+        width: 100%;
+        min-width: 0;
+      }
+      .diagram-container {
+        width: 100%;
+        overflow-x: auto;
+      }
+      .eyebrow {
+        font-family: var(--font-mono);
+        font-size: 0.66rem;
+        font-weight: 500;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--color-muted);
+        margin-bottom: 0.5rem;
+      }
+      h1 {
+        font-family: var(--font-serif);
+        font-size: clamp(1.5rem, 2.4vw + 0.75rem, 2rem);
+        font-weight: 400;
+        letter-spacing: -0.02em;
+        line-height: 1.15;
+        color: var(--color-ink);
+        margin-bottom: 1.5rem;
+      }
+      svg {
+        width: 100%;
+        min-width: 1280px;
+        display: block;
+      }
+      @media print {
+        .diagram-container {
+          overflow-x: visible;
+        }
+        svg {
+          min-width: 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="frame">
+      <p class="eyebrow">Sequence · workspace</p>
+      <h1>Request path: browser to database</h1>
+      <div class="diagram-container">
+        <svg viewBox="0 0 1280 1000" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="request-path-title request-path-desc">
+          <title id="request-path-title">Request path: browser to database</title>
+          <desc id="request-path-desc">
+            Sequence of one authenticated write: the browser calls the Next.js proxy with only an opaque session cookie, the BFF sends the server-held access token, the gateway
+            verifies the Ed25519 JWT and live session state and resolves the principal from identity in the same process, and the work module authorizes and writes in one
+            transaction with its outbox event.
+          </desc>
+          <defs>
+            <marker id="arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#4f5d75" /></marker>
+            <marker id="arrow-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#bf4520" /></marker>
+            <marker id="arrow-link" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#2e5aa8" /></marker>
+            <marker id="arrow-open" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+              <polyline points="0 0, 8 3, 0 6" fill="none" stroke="#4f5d75" stroke-width="1.2" />
+            </marker>
+            <pattern id="dots" width="22" height="22" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="0.9" fill="rgba(45,49,66,0.10)" /></pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="#f5f5f5" />
+          <rect width="100%" height="100%" fill="url(#dots)" opacity="0.55" />
+          <line x1="140" y1="96" x2="140" y2="856" stroke="rgba(45,49,66,0.22)" stroke-width="1" stroke-dasharray="3,3" />
+          <line x1="390" y1="96" x2="390" y2="856" stroke="rgba(45,49,66,0.22)" stroke-width="1" stroke-dasharray="3,3" />
+          <line x1="640" y1="96" x2="640" y2="856" stroke="rgba(45,49,66,0.22)" stroke-width="1" stroke-dasharray="3,3" />
+          <line x1="890" y1="96" x2="890" y2="856" stroke="rgba(45,49,66,0.22)" stroke-width="1" stroke-dasharray="3,3" />
+          <line x1="1140" y1="96" x2="1140" y2="856" stroke="rgba(45,49,66,0.22)" stroke-width="1" stroke-dasharray="3,3" />
+          <rect x="612" y="392" width="306" height="140" rx="4" fill="rgba(45,49,66,0.02)" stroke="rgba(45,49,66,0.22)" stroke-width="1" />
+          <rect x="612" y="392" width="40" height="16" rx="2" fill="#f5f5f5" stroke="rgba(45,49,66,0.22)" stroke-width="1" />
+          <text x="632" y="404" fill="#4f5d75" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.12em">OPT</text>
+          <text x="660" y="404" fill="#4f5d75" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.04em">[principal cache miss · 60 s TTL]</text>
+          <rect x="386" y="160" width="8" height="664" fill="rgba(45,49,66,0.06)" stroke="#4f5d75" stroke-width="0.8" />
+          <rect x="636" y="288" width="8" height="488" fill="rgba(45,49,66,0.06)" stroke="#4f5d75" stroke-width="0.8" />
+          <rect x="886" y="456" width="8" height="52" fill="rgba(45,49,66,0.06)" stroke="#4f5d75" stroke-width="0.8" />
+          <rect x="1136" y="592" width="8" height="136" fill="rgba(45,49,66,0.06)" stroke="#4f5d75" stroke-width="0.8" />
+          <line x1="140" y1="160" x2="386" y2="160" stroke="#2e5aa8" stroke-width="1.2" marker-end="url(#arrow-link)" />
+          <rect x="189.1" y="128" width="151.8" height="24" rx="2" fill="#f5f5f5" />
+          <text x="265" y="138" fill="#2e5aa8" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.06em">POST /API/PROXY</text>
+          <text x="265" y="150" fill="#5a6580" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">opaque cookie · x-wos-csrf: 1</text>
+          <path d="M 394,200 H 424 Q 430,200 430,206 V 222 Q 430,228 424,228 H 394" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)" />
+          <rect x="434.0" y="198" width="193.2" height="36" rx="2" fill="#f5f5f5" />
+          <text x="438" y="208" fill="#4f5d75" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.06em">LOAD SESSION</text>
+          <text x="438" y="220" fill="#5a6580" font-size="8" font-family="'Geist Mono', ui-monospace, monospace">web.sessions: no token in JS</text>
+          <text x="438" y="232" fill="#5a6580" font-size="8" font-family="'Geist Mono', ui-monospace, monospace">refresh once if expired</text>
+          <line x1="394" y1="288" x2="636" y2="288" stroke="#2e5aa8" stroke-width="1.2" marker-end="url(#arrow-link)" />
+          <rect x="439.1" y="256" width="151.8" height="24" rx="2" fill="#f5f5f5" />
+          <text x="515.0" y="266" fill="#2e5aa8" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.06em">
+            BEARER ACCESS JWT
+          </text>
+          <text x="515.0" y="278" fill="#5a6580" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">x-request-id</text>
+          <path d="M 644,328 H 674 Q 680,328 680,334 V 350 Q 680,356 674,356 H 644" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)" />
+          <rect x="684.0" y="326" width="198.4" height="36" rx="2" fill="#f5f5f5" />
+          <text x="688" y="336" fill="#4f5d75" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.06em">VERIFY + LIMIT</text>
+          <text x="688" y="348" fill="#5a6580" font-size="8" font-family="'Geist Mono', ui-monospace, monospace">Ed25519 · kid · session state</text>
+          <text x="688" y="360" fill="#5a6580" font-size="8" font-family="'Geist Mono', ui-monospace, monospace">rl:user 600/min · workspace 30 s</text>
+          <line x1="644" y1="456" x2="886" y2="456" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)" />
+          <rect x="694.0" y="424" width="141.9" height="24" rx="2" fill="#f5f5f5" />
+          <text x="765.0" y="434" fill="#4f5d75" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.06em">RESOLVE</text>
+          <text x="765.0" y="446" fill="#5a6580" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">in-process · no network hop</text>
+          <line x1="886" y1="508" x2="644" y2="508" stroke="#4f5d75" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#arrow)" />
+          <rect x="713.9" y="476" width="102.2" height="24" rx="2" fill="#f5f5f5" />
+          <text x="765.0" y="486" fill="#4f5d75" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.06em">PRINCIPAL</text>
+          <text x="765.0" y="498" fill="#5a6580" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">403 if not a member</text>
+          <line x1="644" y1="592" x2="1136" y2="592" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)" />
+          <rect x="678.8" y="560" width="172.4" height="24" rx="2" fill="#f5f5f5" />
+          <text x="765" y="570" fill="#4f5d75" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.06em">
+            SIGNED PRINCIPAL
+          </text>
+          <text x="765" y="582" fill="#5a6580" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">in memory · /work · 60 s</text>
+          <path d="M 1136,632 H 1106 Q 1100,632 1100,638 V 654 Q 1100,660 1106,660 H 1136" fill="none" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)" />
+          <rect x="944.2" y="630" width="151.8" height="48" rx="2" fill="#f5f5f5" />
+          <text x="1092" y="640" fill="#4f5d75" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="end" letter-spacing="0.06em">AUTHORIZE + WRITE</text>
+          <text x="1092" y="652" fill="#5a6580" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="end">authorize(task.create)</text>
+          <text x="1092" y="664" fill="#5a6580" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="end">BEGIN · INSERT</text>
+          <text x="1092" y="676" fill="#5a6580" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="end">INSERT task + outbox · COMMIT</text>
+          <line x1="1136" y1="728" x2="644" y2="728" stroke="#4f5d75" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#arrow)" />
+          <rect x="731.1" y="708" width="67.8" height="12" rx="2" fill="#f5f5f5" />
+          <text x="765" y="718" fill="#4f5d75" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.06em">201 CREATED</text>
+          <line x1="636" y1="776" x2="394" y2="776" stroke="#4f5d75" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#arrow)" />
+          <rect x="463.9" y="744" width="102.2" height="24" rx="2" fill="#f5f5f5" />
+          <text x="515.0" y="754" fill="#4f5d75" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.06em">201 · SAME ID</text>
+          <text x="515.0" y="766" fill="#5a6580" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">x-request-id echoed</text>
+          <line x1="386" y1="824" x2="140" y2="824" stroke="#bf4520" stroke-width="1.4" marker-end="url(#arrow-accent)" />
+          <rect x="212.0" y="804" width="105.9" height="12" rx="2" fill="#f5f5f5" />
+          <text x="265" y="814" fill="#bf4520" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.06em">
+            201 · X-REQUEST-ID
+          </text>
+          <rect x="44" y="40" width="192" height="56" rx="6" fill="#f5f5f5" />
+          <rect x="44" y="40" width="192" height="56" rx="6" fill="rgba(79,93,117,0.10)" stroke="#5a6580" stroke-width="1" />
+          <rect x="52" y="48" width="28" height="12" rx="2" fill="none" stroke="rgba(45,49,66,0.22)" stroke-width="0.8" />
+          <text x="66.0" y="57" fill="#5a6580" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.08em">USR</text>
+          <text x="140.0" y="74" fill="#2d3142" font-size="12" font-family="'Geist', system-ui, sans-serif" text-anchor="middle" font-weight="600">Browser</text>
+          <text x="140.0" y="88" fill="#4f5d75" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">PWA · no token in JS</text>
+          <rect x="294" y="40" width="192" height="56" rx="6" fill="#f5f5f5" />
+          <rect x="294" y="40" width="192" height="56" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1" />
+          <rect x="302" y="48" width="28" height="12" rx="2" fill="none" stroke="rgba(45,49,66,0.22)" stroke-width="0.8" />
+          <text x="316.0" y="57" fill="#5a6580" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.08em">BFF</text>
+          <text x="390.0" y="74" fill="#2d3142" font-size="12" font-family="'Geist', system-ui, sans-serif" text-anchor="middle" font-weight="600">Next.js server</text>
+          <text x="390.0" y="88" fill="#4f5d75" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">web · sessions in Postgres</text>
+          <rect x="544" y="40" width="192" height="56" rx="6" fill="#f5f5f5" />
+          <rect x="544" y="40" width="192" height="56" rx="6" fill="rgba(191,69,32,0.08)" stroke="#bf4520" stroke-width="1" />
+          <rect x="552" y="48" width="24" height="12" rx="2" fill="none" stroke="rgba(191,69,32,0.50)" stroke-width="0.8" />
+          <text x="564.0" y="57" fill="#bf4520" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.08em">GW</text>
+          <text x="640.0" y="74" fill="#2d3142" font-size="12" font-family="'Geist', system-ui, sans-serif" text-anchor="middle" font-weight="600">server · gateway</text>
+          <text x="640.0" y="88" fill="#4f5d75" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">JWT · in-memory caches</text>
+          <rect x="794" y="40" width="192" height="56" rx="6" fill="#f5f5f5" />
+          <rect x="794" y="40" width="192" height="56" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1" />
+          <rect x="802" y="48" width="28" height="12" rx="2" fill="none" stroke="rgba(45,49,66,0.22)" stroke-width="0.8" />
+          <text x="816.0" y="57" fill="#5a6580" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.08em">MOD</text>
+          <text x="890.0" y="74" fill="#2d3142" font-size="12" font-family="'Geist', system-ui, sans-serif" text-anchor="middle" font-weight="600">server · identity</text>
+          <text x="890.0" y="88" fill="#4f5d75" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">principal resolve</text>
+          <rect x="1044" y="40" width="192" height="56" rx="6" fill="#f5f5f5" />
+          <rect x="1044" y="40" width="192" height="56" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1" />
+          <rect x="1052" y="48" width="28" height="12" rx="2" fill="none" stroke="rgba(45,49,66,0.22)" stroke-width="0.8" />
+          <text x="1066.0" y="57" fill="#5a6580" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.08em">SVC</text>
+          <text x="1140.0" y="74" fill="#2d3142" font-size="12" font-family="'Geist', system-ui, sans-serif" text-anchor="middle" font-weight="600">work module</text>
+          <text x="1140.0" y="88" fill="#4f5d75" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">workspace_work role</text>
+          <text x="612" y="888" fill="#4f5d75" font-size="14" font-family="'Instrument Serif', 'Noto Serif', serif" font-style="italic">
+            Member, role, team, employee or department changes evict principal:*.
+          </text>
+          <text x="1236" y="912" fill="#2d3142" font-size="14" font-family="'Instrument Serif', 'Noto Serif', serif" text-anchor="end" font-style="italic">
+            After COMMIT, NOTIFY wakes the work module&#x27;s relay, which hands the event to its consumer groups in process, same request id.
+          </text>
+          <line x1="40" y1="936" x2="1240" y2="936" stroke="rgba(45,49,66,0.10)" stroke-width="0.8" />
+          <text x="40" y="952" fill="#4f5d75" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.18em">LEGEND</text>
+          <rect x="40" y="964" width="16" height="10" rx="2" fill="rgba(191,69,32,0.08)" stroke="#bf4520" stroke-width="1" />
+          <text x="62" y="972" fill="#4f5d75" font-size="9" font-family="'Geist', system-ui, sans-serif">Focal actor</text>
+          <rect x="153.4" y="960" width="6" height="16" fill="rgba(45,49,66,0.06)" stroke="#4f5d75" stroke-width="0.8" />
+          <text x="167.4" y="972" fill="#4f5d75" font-size="9" font-family="'Geist', system-ui, sans-serif">Activation</text>
+          <line x1="249.4" y1="969" x2="277.4" y2="969" stroke="#2e5aa8" stroke-width="1.2" marker-end="url(#arrow-link)" />
+          <text x="285.4" y="972" fill="#4f5d75" font-size="9" font-family="'Geist', system-ui, sans-serif">HTTP request</text>
+          <line x1="378.2" y1="969" x2="406.2" y2="969" stroke="#4f5d75" stroke-width="1.2" marker-end="url(#arrow)" />
+          <text x="414.2" y="972" fill="#4f5d75" font-size="9" font-family="'Geist', system-ui, sans-serif">Internal call</text>
+          <line x1="512.4" y1="969" x2="540.4" y2="969" stroke="#4f5d75" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#arrow)" />
+          <text x="548.4" y="972" fill="#4f5d75" font-size="9" font-family="'Geist', system-ui, sans-serif">Return</text>
+          <line x1="608.8" y1="969" x2="636.8" y2="969" stroke="#bf4520" stroke-width="1.2" marker-end="url(#arrow-accent)" />
+          <text x="644.8" y="972" fill="#4f5d75" font-size="9" font-family="'Geist', system-ui, sans-serif">Response to user</text>
+          <rect x="759.1999999999999" y="963" width="22" height="12" rx="2" fill="rgba(45,49,66,0.02)" stroke="rgba(45,49,66,0.22)" stroke-width="1" />
+          <text x="787.1999999999999" y="972" fill="#4f5d75" font-size="9" font-family="'Geist', system-ui, sans-serif">Optional step</text>
+        </svg>
+      </div>
+    </div>
+  </body>
+</html>

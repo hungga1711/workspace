@@ -1,0 +1,187 @@
+{
+  "extName": {
+    "message": "workspace AI Insights"
+  },
+  "extDescription": {
+    "message": "See how your team uses ChatGPT, Claude, Gemini and Copilot at work, with a visible notice and a filter that stops sensitive data before it is sent."
+  },
+  "optIntro": {
+    "message": "AI Insights: records how AI is used at work according to your company's policy, and warns about, redacts or blocks sensitive data before it is sent."
+  },
+  "optCodeLabel": {
+    "message": "Connection code"
+  },
+  "optCodePlaceholder": {
+    "message": "Paste the code from workspace › Me › AI"
+  },
+  "optConnect": {
+    "message": "Connect"
+  },
+  "optDisconnect": {
+    "message": "Disconnect"
+  },
+  "optNote1": {
+    "message": "Recorded only when you press send, and only on these AI sites: $sites$.",
+    "placeholders": {
+      "sites": {
+        "content": "$1"
+      }
+    }
+  },
+  "optNote2": {
+    "message": "Every AI page shows a small notice in the corner."
+  },
+  "optNote3": {
+    "message": "You can see what was recorded in workspace › Me › AI."
+  },
+  "optWhatSent": {
+    "message": "What this extension sends, field by field"
+  },
+  "statusExpired": {
+    "message": "This code is no longer valid. Create a new one in workspace."
+  },
+  "statusConnected": {
+    "message": "Connected to $host$",
+    "placeholders": {
+      "host": {
+        "content": "$1"
+      }
+    }
+  },
+  "statusLastSent": {
+    "message": " · last sent $when$",
+    "placeholders": {
+      "when": {
+        "content": "$1"
+      }
+    }
+  },
+  "statusNone": {
+    "message": "Not connected."
+  },
+  "statusBadCode": {
+    "message": "That code is not valid. Copy the whole code again from workspace."
+  },
+  "noticeOn": {
+    "message": "AI Insights: your company records AI use on this page"
+  },
+  "noticeOff": {
+    "message": "workspace AI Insights is not connected"
+  },
+  "noticeWhatPrompts": {
+    "message": "What you send is saved to workspace so the company can see what AI helps with. Nothing is recorded until you press send."
+  },
+  "noticeWhatBoth": {
+    "message": "What you send and the AI's answers are saved to workspace so the company can see what AI helps with. Nothing is recorded until you press send."
+  },
+  "noticePolicy": {
+    "message": "See the policy and what was recorded"
+  },
+  "noticeConnect": {
+    "message": "Open the extension and paste the connection code from workspace › Me › AI."
+  },
+  "confirmSensitive": {
+    "message": "This message seems to contain $kinds$.\n\nSending it to an outside AI may break company rules. Send anyway?",
+    "placeholders": {
+      "kinds": {
+        "content": "$1"
+      }
+    }
+  },
+  "kindPersonalId": {
+    "message": "an ID/passport number"
+  },
+  "kindCard": {
+    "message": "a card number"
+  },
+  "kindSecret": {
+    "message": "a password/API key"
+  },
+  "kindContacts": {
+    "message": "contact details (emails, phone numbers)"
+  },
+  "kindBankAccount": {
+    "message": "a bank account number"
+  },
+  "optHint": {
+    "message": "Suggest the task I have open in workspace"
+  },
+  "optHintNote": {
+    "message": "A prompt sent within 2 hours of opening a task in workspace is suggested for that task; you confirm it in Me › AI. The extension reads only the task ID, nothing else."
+  },
+  "optHintDenied": {
+    "message": "The browser did not allow the extension to read the workspace page, so suggestions are off."
+  },
+  "noticeRedact": {
+    "message": "Sensitive data is redacted before sending."
+  },
+  "noticeBlock": {
+    "message": "Messages with sensitive data will not be sent."
+  },
+  "kindKeyword": {
+    "message": "a company keyword"
+  },
+  "redactTitle": {
+    "message": "Sensitive data redacted"
+  },
+  "redactBody": {
+    "message": "Your company asks to redact $kinds$ before sending to an outside AI. This is what will be sent:",
+    "placeholders": {
+      "kinds": {
+        "content": "$1"
+      }
+    }
+  },
+  "redactSend": {
+    "message": "Send the redacted text"
+  },
+  "redactCancel": {
+    "message": "Cancel"
+  },
+  "blockTitle": {
+    "message": "This message was not sent"
+  },
+  "blockBody": {
+    "message": "This message contains $kinds$. Your company does not allow sending this kind of data to an outside AI. Remove it and send again.",
+    "placeholders": {
+      "kinds": {
+        "content": "$1"
+      }
+    }
+  },
+  "blockOk": {
+    "message": "Got it"
+  },
+  "feedbackAsk": {
+    "message": "Did AI help?"
+  },
+  "feedbackYes": {
+    "message": "Yes"
+  },
+  "feedbackPartly": {
+    "message": "Partly"
+  },
+  "feedbackNo": {
+    "message": "No"
+  },
+  "feedbackDismiss": {
+    "message": "Close"
+  },
+  "linkAsk": {
+    "message": "Link this chat to $code$ in workspace?",
+    "placeholders": {
+      "code": {
+        "content": "$1"
+      }
+    }
+  },
+  "linkYes": {
+    "message": "Link"
+  },
+  "linkNo": {
+    "message": "Not this task"
+  },
+  "statusPaused": {
+    "message": "Your company has switched AI Insights off. Nothing is recorded."
+  }
+}

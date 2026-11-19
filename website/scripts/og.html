@@ -1,0 +1,49 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; }
+  html, body { width: 1200px; height: 630px; background: #0a0a0a; }
+  body { font-family: Geist, system-ui, sans-serif; color: #ededed; position: relative; overflow: hidden; }
+  .grid { position: absolute; inset: 0;
+    background-image: linear-gradient(to right, #1a1a1a 1px, transparent 1px), linear-gradient(to bottom, #1a1a1a 1px, transparent 1px);
+    background-size: 48px 48px; mask-image: radial-gradient(ellipse at 30% 40%, black 10%, transparent 70%); }
+  .frame { position: absolute; inset: 40px; border: 1px solid #262626; }
+  .glow { position: absolute; width: 760px; height: 420px; left: 360px; top: -120px; border-radius: 50%; background: #2563eb; opacity: 0.28; filter: blur(120px); }
+  .x { position: absolute; width: 21px; height: 21px; }
+  .x::before, .x::after { content: ""; position: absolute; background: #5e5e5e; }
+  .x::before { left: 10px; top: 0; width: 1px; height: 21px; }
+  .x::after { top: 10px; left: 0; height: 1px; width: 21px; }
+  .tl { left: -11px; top: -11px; } .tr { right: -11px; top: -11px; } .bl { left: -11px; bottom: -11px; } .br { right: -11px; bottom: -11px; }
+  .content { position: absolute; left: 96px; top: 96px; right: 96px; }
+  .brand { display: flex; align-items: center; gap: 14px; font-size: 30px; font-weight: 600; letter-spacing: -0.04em; }
+  h1 { margin-top: 44px; font-size: 66px; line-height: 1.04; font-weight: 600; letter-spacing: -0.05em; max-width: 980px; }
+  p { margin-top: 22px; font-size: 26px; line-height: 1.4; color: #a1a1a1; max-width: 900px; letter-spacing: -0.01em; }
+  .ai { color: #7da2ff; white-space: nowrap; }
+  .foot { position: absolute; left: 96px; right: 96px; bottom: 84px; display: flex; justify-content: space-between; align-items: center;
+    font-family: "Geist Mono", monospace; font-size: 20px; color: #6b6b6b; }
+  .pill { display: inline-flex; gap: 10px; align-items: center; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; background: #4ade80; }
+</style>
+</head>
+<body>
+  <div class="glow"></div>
+  <div class="grid"></div>
+  <div class="frame"><span class="x tl"></span><span class="x tr"></span><span class="x bl"></span><span class="x br"></span></div>
+  <div class="content">
+    <div class="brand">
+      <svg width="48" height="48" viewBox="0 0 40 40"><defs><linearGradient id="ogm" gradientUnits="userSpaceOnUse" x1="6" y1="8" x2="34" y2="32"><stop offset="0" stop-color="#3b6bff"/><stop offset="1" stop-color="#8b5cf6"/></linearGradient></defs><rect width="40" height="40" rx="10" fill="#ffffff"/><path d="M10 17 C11.5 30 16 30 17.6 22.5 C18.6 18 21.4 18 22.4 22.5 C24 30 28.5 30 30 17" fill="none" stroke="url(#ogm)" stroke-width="4.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M18.2 12.6 H21.8 L20 15.2z" fill="url(#ogm)" stroke="url(#ogm)" stroke-width=".8" stroke-linejoin="round"/></svg>
+      Workspace
+    </div>
+    <h1>The open-source workspace that manages AI at work.</h1>
+    <p>See what your team does with AI, and whether it helps. <span class="ai">No AI yet? Tasks, docs and chat, free.</span></p>
+  </div>
+  <div class="foot">
+    <span class="pill"><span class="dot"></span>MIT licensed · self-hosted</span>
+    <span>workspace.hungga1711.dev</span>
+  </div>
+</body>
+</html>

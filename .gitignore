@@ -1,0 +1,37 @@
+node_modules/
+dist/
+dist-bundle/
+.env
+.env.*
+!.env.example
+*.log
+.gstack/
+.next/
+*.tsbuildinfo
+coverage/
+playwright-report/
+test-results/
+.DS_Store
+.next-*/
+
+# Key material; backup.sh's default target (it holds every secret of the installation); upgrade.sh's roll-back marker
+*.pem
+*.key
+infra/production/backups/
+infra/production/.upgrade-previous
+
+# The browser extension zip is built from frontend/browser-extension (pnpm ext:zip, CI, the Docker image)
+frontend/web/public/downloads/
+# The whiteboard's fonts, copied from @excalidraw/excalidraw on install (their licence files are committed).
+frontend/web/public/excalidraw/**/*.woff2
+
+# Load-test sessions (cookies) and raw results (tooling/loadtest/README.md)
+tooling/loadtest/data/
+tooling/loadtest/results/
+
+# Demo seed credentials (tooling/scripts/seed-demo.mjs)
+.seed-demo.json
+
+# Local agent settings and worktrees
+.claude/settings.local.json
+.claude/worktrees/

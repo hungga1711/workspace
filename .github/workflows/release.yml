@@ -1,0 +1,82 @@
+name: release
+# One button for a release (Actions › release › Run workflow, pick patch, minor or major). From main it:
+#   1. sets the next version in every manifest and writes its CHANGELOG.md section from "## [Unreleased]" and the
+#      commits since the previous tag (tooling/scripts/release.mjs);
+#   2. commits "Release x.y.z", tags vx.y.z and pushes both;
+#   3. creates the GitHub Release with those notes and a source SBOM;
+#   4. builds, tests and publishes the image as :x.y.z and :latest, signed, with its SBOM on the release.
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: Which part of the version goes up
+        type: choice
+        options: [patch, minor, major]
+        default: minor
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  prepare:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    outputs:
+      version: ${{ steps.bump.outputs.version }}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with: { node-version: 22 }
+      - name: Next version and its changelog
+        id: bump
+        run: |
+          version=$(node tooling/scripts/release.mjs "${{ inputs.bump }}" --notes-out "$RUNNER_TEMP/notes.md")
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+      - name: Commit, tag and push
+        env:
+          VERSION: ${{ steps.bump.outputs.version }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898+github-actions[bot]@users.noreply.github.com"
+          git commit -am "Release $VERSION"
+          git tag -a "v$VERSION" -m "workspace $VERSION"
+          git push origin HEAD:main "v$VERSION"
+      - name: Source SBOM (SPDX, every package in pnpm-lock.yaml)
+        uses: anchore/sbom-action@66cbf4bc1f1c0d2edc94016e65bc221b6bb0ad6c # v0.24.3
+        with:
+          path: .
+          format: spdx-json
+          output-file: workspace-v${{ steps.bump.outputs.version }}-source.spdx.json
+          upload-artifact: false
+          upload-release-assets: false
+      - name: GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ steps.bump.outputs.version }}
+        run: |
+          flags=""
+          case "$VERSION" in *-*) flags="--prerelease" ;; esac
+          gh release create "v$VERSION" "workspace-v$VERSION-source.spdx.json" \
+            --title "workspace v$VERSION" --notes-file "$RUNNER_TEMP/notes.md" --verify-tag $flags
+
+  image:
+    needs: prepare
+    permissions:
+      contents: write
+      packages: write
+      id-token: write
+    uses: ./.github/workflows/image.yml
+    with:
+      ref: v${{ needs.prepare.outputs.version }}
+      publish: true
+      latest: true
+      version: ${{ needs.prepare.outputs.version }}

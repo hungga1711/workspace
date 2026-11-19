@@ -1,0 +1,80 @@
+---
+title: Turn AI on or off
+description: AI is optional and off by default. Two separate switches control it, and the rest of Workspace never depends on either.
+---
+
+A new workspace has no AI at all: no assistant, no AI buttons, nothing recorded. Chat, tasks, documents, meetings
+and approvals work fully without it. An admin can switch on either of two independent parts, at any time, and switch
+them off again.
+
+| Switch | What it turns on | Needs an AI model? |
+|---|---|---|
+| **The company's own AI** | The assistant, @AI in chat, summaries, translation, task and document help, agents | Yes, one you connect (your key, an OpenAI-compatible API, or a self-hosted model) |
+| **AI Insights** | Recording how staff use ChatGPT, Claude, Gemini, Copilot… through the browser extension, the safety net and the reports | No; a model only adds one-line summaries |
+
+## Where the switches are
+
+- **At first setup**: `/setup` has a section *AI (optional, off by default)* with both choices, unticked.
+- **Any time later**: **Admin › System › AI connections**. The two switches are at the top of its *Connections*
+  tab; *Insights*, *Privacy*, *Cost & limits* and *Danger zone* are the other tabs. Only admins (the Owner and Admin
+  roles) see it.
+
+Each switch saves as soon as you change it. Whatever you leave off stays hidden from everyone.
+
+## Turning on the company's own AI
+
+<Steps>
+<Step>
+Switch on **The company's own AI**.
+</Step>
+<Step>
+Further down the *Connections* tab, add a connection:
+
+- **API key**: OpenAI, Anthropic (Claude) or Google (Gemini);
+- **OpenAI-compatible API**: any server that speaks that API;
+- **Self-hosted**: Ollama or LM Studio on your own machine (for example `http://host.docker.internal:11434`).
+
+Press **Test**, then **Make default**. Keys are encrypted before they are stored.
+</Step>
+<Step>
+Optional, in *Cost & limits*: enter each model's price and set monthly budgets for the company, a department or a
+person. Calls stop with
+a clear message when a budget is reached.
+</Step>
+</Steps>
+
+Operators can instead set `OPENAI_API_KEY`, `ANTHROPIC_API_KEY`, `GEMINI_API_KEY` or `OPENAI_BASE_URL` in `.env`
+(see [Configuration](/docs/self-hosting/configuration)); the switch still decides whether people see AI.
+
+## Turning on AI Insights
+
+<Steps>
+<Step>
+Switch on **AI Insights**. The policy and safety net are in the *Privacy* tab; topics, the weekly report e-mail and
+provider imports in *Insights*.
+</Step>
+<Step>
+Set the policy: how much managers may read (topic only, a one-line summary, or full text), whether answers are kept,
+how long data is kept (7 to 730 days, 180 by default), and the safety-net mode (warn, redact or block) with your own
+keywords. Everyone is notified of each policy change.
+</Step>
+<Step>
+Tell staff before recording starts; templates for the notice and an internal AI policy are in the
+[repository](https://github.com/hungga1711/workspace/tree/main/docs/ai-insights/templates).
+</Step>
+<Step>
+Each person installs the extension and connects it with a code from **Me › AI**. Nothing is recorded for anyone who
+has not connected it. Details: [Browser extension](/docs/ai-insights/extension).
+</Step>
+</Steps>
+
+## Turning AI off again
+
+| You switch off | What happens |
+|---|---|
+| **The company's own AI** | The assistant and every AI button disappear for everyone. Tasks, docs and chat are unchanged. |
+| **AI Insights** | Recording stops at once: installed extensions show *not connected* and send nothing. Data already recorded stays until its retention ends. |
+
+To remove recorded data immediately, use **Delete all AI Insights data** in the *Danger zone* tab. It deletes every recorded
+conversation, who opened them, and every extension connection code. The company's own AI usage records are not
+affected. Each person can also export their own data or ask for deletion in **Me › AI**.

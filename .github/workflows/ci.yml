@@ -1,0 +1,82 @@
+name: ci
+# Every push to any branch is tested and its image built; a push to main also publishes the image as :latest.
+# Pull requests from forks are tested the same way (a branch of this repository is already covered by its push).
+# Free-plan friendly: a docs-only change runs nothing, and a newer push to the same branch cancels the older run.
+on:
+  push:
+    branches: ["**"]
+    paths-ignore: ["**.md", "docs/**", "website/**", ".github/workflows/website.yml", ".github/ISSUE_TEMPLATE/**"]
+  pull_request:
+    paths-ignore: ["**.md", "docs/**", "website/**", ".github/workflows/website.yml", ".github/ISSUE_TEMPLATE/**"]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+# Third-party actions are pinned to a commit (the tag is in the comment); Dependabot keeps them current.
+jobs:
+  test:
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: pnpm/action-setup@7088e561eb65bb68695d245aa206f005ef30921d # v4.1.0
+        with: { version: 10.33.0 }
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with: { node-version: 22, cache: pnpm }
+      - run: pnpm install --frozen-lockfile
+      - name: Lint
+        run: pnpm lint
+      - name: Format
+        run: pnpm format:check
+      - name: Shell scripts
+        run: git ls-files -z '*.sh' | xargs -0 shellcheck -S style
+      - name: Infrastructure (Postgres, S3, LiveKit)
+        run: docker compose -f infra/local/docker-compose.yml up -d --wait
+      - name: Build shared packages
+        run: pnpm build:packages
+      - name: Event catalog in sync with @workspace/contracts
+        run: node tooling/scripts/events-catalog.mjs --check
+      - name: OpenAPI document in sync with @workspace/contracts
+        run: node tooling/scripts/openapi.mjs --check
+      - name: Typecheck
+        run: pnpm -r typecheck
+      - name: Migrate module schemas
+        run: node tooling/scripts/migrate-all.mjs
+      - name: Start the test server (some integration tests talk to the running stack)
+        # The test installation: database workspace_test, :4100/:4101, TEST_FIXTURES=1 (tooling/scripts/test-db.mjs).
+        run: |
+          MAIL_OUTBOX_DIR=$RUNNER_TEMP/mail RATE_SIGNUP_PER_HOUR=1000 AI_LOCAL_MODEL=1 WEBHOOK_ALLOW_PRIVATE=1 pnpm test:server > server.log 2>&1 &
+          npx --yes wait-on@8.0.3 -t 120000 http://localhost:4100/health http://localhost:4101/health
+      - name: Unit + integration tests (real Postgres/S3)
+        # On workspace_test; a suite that needs first-run setup empties it first (one workspace per installation).
+        run: pnpm -r --workspace-concurrency=1 test
+      - name: Browser extension zip (served from Của tôi › AI; built, never committed)
+        run: cd frontend/web && pnpm ext:zip
+      - name: Web build + performance budget
+        # GATEWAY_URL at build: the rewrites that hand /api/mcp, the runner and the connect program to the server are
+        # fixed when the app is built (next.config.mjs), and the E2E specs for them go through the app's address.
+        run: cd frontend/web && GATEWAY_URL=http://localhost:4100 NEXT_PUBLIC_CHAT_URL=http://localhost:4100 STORAGE_PUBLIC_ORIGIN="http://localhost:8333 http://localhost:4100" LIVEKIT_URL=ws://localhost:7880 pnpm build && pnpm budget
+      - name: Browser E2E, performance and accessibility
+        run: |
+          (cd frontend/web && TEST_FIXTURES=1 GATEWAY_URL=http://localhost:4100 WEB_DATABASE_URL=postgres://workspace_web:app_pw@localhost:5432/workspace_test pnpm start > web.log 2>&1 &)
+          npx --yes wait-on@8.0.3 -t 120000 http://localhost:3000
+          cd frontend/web && npx playwright install --with-deps chromium && GATEWAY_URL=http://localhost:4100 MAIL_OUTBOX_DIR=$RUNNER_TEMP/mail npx playwright test
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: failure()
+        with: { name: e2e-artifacts, path: "frontend/web/test-results\nserver.log" }
+
+  image:
+    needs: test
+    permissions:
+      contents: write
+      packages: write
+      id-token: write
+    uses: ./.github/workflows/image.yml
+    with:
+      publish: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+      latest: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}

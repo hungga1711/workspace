@@ -1,0 +1,221 @@
+---
+title: Agent workflows
+description: How a workflow wraps the AI in inputs, an environment, resources, checks, guardrails and outputs, and how a run moves through it on the server, in a sandbox or on someone's computer.
+---
+
+A **workflow** is a harness around the AI: what a run is given, where it runs, what it may read, how its result is
+checked, when it must stop and where the result goes. A task is handed to at most one workflow; pressing **Run**
+creates a **run**, which executes the steps in order and stops wherever a person has to decide.
+
+The code is in `backend/server/src/modules/work/`: `workflows.ts` (runs), `workflows/` (`model.ts`, `templates.ts`,
+`render.ts`), `agent-ask.ts` (questions), `workflow-context.ts` (what the AI reads about the task) and
+`http/workflows.controller.ts` (the API).
+
+## What a workflow is made of
+
+| Part            | What it holds                                                                                                 |
+| --------------- | ------------------------------------------------------------------------------------------------------------- |
+| **Inputs**      | A short form asked when a run starts (text, long text, choice, number, date). A value fills `{{input.<key>}}` |
+| **Environment** | Where the steps run: the company's AI, a sandbox, or the assignee's computer                                  |
+| **Resources**   | What every AI step reads: a playbook, workspace pages, uploaded files, links, the task's own context          |
+| **Steps**       | The pipeline: AI work, commands, automatic checks, approvals, task moves                                      |
+| **Guardrails**  | Working minutes per run and per step, a token budget, whether the AI may stop to ask people                   |
+| **Output**      | Where the result goes: a comment on the task, a page in Docs, files, subtasks, a task status                  |
+
+## Steps
+
+| Kind       | What it does                                                                                                                                                                                                                                                                           | Where                                   |
+| ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------- |
+| `ai`       | Sends the step's instruction to a model. Optional `model`, `role` (who the model is for this step), `tools` (company MCP tools on or off), a longer result, its own time limit, retries                                                                                                | everywhere                              |
+| `command`  | Runs a shell command in the run's working folder, e.g. `npm test`                                                                                                                                                                                                                      | sandbox, computer                       |
+| `check`    | Judges the last result. An AI judges it against `criteria` (one requirement per line), or a command's exit code decides. A failed check sends the work back to the step that made it, with the issues, up to `attempts` times; then the run stops or goes on with the issues on record | everywhere (command: sandbox, computer) |
+| `approval` | Waits for a person: anyone who may edit the task, its owner, its assignee, whoever started the run, or one named person. They approve, or send the work back with a note                                                                                                               | everywhere                              |
+| `status`   | Moves the task, e.g. to `review`                                                                                                                                                                                                                                                       | everywhere                              |
+
+An instruction can use these placeholders:
+
+| Placeholder                     | Filled with                                                            |
+| ------------------------------- | ---------------------------------------------------------------------- |
+| `{{task}}`                      | The task (code, title, description) and its workspace context          |
+| `{{previous}}`                  | The last result before this step, then any note an approver gave since |
+| `{{steps.<key>}}`               | The result of any earlier AI or command step                           |
+| `{{input.<key>}}`, `{{inputs}}` | One input's value, or all of them                                      |
+| `{{resources}}`                 | The workflow's resources; added before the instruction when not placed |
+| `{{answers}}`                   | People's answers to the run's questions                                |
+
+The last result of the run is the deliverable: it is what gets posted, saved as a page and turned into subtasks
+(its `- [ ]` lines). Checks and approvals make no result of their own.
+
+People do not type placeholders: in the editor a reference is picked with `@` and shown as a chip ("Result: 2 ·
+Draft"). An instruction that refers to nothing gets the task after it.
+
+**Resources** can be standing instructions, pages from Docs, files (uploaded or already in the Drive: text, PDF, Word,
+Excel and PowerPoint are read; other files are listed and handed to a sandbox as files), other tasks, and links. A
+Google Docs, Sheets, Slides or Drive link is read when it is shared as "Anyone with the link"; the editor says at once
+whether a pasted link can be read. Everything is read as the person who starts the run, so a workflow never shows
+someone a page or file they could not open themselves.
+
+**Time estimates** (on by default per workflow) show how long each step and the whole run should take, from the
+workflow's own earlier runs, and when a run in progress should be done.
+
+## Environments
+
+| Environment                          | Runs on                                                                             | Use it for                                                                                       |
+| ------------------------------------ | ----------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------ |
+| **Company AI** (`assistant`)         | The server, as the person who started the run. No commands                          | Writing, analysis and review: most departments' work                                             |
+| **Sandbox** (`sandbox`)              | A runner, in a fresh folder per run, inside a Docker container when you ask for one | Work on files or a repository that should not touch anyone's own computer: data analysis, audits |
+| **Assignee's computer** (`computer`) | The assignee's own folder, with their coding agent and credentials                  | Engineering work that ends in a branch and a pull request                                        |
+
+A sandbox says whose runner it uses: a computer of **whoever starts the run**, or a **company runner** that takes
+runs anyone starts. A container sandbox sets its image, whether it has a network, CPU and memory, and the names of
+environment variables to pass in. Any sandbox may clone a git repository and run a setup command once. A workflow
+that asks for a container is never run in less: a runner without Docker fails the run and says why.
+
+Inside a sandbox every step works in the run's own folder. Reference files (the workflow's files and, when turned
+on, the task's attachments) are in `../assets`; what the run writes to `../out` is attached to the task when the
+workflow's output says so. The folder is removed when the run ends unless the workflow keeps it.
+
+## Templates
+
+Ready-made workflows ship for every department (`TEMPLATES` in `workflows/templates.ts`, English and Vietnamese;
+other languages read the English text). Using one makes a copy the team can change.
+
+| Department       | Templates                                                                                         |
+| ---------------- | ------------------------------------------------------------------------------------------------- |
+| Engineering      | Ship a change, Fix a bug, Review a pull request (assignee's computer); Dependency audit (sandbox) |
+| Product          | Feature spec, Bug triage, Release notes                                                           |
+| Operations       | Incident postmortem, Write an SOP                                                                 |
+| Marketing        | Launch content, Campaign content pack, SEO article                                                |
+| Sales            | Proposal with a price check, Call prep                                                            |
+| Customer support | Customer reply with a policy check, FAQ from tickets                                              |
+| People & HR      | Job post and interview kit, Onboarding plan                                                       |
+| Finance          | Data report (sandbox, computes with code), Budget variance                                        |
+| Legal            | Contract review                                                                                   |
+| Research         | Research brief                                                                                    |
+
+Each one asks for a few inputs, carries a playbook skeleton to fill in once (brand voice, price list, policies,
+standard contract positions), and puts a check before the person who approves.
+
+## Triggers
+
+A workflow can also start by itself, with up to six triggers (`workflows/triggers.ts`; firing in
+`workflow-triggers.ts`): a task is created or moves to a status, a schedule (daily or on chosen weekdays), a secret
+address another system posts to (`/api/hooks/…`), or a linked pull or merge request opened or merged. A triggered run
+acts as the person who set the triggers up, and only on the company's AI or a sandbox on a company runner.
+
+## Tables
+
+| Table                      | Holds                                                                                                                                                                                             |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `agent_workflows`          | `name`, `category`, `runner` (`server` or `local`, derived from the environment), `steps` jsonb, `config` jsonb (inputs, environment, resources, guardrails, output), `template`, `archived`      |
+| `tasks.workflow_id`        | Which workflow the task is handed to                                                                                                                                                              |
+| `task_agent_runs`          | `status`, `current_step`, `steps` jsonb, the inputs given, the config at the start, the environment's preparation, artifacts, usage, `started_by`, `claimed_by` (the device), `error`, timestamps |
+| `task_agent_run_questions` | One round of questions from one step: `questions`, `answers`, `outcome`, who answered                                                                                                             |
+
+A run's `steps` is a **copy of the workflow's steps made when it starts**, each with its own `state`, `input`,
+`output`, `log`, timings, `ran` (the model that answered, tokens, tools called), a check's `verdict`, and a `history`
+of every attempt and of what people and checks did. Editing a workflow later never rewrites a run that already
+happened.
+
+## States
+
+<Diagram name="run-states" caption="RunStatus: how a run moves, and who moves it." />
+
+- **queued → running.** A run on the company's AI is driven right away; a sandbox or computer run waits for a runner
+  to claim it.
+- **waiting_approval.** Reached at an `approval` step. `POST runs/:id/approve` continues with the next step;
+  `POST runs/:id/rework` with a note sends the previous AI step back to run again, keeping the result it replaces.
+- **waiting_input.** The AI asked people something (below). Answering puts the run back at the same step.
+- **paused.** The step in progress finishes, then nothing runs until **Continue** (`runs/:id/resume`).
+- **done, failed, cancelled.** **Stop** (`runs/:id/cancel`) ends it; a runner sees that at its next check and kills
+  the step's process. A failed run can be run again from the step that failed (`runs/:id/retry`).
+
+Starting, pausing, resuming, cancelling, asking and answering emit `work.run.*` events (`work.run.started.v1`,
+`work.run.asked.v1`…), which the home projector turns into "waiting for you" items and the audit trail records.
+
+## What keeps a run in bounds
+
+- **Checks.** A failed check resets the step that made the result, with the issues attached; that step and
+  everything after it run again. Every verdict stays in the step's history.
+- **Retries.** An AI or command step with `retries` runs again after a model error or a non-zero exit.
+- **Time and tokens.** A step is stopped after its minutes. The run fails when its working time (waiting for people
+  does not count) or its tokens pass the guardrails.
+- **Restarts.** A server run in flight when the process stops is picked up again on start, as the person who started
+  it. A runner that goes silent loses its claim and the run goes back to the queue.
+
+## Runners
+
+<Diagram name="runners" caption="The server with the company's AI, or a runner with its own agent." />
+
+### Company AI
+
+The server loops over the steps, **one step per transaction**, so the task page sees progress while the model
+works. An `ai` step goes to the ai module (`POST /ai/workflows/step`) **as the person who pressed Run**, so their
+AI budget, the company policy and the safety net apply, and usage is recorded against the task.
+
+### Sandbox and computer
+
+A person connects their computer once (AI › Connect pastes one line that runs `workspace-connect.mjs`), which keeps
+`workspace-runner.mjs` running with a personal API key. A company runner is the same program started with
+`--shared` by someone who manages the company's AI agents. The runner executes; the server decides:
+
+1. `POST runner/claim` every few seconds, saying what the runner has (Docker, its agent). The server hands it the
+   oldest queued run it may take: the caller's own, or, for a company runner, any run whose sandbox asks for one.
+2. For a sandbox it prepares the folder, the container, the clone, the assets and the setup command, and reports what
+   isolation it actually gave (`runner/runs/:id/env`).
+3. `POST runner/runs/:id/next` returns the next step **already rendered by the server**: the instruction or the
+   command, the model, the time limit. Approvals and status steps never reach the runner.
+4. It sends an AI step's instruction on stdin to the coding agent (`claude -p` by default; Codex, Gemini CLI,
+   opencode, Cursor Agent, Qwen Code or Copilot CLI when chosen), runs commands in a shell or in the container, and
+   reports with `POST runner/runs/:id/step`.
+5. At the end it uploads the files in `out` (`runner/runs/:id/artifacts`).
+
+A run on someone's own computer starts only when that person presses Run, and only their runner can claim it. Before
+a step's text is handed to an AI outside the computer, the runner asks the server's safety net (`local-connect.ts`),
+which applies the company's rule for sensitive data: warn, redact or block. The text itself is never stored.
+
+## Questions instead of guesses
+
+Unless the workflow or the step turns asking off, every AI step's instruction ends with an ask hint. When something
+essential is unclear, the agent prints only a fenced block and stops:
+
+````text
+```workspace-ask
+{"questions": [{"text": "Which market?", "options": ["Vietnam", "Singapore"]}, {"text": "Deadline?"}]}
+```
+````
+
+The server parses it (`parseAsk`), stores a row in `task_agent_run_questions` and sets the run to `waiting_input`;
+the task and the chat sidebar show "AI is asking". When someone answers, the same step runs again with the answers
+added. Limits (`agent-ask.ts`): 3 rounds per step (`MAX_STEP_ROUNDS`) and 6 per run (`MAX_RUN_ROUNDS`). Past them,
+or when someone picks "let the AI decide", the step runs again told to decide for itself, keeping what was already
+answered.
+
+## What the AI reads
+
+`taskContext` (`workflow-context.ts`) builds the context for `{{task}}` **as the person who started the run**:
+the project and what moved in it this week, the parent task, subtasks, recent comments, attached files, documents the
+task names, and how similar tasks were done. The workflow's resources are added the same way: the playbook, the text
+of the pages it lists (only those the person may open) and of its text files. Both are capped so a local model stays
+fast. Everything read from the workspace is wrapped as untrusted content, and no permission ever depends on model
+output.
+
+## API
+
+| Endpoint (under `/api/work/`)                                                                      | Who                                                                                                  |
+| -------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| `GET/POST workflows`, `GET/PUT/DELETE workflows/:id`, `POST workflows/:id/duplicate`               | The creator edits their workflow; `ai.agent.manage` edits any                                        |
+| `PUT tasks/:ref/workflow`                                                                          | Hand a task to a workflow (or none)                                                                  |
+| `GET workflows/:id/triggers`, `POST workflows/:id/triggers/:triggerId/address`                     | The workflow's triggers and a new secret address for a hook                                          |
+| `GET/POST tasks/:ref/runs`                                                                         | List runs; start one with its inputs (assignee's computer: the assignee only; otherwise `task.edit`) |
+| `POST runs/:id/approve · rework · pause · resume · cancel · retry`                                 | The people on the task                                                                               |
+| `GET agent-questions/open`, `POST agent-questions/:id/answer`                                      | Questions waiting for the caller                                                                     |
+| `POST runner/claim`, `POST runner/runs/:id/env · next · step · artifacts · collected`, `GET runner/runs/:id` | The runner, with a personal API key                                                                  |
+
+## Changing it
+
+- New step field: extend `WorkflowStep` in `workflows/model.ts`, normalize and validate it there, carry it through
+  the engine and the runner, and add it to the editor.
+- New template: add it to `TEMPLATES` in `workflows/templates.ts` with English and Vietnamese texts;
+  `templates.test.ts` checks its placeholders and that no AI result goes unchecked.
+- New coding agent for the runner: add an entry to the registry at the top of `workspace-connect.mjs`.

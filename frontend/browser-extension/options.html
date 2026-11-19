@@ -1,0 +1,108 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>workspace AI</title>
+    <style>
+      body {
+        font:
+          14px/1.5 system-ui,
+          sans-serif;
+        color: #0a0a0a;
+        margin: 0;
+        padding: 20px;
+        width: 360px;
+        background: #fafafa;
+      }
+      h1 {
+        font-size: 16px;
+        margin: 0 0 4px;
+      }
+      p {
+        color: #5c5c66;
+        margin: 0 0 12px;
+      }
+      label {
+        display: block;
+        font-weight: 600;
+        font-size: 13px;
+        margin: 12px 0 4px;
+      }
+      input {
+        width: 100%;
+        box-sizing: border-box;
+        border: 1px solid #e7e7ea;
+        border-radius: 6px;
+        padding: 8px;
+        font: inherit;
+      }
+      button {
+        margin-top: 12px;
+        background: #4f46e5;
+        color: #fff;
+        border: 0;
+        border-radius: 6px;
+        padding: 8px 14px;
+        font: 600 13px system-ui;
+        cursor: pointer;
+      }
+      button.secondary {
+        background: #fff;
+        color: #0a0a0a;
+        border: 1px solid #e7e7ea;
+        margin-left: 6px;
+      }
+      .status {
+        margin-top: 12px;
+        font-size: 13px;
+      }
+      .ok {
+        color: #15803d;
+      }
+      .err {
+        color: #c0262d;
+      }
+      ul {
+        padding-left: 18px;
+        color: #5c5c66;
+        margin: 8px 0 0;
+      }
+      a {
+        color: #4338ca;
+      }
+      label.check {
+        display: flex;
+        gap: 8px;
+        align-items: flex-start;
+        font-weight: 500;
+        margin-top: 16px;
+      }
+      label.check input {
+        width: auto;
+        margin-top: 3px;
+      }
+      .small {
+        font-size: 12px;
+        margin: 4px 0 0 24px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>workspace AI</h1>
+    <p data-i18n="optIntro"></p>
+    <label for="code" data-i18n="optCodeLabel"></label>
+    <input id="code" data-i18n-placeholder="optCodePlaceholder" autocomplete="off" />
+    <button id="save" type="button" data-i18n="optConnect"></button><button id="off" class="secondary" type="button" data-i18n="optDisconnect"></button>
+    <div id="status" class="status" role="status"></div>
+    <label class="check" id="hint-row" hidden><input id="hints" type="checkbox" /> <span data-i18n="optHint"></span></label>
+    <p class="small" id="hint-note" data-i18n="optHintNote" hidden></p>
+    <ul>
+      <li data-i18n="optNote1"></li>
+      <li data-i18n="optNote2"></li>
+      <li data-i18n="optNote3"></li>
+      <li><a data-i18n="optWhatSent" href="https://github.com/hungga1711/workspace/blob/main/docs/extension/what-is-sent.md" target="_blank" rel="noopener"></a></li>
+    </ul>
+    <script src="sites.js"></script>
+    <script src="options.js"></script>
+  </body>
+</html>

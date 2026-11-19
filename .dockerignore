@@ -1,0 +1,31 @@
+# Build context of infra/docker/Dockerfile: sources only. Dependencies and build outputs are made inside the image.
+**/node_modules
+**/dist
+**/.next
+**/.next-*
+**/*.tsbuildinfo
+**/coverage
+**/test-results
+**/playwright-report
+**/.DS_Store
+**/*.log
+.git
+.github
+.gstack
+.claude
+.seed-demo.json
+tooling/loadtest/data
+tooling/loadtest/results
+# Secrets anywhere in the tree (patterns here are anchored at the root, unlike .gitignore), and backup.sh's
+# default target, which holds the database dump and every secret.
+**/.env
+**/.env.*
+!**/.env.example
+**/*.pem
+**/*.key
+infra/production/backups
+infra/production/.upgrade-previous
+docs
+**/dist-bundle
+# The public site has its own build (website.yml); the image never uses it.
+website

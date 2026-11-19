@@ -1,0 +1,5 @@
+Task ID,Task Name,Task Content,Status,Date Created,Due Date,Priority,Assignees,Tags,Parent ID,List Name,Folder Name,Space Name
+86a1,Thiết kế trang giá,Bản nháp cho đợt ra mắt,in progress,10/01/2026,10/25/2026,high,"[lan@congty.vn, huy@congty.vn]","[web, launch]",,Website,Marketing,Công ty
+86a2,Viết nội dung,,to do,10/01/2026,"Friday, October 30th 2026",normal,[Trần Huy],[],86a1,Website,Marketing,Công ty
+86a3,Duyệt ảnh,,complete,10/02/2026,,low,[],[],86a2,Website,Marketing,Công ty
+86b1,Hợp đồng đối tác,,review,10/03/2026,1793318400000,urgent,[someone@else.com],[sales],,Sales,Marketing,Công ty

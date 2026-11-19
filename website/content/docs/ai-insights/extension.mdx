@@ -1,0 +1,67 @@
+---
+title: Browser extension
+description: Exactly what the AI Insights browser extension sends to your server, when it sends it, what it never sends, and the JSON of each payload.
+---
+
+Written from the code in
+[frontend/browser-extension](https://github.com/hungga1711/workspace/tree/main/frontend/browser-extension). If
+the two disagree, the code is right.
+
+## When it runs
+
+- **Only on listed AI sites**: ChatGPT, Claude, Gemini, Copilot and Microsoft 365 Copilot, Perplexity, DeepSeek,
+  Grok, Meta AI, Poe, Qwen, Kimi, Doubao, You.com, HuggingChat, Z.ai and Duck.ai (hosts in
+  [`sites.js`](https://github.com/hungga1711/workspace/blob/main/frontend/browser-extension/sites.js)).
+- **Only after the person connects it** with a code from Me › AI.
+- **Only when the person presses send.** Typing, pasting and deleting are not recorded.
+- **With a notice** in the corner of every page it runs on.
+
+## Where it goes
+
+One address only: the company's server from the connection code, `POST <server>/api/ai-monitor/events` with
+`Authorization: Bearer aim_…`. Events queue in the browser (at most 500) and go in batches of 20. The project
+maintainers receive nothing.
+
+## What it sends
+
+A prompt, as it arrives at the company's server:
+
+```jsonc
+{
+  "url": "https://chatgpt.com/c/abc123",
+  "conversation": "/c/abc123",
+  "prompt": "Draft a reply to the customer about…", // as sent; redacted text when the policy redacts
+  "response": null,                                // only if the policy captures answers
+  "at": "2026-10-26T08:12:33.000Z",
+  "model": "",                                     // always empty from the extension
+  "hint": { "taskId": "task_01HV…", "seenAt": "…" }, // only with the optional task hint
+  "redactions": { "personal_id": 1 }               // counts, never the removed text
+}
+```
+
+The other kinds are a safety event (the action and the kinds found, no text), a "Did AI help?" answer and the
+person's answer to "link this chat to a task?" (the task key).
+
+The server answers with the current policy, which the extension applies:
+
+```json
+{ "accepted": 3, "captureResponses": false, "sensitiveMode": "redact", "keywords": ["Project Delta"] }
+```
+
+## Never sent
+
+- Anything on the page other than the prompt sent: other messages, files, images.
+- Keystrokes, unsent drafts, clipboard, time on page, screenshots.
+- Other tabs, other sites, browsing history, cookies.
+- Text removed by redaction, or any text from a warned or blocked prompt.
+- Anything to the maintainers or a third party.
+
+## Disconnect
+
+Open the extension and press **Disconnect**: the server address, code, queue and policy are removed from the
+browser. A new code in Me › AI revokes the old one.
+
+Field by field, with limits and what comes back:
+[docs/extension/what-is-sent.md](https://github.com/hungga1711/workspace/blob/main/docs/extension/what-is-sent.md).
+Privacy policy:
+[docs/extension/privacy-policy.md](https://github.com/hungga1711/workspace/blob/main/docs/extension/privacy-policy.md).

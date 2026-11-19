@@ -1,0 +1,60 @@
+---
+title: Request path, security and AI gateway
+description: How a request reaches a module, how people sign in and how access is checked, and how AI calls and AI Insights data flow.
+---
+
+## Request path
+
+<Diagram name="request-path" caption="From the browser to the database." />
+
+1. Browser → **web BFF** (:3000). The browser holds only an opaque, httpOnly session id; access and refresh tokens
+   stay in Postgres.
+2. BFF → **gateway** (:4000). The gateway verifies the token, resolves the person into a principal and signs a
+   60-second internal token.
+3. Gateway → **module**, in memory. Each module verifies the signed principal again and ignores any header the
+   client added.
+
+API keys (`wos_…`) follow the same path: a personal key acts as its creator, narrowed to the permissions ticked;
+a workspace key acts as a service. The gateway rate-limits per person or key (600 requests a minute by default) and
+has its own ceilings for sign-in, recovery and the extension intake.
+
+## Sign-in and authorization
+
+Sign-in is the app's own: bcrypt passwords with lockout, short-lived Ed25519 access tokens, rotating refresh tokens,
+and two-step codes (TOTP with recovery codes). Every module checks
+`authorize(principal, permission, resource)` for people, API keys and AI agents alike. Scopes run
+`SELF < TEAM < DEPARTMENT < WORKSPACE`; an AI agent acting for someone never exceeds that person's own access.
+
+Hardening worth knowing when you run it: a strict CSP, a CSRF header on every write, session rows keyed by a hash so
+a database dump yields no usable cookies, AI keys encrypted at rest, HTTPS-only webhooks with SSRF guards and HMAC
+signatures. Report vulnerabilities as described in
+[SECURITY.md](https://github.com/hungga1711/workspace/blob/main/SECURITY.md).
+
+## AI gateway
+
+<Diagram name="ai-gateway" caption="Connections, routing and metering." />
+
+Callers name a **feature** (`ask`, `thread_summary`, `brief`…) and a **tier** (`fast` or `smart`), never a vendor.
+The gateway picks the route from the admin's connections, skips a vendor that is rate-limited or failing for a
+short while, and falls back to a local extractive answer so people get a result instead of an error. Every call is
+metered per person, feature and model against the monthly budgets admins set.
+
+Tool-using agents run with the intersection of the agent's and the asker's permissions; everything read from
+messages, documents and tasks is wrapped as untrusted content for the model, and no authorization ever depends on
+model output.
+
+## AI Insights intake
+
+<Diagram name="ai-oversight" caption="AI activity intake and oversight." />
+
+The browser extension posts batches to `/api/ai-monitor/events` with a personal connection code. Each conversation
+gets a topic and sensitive-data flags; opening a full conversation is logged and shown to the person; retention is
+pruned hourly per the company policy. The product side is in [AI Insights](/docs/ai-insights).
+
+## Full reference
+
+[System design](https://github.com/hungga1711/workspace/blob/main/docs/architecture/system-design.md) §5 (request
+path, API keys, rate limits), §6 (authentication, authorization model, boundaries), §11 (AI routing, circuit
+breaker, budgets, tool use, oversight) and §13 (security hardening).
+
+Next: [Code structure](/docs/advanced/code-structure).

@@ -1,0 +1,57 @@
+{
+  "teams": { "data": { "teams": { "nodes": [{ "id": "team-eng", "name": "Engineering", "key": "ENG" }] } } },
+  "issues": {
+    "data": {
+      "issues": {
+        "nodes": [
+          {
+            "id": "lin-1",
+            "identifier": "ENG-123",
+            "title": "Rate limit the export API",
+            "url": "https://linear.app/acme/issue/ENG-123",
+            "createdAt": "2026-10-30T09:00:00.000Z",
+            "updatedAt": "2026-11-05T12:00:00.000Z",
+            "startedAt": "2026-11-02T09:00:00.000Z",
+            "completedAt": "2026-11-05T12:00:00.000Z",
+            "canceledAt": null,
+            "dueDate": "2026-11-06",
+            "state": { "type": "completed", "name": "Done" },
+            "assignee": { "email": "lily@brightline.test" },
+            "team": { "id": "team-eng" }
+          },
+          {
+            "id": "lin-2",
+            "identifier": "ENG-124",
+            "title": "Review billing copy",
+            "url": "https://linear.app/acme/issue/ENG-124",
+            "createdAt": "2026-11-01T09:00:00.000Z",
+            "updatedAt": "2026-11-06T12:00:00.000Z",
+            "startedAt": "2026-11-03T09:00:00.000Z",
+            "completedAt": null,
+            "canceledAt": null,
+            "dueDate": null,
+            "state": { "type": "started", "name": "In Review" },
+            "assignee": null,
+            "team": { "id": "team-eng" }
+          },
+          {
+            "id": "lin-3",
+            "identifier": "ENG-125",
+            "title": "Old idea",
+            "url": "https://linear.app/acme/issue/ENG-125",
+            "createdAt": "2026-10-01T09:00:00.000Z",
+            "updatedAt": "2026-11-06T13:00:00.000Z",
+            "startedAt": null,
+            "completedAt": null,
+            "canceledAt": "2026-11-06T13:00:00.000Z",
+            "dueDate": null,
+            "state": { "type": "canceled", "name": "Canceled" },
+            "assignee": null,
+            "team": { "id": "team-eng" }
+          }
+        ],
+        "pageInfo": { "hasNextPage": false, "endCursor": null }
+      }
+    }
+  }
+}

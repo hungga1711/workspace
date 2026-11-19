@@ -1,0 +1,21 @@
+{
+  "title": "Docs",
+  "root": true,
+  "pages": [
+    "---Start here---",
+    "index",
+    "quick-start",
+    "---Self-hosting---",
+    "...self-hosting",
+    "---AI (optional)---",
+    "...ai-insights",
+    "---Guides---",
+    "...guides",
+    "---Advanced: for contributors---",
+    "...advanced",
+    "---Integrations---",
+    "...integrations",
+    "---Project---",
+    "contributing"
+  ]
+}

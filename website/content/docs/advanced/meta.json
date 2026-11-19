@@ -1,0 +1,13 @@
+{
+  "title": "Advanced",
+  "pages": [
+    "index",
+    "system-design",
+    "request-path",
+    "code-structure",
+    "database",
+    "events",
+    "workflows",
+    "first-change"
+  ]
+}

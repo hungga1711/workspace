@@ -1,0 +1,121 @@
+---
+title: Events
+description: How a change in one module reaches the others, through a transactional outbox, an in-process bus and idempotent consumers.
+---
+
+When a module changes something other modules care about (a task is assigned, a run waits for approval, a member
+joins), it writes an **event into its outbox in the same transaction** as the change. The module's relay delivers it,
+inside the server process, to every **consumer group** subscribed to its topic. There is no broker
+([ADR-0021](https://github.com/hungga1711/workspace/blob/main/docs/adr/0021-one-server-no-valkey.md)).
+
+<Diagram name="event-sequence" caption="One event from the producer's transaction to a consumer group." />
+
+## Guarantees
+
+- **No dual writes.** An event exists only if the business transaction commits; a rollback emits nothing.
+- **At least once, effectively once.** A consumer records `(group, eventId)` in `processed_events` in the same
+  transaction as its handler, so a redelivered event is skipped.
+- **One topic per aggregate type**, `workspace.<aggregateType>` (`workspace.work.task`, `workspace.work.run`…), not
+  per event type.
+- **No ordering across topics.** A group handles its events one at a time, but projections that care compare a
+  version (`source_version < $3` in the home projector) instead of trusting arrival order.
+- **Failures are contained.** A handler that throws is tried 5 times (waiting 200, 400, 800, 1600 ms), then the event
+  goes to the group's `dead_events` table; other events keep flowing.
+- **The outbox is the replay copy**, kept `EVENT_RETENTION_DAYS` (3) after delivery.
+
+## The envelope
+
+Every event is checked against `EventEnvelope` (`backend/packages/contracts/src/event-envelope.ts`) on write and on
+read.
+
+| Field | Rule |
+|---|---|
+| `eventId` | ULID; the outbox row id and the dedupe key |
+| `eventType` | `domain.entity.verb.vN`, e.g. `work.task.created.v1`; `version` must equal the `.vN` suffix |
+| `aggregateType`, `aggregateId` | Choose the topic, and name the entity the event is about |
+| `actorId` | `user:<id>`, `agent:<id>` or a bare id |
+| `occurredAt` | ISO time; consumers order and display by it |
+| `requestId` | Always set: `appendToOutbox` throws without one, so every event traces back to a request |
+| `payload` | Checked against the event's schema in the registry |
+| `origin` | Optional ip, user agent and channel, signed by the gateway; the audit trail stores it |
+
+## The registry
+
+Every event type is declared once in `backend/packages/contracts/src/events/<domain>.ts`, with its topic, a summary,
+an intent (`projection` or `audit`) and a zod payload schema:
+
+```ts
+// backend/packages/contracts/src/events/work.ts
+"work.run.started.v1": defineEvent({
+  aggregateType: "work.run",
+  summary: "Someone started a task's agent workflow",
+  intent: "audit",
+  payload: run,
+}),
+```
+
+Producers cannot publish anything else, and consumers validate before handling. Every consumer group and the topics
+it reads are declared in `CONSUMER_GROUPS` (`events/groups.ts`); the server refuses to start if a declared group has
+no handler, or a handler subscribes to topics its declaration does not list.
+
+## Producing an event
+
+Inside a module, use its typed `emit()` helper in the transaction that makes the change:
+
+```ts
+await withTransaction(pool, async (c) => {
+  await c.query("INSERT INTO task_agent_runs (…) VALUES (…)", […]);
+  await emit(c, "work.run.started.v1", "work.run", runId, await runEvent(c, run));
+});
+```
+
+`emit` calls `appendToOutbox`, which validates the event and inserts the row; a statement trigger sends
+`NOTIFY workspace_outbox_<schema>` on commit and the module's relay wakes up.
+
+## Consuming events
+
+A module subscribes in its `start.ts`:
+
+```ts
+// backend/server/src/modules/home/start.ts
+await startConsumer({ bus: ctx.bus, groupId: "home-projector", topics: HOME_TOPICS, pool: deps.pool, handle: project });
+```
+
+`handle(event, client)` runs inside `runWithContext` (the event's actor and request id) and `withTransaction`,
+together with the dedupe insert. Switch on `eventType`, narrow with `asKnown(e)` to get a typed payload, and make
+the handler safe to run twice in a row.
+
+| Group | Module | Does |
+|---|---|---|
+| `home-projector` | home | Builds "Needs you", the activity feed and notifications from task, run, approval, chat, calendar, leave… events |
+| `search-indexer` | search | Upserts full-text rows for messages, tasks, projects, documents and people |
+| `work-settings`, `ai-settings`, `employee-profiles`, `chat-onboarding`… | each module | Project the workspace's config (time zone, locale, features) and members into the module's own tables |
+| `platform-webhooks`, `platform-audit` | platform | Fan events out to the company's webhooks and into the append-only audit trail |
+
+The full list of event types, payloads, producers and consumers is generated from the registry:
+[docs/events/catalog.md](https://github.com/hungga1711/workspace/blob/main/docs/events/catalog.md).
+
+## Adding an event, step by step
+
+1. Declare it in `backend/packages/contracts/src/events/<domain>.ts` with a payload schema.
+2. If a new group consumes it, add the group and its topics to `CONSUMER_GROUPS`.
+3. `pnpm build:packages`, then `emit()` it in the producing transaction.
+4. Handle it in the consumer (`startConsumer` in that module's `start.ts`), idempotently.
+5. `pnpm events:catalog` regenerates `docs/events/catalog.md`; CI fails if it is out of date.
+6. Add an integration test in `backend/server/test/<module>/` that performs the change and checks the consumer's
+   effect.
+
+## When something fails
+
+In production, from `infra/production/`:
+
+```bash
+docker compose exec app /app/infra/production/entrypoint.sh dlq list            # waiting dead letters, per group
+docker compose exec app /app/infra/production/entrypoint.sh dlq show <group>    # the events and why they failed
+docker compose exec app /app/infra/production/entrypoint.sh dlq replay <group>  # after the fix: the server re-drives them
+```
+
+Watch the logs for `"event dead-lettered"`. The
+[operations runbook](https://github.com/hungga1711/workspace/blob/main/docs/runbooks/operations.md) has the rest.
+
+The search schema is a projection: if it ever drifts, `reindex` rebuilds it from the modules' own data.

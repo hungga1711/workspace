@@ -1,0 +1,61 @@
+---
+title: Contributing
+description: Run Workspace from source, the ground rules, and the checks to run before a pull request.
+---
+
+Contributions are MIT licensed; there is no CLA. The full contributor guide lives with the code in
+[CONTRIBUTING.md](https://github.com/hungga1711/workspace/blob/main/CONTRIBUTING.md), and
+[AGENTS.md](https://github.com/hungga1711/workspace/blob/main/AGENTS.md) maps the repository for new contributors
+and coding agents alike.
+
+## Run from source
+
+You need Node.js 22, pnpm 10 (`corepack enable`) and Docker with Compose v2. From the repository root:
+
+```bash
+pnpm install
+cp .env.example .env
+pnpm infra:up                 # Postgres, S3 (SeaweedFS), LiveKit
+pnpm build:packages           # shared packages; needed before typecheck and the server
+pnpm migrate
+pnpm dev:server               # every backend module in one process, :4000
+cd frontend/web && pnpm dev   # http://localhost:3000, in a second terminal
+```
+
+Open http://localhost:3000, create the company at `/setup`, then fill it with demo data (five people, two
+departments, three projects with tasks, documents, meetings, chat and eight weeks of AI history):
+
+```bash
+SEED_OWNER_EMAIL=<owner e-mail> SEED_OWNER_PASSWORD=<owner password> pnpm seed:demo
+```
+
+To work on the browser extension, load `frontend/browser-extension` unpacked in Chrome and connect it with a code
+from Me › AI. The
+[local development runbook](https://github.com/hungga1711/workspace/blob/main/docs/runbooks/local-development.md)
+covers ports, tests, E2E and common problems.
+
+## Ground rules
+
+- **Every feature works without AI.** AI surfaces hide when no provider is connected; nothing may depend on one.
+- **No SaaS concepts.** No billing, plans, seat limits or platform admin. One installation is one company.
+- **Modules stay apart.** Each owns its folder and schema and never imports another's code (`pnpm lint` refuses
+  it). Cross-module data goes through the module's API or events.
+- **Text lives in the catalogs.** Every user-facing string is in `frontend/web/src/lib/i18n/messages/`: `en.ts` is
+  the source and its keys are the type; `vi.ts`, `zh.ts` and `es.ts` translate it, and a missing key reads in English.
+- **UI follows DESIGN.md.** Tailwind v4 with the design tokens; no raw hex values or new `.css` files.
+- **Fast and light.** Route JavaScript budgets are checked in CI; heavy client code loads on demand.
+
+## Before a pull request
+
+```bash
+pnpm build:packages            # if backend/packages/ changed
+pnpm typecheck && pnpm lint && pnpm format:check
+cd frontend/web && pnpm test
+pnpm -r test                   # integration tests, needs pnpm infra:up
+```
+
+For UI changes, add or update a Playwright spec in `frontend/web/e2e/` and include before and after screenshots.
+Write commit messages as one plain sentence about the user-visible change, one logical change per commit.
+
+Going deeper: the [contributor guide](/docs/advanced) covers the system design, code structure, database, events and
+agent workflows, and walks through [a first change](/docs/advanced/first-change) end to end.

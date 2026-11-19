@@ -1,0 +1,35 @@
+---
+title: REST API
+description: The public HTTP API for tasks, projects, documents, chat and people, described by OpenAPI 3.1, with API keys, webhooks and rate limits.
+---
+
+[`docs/api/openapi.json`](https://github.com/hungga1711/workspace/blob/main/docs/api/openapi.json) describes the
+routes an integration may call: tasks, projects, documents, search, workload and outcomes, and AI Insights
+aggregates. It is generated from the same schemas the server validates with, and CI fails if it is stale.
+
+## Calling it
+
+| | |
+|---|---|
+| Base URL | `https://<API_DOMAIN>` or your app domain; paths start with `/api/` |
+| Auth | `Authorization: Bearer wos_…` (a personal key from Me › Profile › Sign-in and security, or a workspace key from Admin › Security & integrations › Integrations & API) |
+| Rate limit | 600 requests per key per minute (`RATE_USER_PER_MIN`), then `429` |
+| Errors | `{ "error": "…", "requestId": "…" }` |
+| Concurrency | Updates take `expectedVersion`; a concurrent edit returns `409` |
+
+```bash title="List my tasks"
+curl -s "https://api.example.com/api/work/tasks?scope=assigned&status=in_progress" \
+  -H "Authorization: Bearer wos_…"
+```
+
+## Browse it
+
+Set `API_DOCS=1` and open `/api/docs` (or `/api/docs/openapi.json`). Off by default.
+
+## Webhooks and notifications
+
+- **Webhooks** (Admin › Security & integrations › Integrations & API): HTTPS only, HMAC-signed with `X-workspace-Signature`.
+
+Full reference, in the repository:
+[docs/api/README.md](https://github.com/hungga1711/workspace/blob/main/docs/api/README.md): reading by code, how the
+document is generated and checked, adding a route.

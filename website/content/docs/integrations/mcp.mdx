@@ -1,0 +1,93 @@
+---
+title: MCP server
+description: Connect Claude, ChatGPT, Cursor or VS Code to your work with just a URL.
+---
+
+Workspace is a Model Context Protocol server. An AI assistant connects with **just the address**: the person signs in,
+sees which app is asking and what it may do, and approves. The agent then reads and updates their work as them, with
+the permissions they chose, and admins see every connected agent and every tool it called. It needs no AI provider in
+Workspace and costs nothing until an agent calls it.
+
+|           |                                                                         |
+| --------- | ----------------------------------------------------------------------- |
+| Address   | `https://<APP_DOMAIN>/api/mcp` (shown with a copy button in Me › AI agents) |
+| Transport | Streamable HTTP, stateless                                              |
+| Sign-in   | OAuth 2.1 with PKCE, or `Authorization: Bearer wos_…` (a personal key)   |
+
+## Connect an app
+
+<Tabs items={["Claude", "Claude Code", "ChatGPT", "Cursor", "VS Code"]}>
+<Tab value="Claude">
+
+Settings › Connectors › **Add custom connector**, paste the address, then **Connect** and approve in Workspace.
+
+</Tab>
+<Tab value="Claude Code">
+
+```bash
+claude mcp add --transport http workspace https://app.example.com/api/mcp
+```
+
+Then `/mcp` › workspace to sign in.
+
+</Tab>
+<Tab value="ChatGPT">
+
+Settings › Apps & Connectors › Advanced › **Developer mode**, then create a connector with the address and OAuth.
+
+</Tab>
+<Tab value="Cursor">
+
+Me › AI agents › **Add to Cursor** installs it in one click. Or in `~/.cursor/mcp.json`:
+
+```json
+{ "mcpServers": { "workspace": { "url": "https://app.example.com/api/mcp" } } }
+```
+
+</Tab>
+<Tab value="VS Code">
+
+Me › AI agents › **Add to VS Code** installs it in one click. Or in `.vscode/mcp.json`:
+
+```json
+{ "servers": { "workspace": { "type": "http", "url": "https://app.example.com/api/mcp" } } }
+```
+
+</Tab>
+</Tabs>
+
+Clients without OAuth send a personal key (Me › Profile › Sign-in and security) in the `Authorization` header, or use
+the one-file stdio bridge `tooling/scripts/mcp-stdio.mjs`.
+
+## Tools
+
+Every call goes through the same permission checks as the web app. Records take their id or the code shown in the app
+(`WEB-42`, `D-012`), and results link back into the app.
+
+| Area                  | Tools                                                                                   |
+| --------------------- | --------------------------------------------------------------------------------------- |
+| Tasks                 | `list_my_tasks`, `get_task`, `create_task`, `update_task`, `comment_on_task`, `list_task_links`, `link_work_to_task` |
+| Projects              | `list_projects`, `get_project`, `project_progress`, `project_reviews`                   |
+| Workflows             | `list_workflows`, `start_workflow_run`, `get_workflow_run`, `decide_workflow_run`, `stop_workflow_run` |
+| Approvals             | `list_approvals`, `get_approval`, `request_approval`, `decide_approval`                 |
+| Calendar              | `list_calendar_events`, `schedule_event`, `respond_to_event`, `get_meeting`             |
+| My day                | `my_day`: what needs me, meetings, deadlines, unread inbox                              |
+| Documents, whiteboards | `list_documents`, `read_document`, `create_document`, `list_whiteboards`, `read_whiteboard` |
+| Chat                  | `list_channels`, `read_channel`, `read_thread`, `post_message`, `unanswered_questions`  |
+| People and search     | `find_people`, `search`                                                                 |
+| Managers              | `team_workload`, `overdue_work`, `blocked_work`, `team_output`, `attendance_summary`, `ai_insights_summary` (aggregates only) |
+
+**Prompts:** `daily_standup`, `plan_my_week`, `project_status_report`, `team_check_in`, `catch_up_channel`.
+**Resources:** `workspace://tasks/{id}`, `projects/{id}`, `docs/{id}`, `whiteboards/{id}`.
+
+## Safe by default
+
+- PKCE (S256) only; one-time codes; refresh tokens rotate, and a replayed one ends the connection.
+- A token opens only `/api/mcp`, acts as the person narrowed to the approved permissions, and stops when they
+  disconnect the app, an admin does, or their sessions end (sign out everywhere, password reset, disabled account).
+- Codes, tokens and secrets are stored hashed.
+- **Admin › Security & integrations › MCP access** lists every live connection and logs each tool call (who, which app, which tool, result,
+  duration), never the arguments or answers.
+
+The full reference is in the repository:
+[docs/integrations/mcp.md](https://github.com/hungga1711/workspace/blob/main/docs/integrations/mcp.md).

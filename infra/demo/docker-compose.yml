@@ -1,0 +1,79 @@
+# The public demo: the production stack plus demo mode, a seed on first boot and an hourly reset.
+# Layered on infra/production/docker-compose.yml, so paths below are relative to infra/production. Use ./demo.sh,
+# which passes both files and this folder's .env:
+#
+#   ./demo.sh init     # writes .env with generated secrets (asks for the domain and the Let's Encrypt email)
+#   ./demo.sh up       # build, start, seed once, snapshot; then every hour: restore the snapshot
+#
+#  first boot:  demo-seed ─► /api/signup (SETUP_TOKEN) ─► seed-demo.mjs (members, work, 8 weeks of AI Insights)
+#               ─► pg_dump -Fc ─► snapshot volume
+#  every hour:  demo-reset ─► pg_restore --clean (same database, the app keeps running) ─► wipe files
+name: workspace-demo
+
+x-demo-env: &demo-env
+  DEMO_MODE: "1"
+
+services:
+  app:
+    environment:
+      <<: *demo-env
+      DEMO_OWNER_EMAIL: ${DEMO_OWNER_EMAIL:-admin@example.com}
+      DEMO_OWNER_PASSWORD: ${DEMO_OWNER_PASSWORD:?set DEMO_OWNER_PASSWORD in infra/demo/.env}
+      DEMO_PASSWORD: ${DEMO_PASSWORD:?set DEMO_PASSWORD in infra/demo/.env}
+      DEMO_SEED_SECRET: ${DEMO_SEED_SECRET:?set DEMO_SEED_SECRET in infra/demo/.env}
+      DEMO_RATE_PER_IP_PER_MIN: ${DEMO_RATE_PER_IP_PER_MIN:-120}
+      # Everyone shares three accounts: the per-account limit is the per-IP one's backstop, not the main gate.
+      RATE_USER_PER_MIN: ${RATE_USER_PER_MIN:-1200}
+      STORAGE_DRIVER: ${STORAGE_DRIVER:-local}
+      STORAGE_LOCAL_DIR: /data/files
+    volumes:
+      - demofiles:/data/files
+
+  # One-shot: set up the workspace, seed it, take the snapshot the hourly reset restores. Skips when it exists.
+  demo-seed:
+    image: postgres:16.4-alpine
+    restart: "no"
+    depends_on:
+      app: { condition: service_healthy }
+    entrypoint: ["sh", "/demo/seed.sh"]
+    environment:
+      GATEWAY_URL: http://app:4000
+      SETUP_TOKEN: ${SETUP_TOKEN:?set SETUP_TOKEN in infra/demo/.env}
+      # The demo's language (`en` or `vi`): the workspace locale and time zone, and the seeded data.
+      DEMO_LOCALE: ${DEMO_LOCALE:-en}
+      # Empty: a name that fits DEMO_LOCALE (first-run.mjs).
+      DEMO_COMPANY: ${DEMO_COMPANY:-}
+      SEED_OWNER_EMAIL: ${DEMO_OWNER_EMAIL:-admin@example.com}
+      SEED_OWNER_PASSWORD: ${DEMO_OWNER_PASSWORD}
+      SEED_PASSWORD: ${DEMO_PASSWORD}
+      DEMO_SEED_SECRET: ${DEMO_SEED_SECRET}
+      SEED_DATABASE_URL: postgres://workspace_owner:${PG_OWNER_PASSWORD}@postgres:5432/workspace
+      PGHOST: postgres
+      PGUSER: postgres
+      PGPASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - ../demo:/demo:ro
+      - ../../tooling/scripts:/repo/tooling/scripts:ro
+      - demosnapshot:/snapshot
+
+  # Every DEMO_RESET_SECONDS (default an hour): the database back to the snapshot (sign-in sessions included),
+  # uploaded files removed. Waits for the first snapshot.
+  demo-reset:
+    image: postgres:16.4-alpine
+    restart: unless-stopped
+    depends_on:
+      postgres: { condition: service_healthy }
+    entrypoint: ["sh", "/demo/reset.sh"]
+    environment:
+      DEMO_RESET_SECONDS: ${DEMO_RESET_SECONDS:-3600}
+      PGHOST: postgres
+      PGUSER: postgres
+      PGPASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - ../demo:/demo:ro
+      - demosnapshot:/snapshot
+      - demofiles:/files
+
+volumes:
+  demosnapshot:
+  demofiles:

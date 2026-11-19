@@ -1,0 +1,76 @@
+# Local development infrastructure. Dev-only credentials; never reuse outside localhost.
+#
+#  app ──► postgres:5432, database "workspace", one schema per module (pgbouncer:6432 with --profile pgbouncer)
+#  events: outbox (postgres) ──► relay in each module ──► consuming modules, in the server process (no broker)
+#  search ──► postgres schema "search" (full-text)   files (R2 stand-in, S3 API) ──► seaweedfs s3:8333
+#  meetings: browser ⇄ livekit:7880 (WebRTC SFU)   recordings: egress ──► S3/R2 (profile "recording")
+name: workspace
+
+services:
+  postgres:
+    image: postgres:16.4-alpine
+    # The server connects directly (a pool of 5–15 per module, docs/runbooks/operations.md "Connections"); 200
+    # leaves room for tests and tools.
+    command: ["postgres", "-c", "max_connections=200"]
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: workspace
+    ports: ["5432:5432"]
+    volumes:
+      - ./postgres/init.sql:/docker-entrypoint-initdb.d/00-init.sql:ro
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d workspace"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  # Optional transaction pooler (`--profile pgbouncer`); point the <MODULE>_DATABASE_URLs at :6432.
+  pgbouncer:
+    image: edoburu/pgbouncer:v1.23.1-p3
+    profiles: ["pgbouncer"]
+    depends_on:
+      postgres: { condition: service_healthy }
+    ports: ["6432:6432"]
+    volumes:
+      - ./pgbouncer/pgbouncer.ini:/etc/pgbouncer/pgbouncer.ini:ro
+      - ./pgbouncer/userlist.txt:/etc/pgbouncer/userlist.txt:ro
+
+  # R2 stand-in for local dev: S3 API with real SigV4 + presigned URL checks.
+  s3:
+    image: chrislusf/seaweedfs:3.80
+    # Small volumes: SeaweedFS reserves a volume's full size on disk, and every bucket (tests create their own)
+    # gets several volumes. The 30 GB default filled a developer's Docker disk with empty reservations.
+    command: ["server", "-s3", "-s3.config=/etc/seaweedfs/s3.json", "-dir=/data", "-master.volumeSizeLimitMB=64"]
+    ports: ["8333:8333"]
+    volumes:
+      - ./seaweedfs/s3.json:/etc/seaweedfs/s3.json:ro
+
+  # Video meetings: LiveKit SFU. Signalling on :7880, media on TCP 7881 / UDP 50000-50060.
+  livekit:
+    image: livekit/livekit-server:v1.13.7
+    command: ["--config", "/etc/livekit/${LIVEKIT_CONFIG:-livekit.yaml}"]
+    ports: ["7880:7880", "7881:7881", "50000-50060:50000-50060/udp"]
+    volumes:
+      - ./livekit:/etc/livekit:ro
+
+  # Meeting recordings (headless Chrome compositor). Heavy, so opt-in: --profile recording. Egress talks to LiveKit
+  # through Redis (LiveKit's own requirement; workspace needs none), so the profile adds one and LiveKit has to be
+  # started with the recording config: LIVEKIT_CONFIG=livekit-recording.yaml docker compose … --profile recording up -d
+  livekit-redis:
+    image: valkey/valkey:8.0.2-alpine
+    profiles: ["recording"]
+
+  egress:
+    image: livekit/egress:v1.11.0
+    profiles: ["recording"]
+    environment:
+      EGRESS_CONFIG_FILE: /etc/egress.yaml
+    volumes:
+      - ./livekit/egress.yaml:/etc/egress.yaml:ro
+    cap_add: [SYS_ADMIN]
+    depends_on: [livekit, livekit-redis]
+
+volumes:
+  pgdata:

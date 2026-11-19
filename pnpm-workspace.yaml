@@ -1,0 +1,5 @@
+packages:
+  - "backend/server"
+  - "backend/packages/*"
+  - "frontend/*"
+  - "tooling/tsconfig"

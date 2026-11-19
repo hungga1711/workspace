@@ -1,0 +1,36 @@
+---
+title: MCP client
+description: Let the company's AI use tools from GitHub, Sentry, Stripe or your own MCP servers.
+---
+
+Workspace is also an MCP **client**. The company's AI (Admin › AI connections) can call tools on outside MCP servers,
+so staff ask in **AI › Ask** ("which errors are new since Friday?", "open an issue for this") and the AI uses the
+tools. AI steps of server-run agent workflows use them too. A company that adds no server pays nothing for it.
+
+## Add a server
+
+Admin › AI connections › **MCP servers**:
+
+- **Gallery:** popular servers (GitHub, Sentry, Stripe, Supabase, Vercel, Hugging Face, Context7…) in one click.
+- **Another server:** any Streamable HTTP address. **Check** says whether it answers and how it signs in.
+- **Sign-in:** none, a token (stored encrypted), or OAuth 2.1 with PKCE and dynamic registration. An OAuth server is
+  either signed in once for the company, or **each person connects their own account**, so the AI acts with their
+  own access in that system.
+
+## Tools and who may use them
+
+- Switch each tool on or off, and choose **Runs on its own** or **Asks first**. Read-only tools run on their own by
+  default; anything that writes asks first.
+- Choose who may use a server: everyone, some departments, or AI admins only.
+- In Ask, a tool that asks first pauses the answer and shows a card with the server, the tool and the arguments; the
+  person approves or declines. Every answer shows which tools it used.
+
+## Security
+
+- Addresses must be https and public: private, loopback and link-local addresses are refused, checked at connect time
+  (no DNS rebinding). Internal servers are allowed through `MCP_ALLOW_PRIVATE_HOSTS`.
+- Tool results are treated as untrusted content, size-capped, with timeouts.
+- Every call is logged (who, server, tool, outcome, duration), never the arguments or results.
+
+The full reference is in the repository:
+[docs/integrations/mcp-client.md](https://github.com/hungga1711/workspace/blob/main/docs/integrations/mcp-client.md).

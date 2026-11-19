@@ -1,0 +1,121 @@
+---
+title: Your first change
+description: A feature end to end, from the migration to the screen, with the tests to write and the checks CI runs before a pull request is merged.
+---
+
+This page walks through one small feature, an **hour estimate on tasks**, across every layer. The feature is an
+example and is not in the repository; the files, helpers and commands are the real ones.
+
+## Before you start
+
+- Run the stack from source ([Contributor guide](/docs/advanced#running-it-from-source)) and seed the demo company.
+- Read [Code structure](/docs/advanced/code-structure) and the
+  [backend](https://github.com/hungga1711/workspace/blob/main/backend/AGENTS.md) and
+  [web](https://github.com/hungga1711/workspace/blob/main/frontend/web/AGENTS.md) guides.
+- Look for an issue labelled `good first issue`, or open one first for anything larger than a fix, so the approach is
+  agreed before the code.
+
+## 1. The migration
+
+A new file after the highest number in the module's folder. Never edit an applied one.
+
+```sql
+-- backend/server/migrations/work/020_task_estimate.sql
+ALTER TABLE tasks ADD COLUMN IF NOT EXISTS estimate_hours numeric(6,2);
+ALTER TABLE tasks DROP CONSTRAINT IF EXISTS tasks_estimate_check;
+ALTER TABLE tasks ADD CONSTRAINT tasks_estimate_check CHECK (estimate_hours IS NULL OR estimate_hours >= 0);
+```
+
+`pnpm migrate` applies it; so does restarting `pnpm dev:server`. Document the column in
+[docs/database/work.md](https://github.com/hungga1711/workspace/blob/main/docs/database/work.md) in the same pull request.
+
+## 2. The domain and the endpoint
+
+In `backend/server/src/modules/work/`:
+
+- **Domain** (`tasks.ts`): add the column to `TASK_COLS` and `TaskRow`, accept it in the update input, write it in
+  the `UPDATE`. Domain functions take a `PoolClient` and a `Principal`, and throw `Invalid`, `Forbidden`,
+  `NotFound` or `Conflict`.
+- **Edge** (`http/tasks.controller.ts`, `@Patch("tasks/:id")`): extend the zod schema of the update body
+  (`estimateHours: z.number().min(0).max(9999).nullable().optional()`). The method keeps its shape:
+  `requirePrincipal` → `parse` → `withTransaction` → domain function → DTO.
+- **Authorization** is already there: editing a task asserts `task.edit` for the task's scope. A new kind of action
+  would get a new permission in `src/modules/identity/catalog.ts`.
+
+## 3. The event, if others care
+
+Other modules learn about tasks from `work.task.*` events. If the home feed or search should know the estimate, add
+it to the payload schema in `backend/packages/contracts/src/events/work.ts`, run `pnpm build:packages`, and include it
+where the module emits the event. Then `pnpm events:catalog`. A field nobody else reads stays out of the event.
+
+## 4. The screen
+
+In `frontend/web/src/`:
+
+- Add the field to the task page component under `components/work/`, reading and writing it through
+  ``api(`work/tasks/${t.id}`, { method: "PATCH", body: { expectedVersion: t.version, estimateHours } })``, the
+  same call the board and the Gantt make. `expectedVersion` makes a stale edit fail with a conflict instead of
+  overwriting someone else's change. Refresh server data with `router.refresh()`.
+- Put every word in `lib/i18n/messages/en.ts` first (`task.estimate`, `task.estimateHint`), then `vi.ts`, `zh.ts`
+  and `es.ts`. Format numbers with `useFormat()`, never a hard-coded locale.
+- Style with the token utilities (`text-ink-2`, `bg-surface`…) from
+  [DESIGN.md](https://github.com/hungga1711/workspace/blob/main/DESIGN.md). No hex values, no new CSS files.
+- Give the input a label, keep it reachable by keyboard, and check that the route stays under its JavaScript budget.
+
+## 5. The tests
+
+| Level | Where | For this feature |
+|---|---|---|
+| Unit | next to the code, `*.test.ts` | Pure logic only, e.g. a formatter for "1.5 h" |
+| Integration | `backend/server/test/work/` | Set an estimate as the assignee (200), as someone without `task.edit` (403), with `-1` (400), and read it back |
+| End to end | `frontend/web/e2e/` | Open a task, type an estimate, reload, see it |
+
+Integration tests build the module's app against the real Postgres, with a test database, and call it with a signed
+principal, exactly as the gateway would:
+
+```ts
+const res = await fetch(`${base}/tasks/${taskId}`, {
+  method: "PATCH",
+  headers: {
+    "content-type": "application/json",
+    [PRINCIPAL_HEADER]: await signInternalToken({ principal: lan, requestId: newId() }, SECRET),
+  },
+  body: JSON.stringify({ expectedVersion: 1, estimateHours: 3.5 }),
+});
+```
+
+See `backend/server/test/work/workflows.test.ts` for a complete file: principals with explicit grants, a fake AI
+client, and negative cases next to the positive ones.
+
+## 6. The checks
+
+```bash
+pnpm build:packages                  # if backend/packages changed
+pnpm typecheck && pnpm lint && pnpm format:check
+cd frontend/web && pnpm test && cd -
+pnpm -r test                         # integration tests; needs pnpm infra:up
+cd frontend/web && npx playwright test e2e/<spec>.spec.ts
+```
+
+CI (`.github/workflows/ci.yml`) runs, in order: lint, format, shell scripts, the development infrastructure, the
+packages build, the event catalog and OpenAPI in sync, typecheck, migrations, the server, every test, the extension
+build, the web build with the **route budgets**, and Playwright (flows, CSP, accessibility, Core Web Vitals). A
+second job builds the production image, boots it from empty volumes and checks it answers.
+
+## 7. The pull request
+
+- One logical change. The commit message is one plain sentence about what a person notices: "Tasks: an hour
+  estimate on the task page".
+- Update the docs page that describes what you changed, in the same pull request.
+- For UI changes, add before and after screenshots.
+- Contributions are MIT licensed. There is no CLA and no sign-off to add.
+
+## Bigger changes
+
+- **A new module**: `sh tooling/scripts/new-module.sh <module>` scaffolds the folder, schema, role, migrations and
+  wiring. Discuss it in an issue first: most features belong in an existing module.
+- **An architectural change**: write an
+  [architecture decision record](https://github.com/hungga1711/workspace/blob/main/docs/adr/README.md). Records are
+  never rewritten; a changed decision gets a new one that supersedes the old.
+- **Anything touching AI**: it must still work, or hide cleanly, with no AI connected, and model output must never
+  decide what someone may read or do.

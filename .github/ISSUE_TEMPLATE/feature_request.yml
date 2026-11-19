@@ -1,0 +1,55 @@
+name: Feature request
+description: Suggest an idea or an improvement
+labels: [enhancement, needs-triage]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        workspace is self-hosted, one company per installation, and every feature must work without an AI provider.
+        Not sure yet? Start a thread in Discussions first.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What are you trying to do, and what gets in the way today?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposal
+      description: What should workspace do? Screens, flows or API you have in mind.
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Tasks and projects
+        - Goals
+        - Documents and drive
+        - Chat and meetings
+        - People and HR
+        - AI Insights
+        - Company AI assistant
+        - Admin and security
+        - Self-hosting and operations
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+  - type: checkboxes
+    id: fit
+    attributes:
+      label: Fit
+      options:
+        - label: It works without an AI provider configured (or it is an AI-only addition that hides when AI is off).
+        - label: It fits one self-hosted workspace (no hosted-service, billing or multi-company features).
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes

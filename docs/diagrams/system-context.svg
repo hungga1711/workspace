@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 1280 612" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="system-context-title system-context-desc" id="system-context-root">
+          <title id="system-context-title">workspace system context</title>
+          <desc id="system-context-desc">System context showing the people who use one self-hosted workspace installation, the browser extension that reports AI activity from the public AI tools, integrations and AI clients that call its API (wos_ API keys, MCP with OAuth, workflow hooks, workspace-connect on a person's computer), and the optional and required external systems it calls or is called by.</desc>
+          <defs>
+      <style>@import url('https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&amp;family=Geist:wght@400;500;600&amp;family=Geist+Mono:wght@400;500;600&amp;family=Noto+Serif:ital@0;1&amp;family=Noto+Sans+KR:wght@400;500;600&amp;family=Noto+Serif+KR:wght@400&amp;family=Noto+Sans+TC:wght@400;500;600&amp;family=Noto+Serif+TC:wght@400&amp;display=swap');
+      #system-context-root { --color-paper:   #f5f5f5;
+      --color-ink:     #2d3142;
+      --color-muted:   #4f5d75;
+      --color-accent:  #bf4520;
+      --font-sans:     'Geist', system-ui, sans-serif;
+      --font-serif:    'Instrument Serif', 'Noto Serif', serif;
+      --font-mono:     'Geist Mono', ui-monospace, monospace; }
+      #system-context-root { font-family: var(--font-sans); color: var(--color-ink); }
+      #system-context-root .diagram-container { width: 100%; overflow-x: auto; }
+      #system-context-root .diagram-container { overflow-x: visible; }</style>
+            <marker id="system-context-arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#4f5d75"/></marker>
+            <marker id="system-context-arrow-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#bf4520"/></marker>
+            <marker id="system-context-arrow-link" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#2e5aa8"/></marker>
+          </defs>
+          <rect width="100%" height="100%" fill="#f5f5f5"/>
+          <rect x="400" y="176" width="400" height="256" rx="8" fill="#2d3142" stroke="#2d3142" stroke-dasharray="4,4" stroke-width="0.8" fill-opacity="0.02" stroke-opacity="0.20"/>
+          <rect x="412" y="180" width="96" height="12" rx="2" fill="#f5f5f5"/>
+          <text x="460" y="189" fill="#5a6580" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.14em">ONE INSTALLATION</text>
+          <rect x="564" y="180" width="224" height="12" rx="2" fill="#f5f5f5"/>
+          <text x="676" y="189" fill="#5a6580" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.14em">NO SAAS · NO BILLING · NO PLATFORM ADMIN</text>
+          <path d="M 296,256 H 440" fill="none" stroke="#2e5aa8" stroke-width="1.2" marker-end="url(#system-context-arrow-link)"/>
+          <path d="M 536,136 V 232" fill="none" stroke="#2e5aa8" stroke-width="1.2" marker-end="url(#system-context-arrow-link)"/>
+          <path d="M 296,340 H 440" fill="none" stroke="#bf4520" stroke-width="1.2" marker-end="url(#system-context-arrow-accent)"/>
+          <path d="M 168,400 V 456" fill="none" stroke="#4f5d75" stroke-width="1" stroke-dasharray="5,4" marker-end="url(#system-context-arrow)"/>
+          <path d="M 600,472 V 360" fill="none" stroke="#4f5d75" stroke-width="1" stroke-dasharray="5,4" marker-end="url(#system-context-arrow)"/>
+          <path
+            d="M 760,248 H 808 Q 816,248 816,240 V 132 Q 816,124 824,124 H 960"
+            fill="none"
+            stroke="#2e5aa8"
+            stroke-width="1"
+            stroke-dasharray="5,4"
+            marker-end="url(#system-context-arrow-link)"
+         />
+          <path d="M 760,296 H 856 Q 864,296 864,288 V 276 Q 864,268 872,268 H 960" fill="none" stroke="#2e5aa8" stroke-width="1.2" marker-end="url(#system-context-arrow-link)"/>
+          <path
+            d="M 760,312 H 840 Q 848,312 848,320 V 332 Q 848,340 856,340 H 960"
+            fill="none"
+            stroke="#2e5aa8"
+            stroke-width="1"
+            stroke-dasharray="5,4"
+            marker-end="url(#system-context-arrow-link)"
+         />
+          <path d="M 960,412 H 840 Q 832,412 832,404 V 336 Q 832,328 824,328 H 760" fill="none" stroke="#2e5aa8" stroke-width="1.2" marker-end="url(#system-context-arrow-link)"/>
+          <path d="M 760,344 H 808 Q 816,344 816,352 V 476 Q 816,484 824,484 H 960" fill="none" stroke="#2e5aa8" stroke-width="1.2" marker-end="url(#system-context-arrow-link)"/>
+          <rect x="476" y="148" width="120" height="12" rx="2" fill="#f5f5f5"/>
+          <text x="536" y="157" fill="#2e5aa8" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.06em">API · MCP · HOOKS</text>
+          <rect x="314" y="236" width="68" height="12" rx="2" fill="#f5f5f5"/>
+          <text x="348" y="245" fill="#2e5aa8" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.06em">HTTPS · PWA</text>
+          <rect x="314" y="320" width="68" height="12" rx="2" fill="#f5f5f5"/>
+          <text x="348" y="329" fill="#bf4520" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.06em">AI ACTIVITY</text>
+          <rect x="176" y="422" width="52" height="12" rx="2" fill="#f5f5f5"/>
+          <text x="202" y="431" fill="#5a6580" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.06em">OBSERVES</text>
+          <rect x="608" y="410" width="52" height="12" rx="2" fill="#f5f5f5"/>
+          <text x="634" y="419" fill="#5a6580" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.06em">OPERATES</text>
+          <rect x="886" y="104" width="52" height="12" rx="2" fill="#f5f5f5"/>
+          <text x="912" y="113" fill="#2e5aa8" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.06em">AI CALLS</text>
+          <rect x="896" y="248" width="32" height="12" rx="2" fill="#f5f5f5"/>
+          <text x="912" y="257" fill="#2e5aa8" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.06em">SMTP</text>
+          <rect x="886" y="320" width="52" height="12" rx="2" fill="#f5f5f5"/>
+          <text x="912" y="329" fill="#2e5aa8" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.06em">WEB PUSH</text>
+          <rect x="886" y="392" width="52" height="12" rx="2" fill="#f5f5f5"/>
+          <text x="912" y="401" fill="#2e5aa8" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.06em">ICS POLL</text>
+          <rect x="878" y="464" width="68" height="12" rx="2" fill="#f5f5f5"/>
+          <text x="912" y="473" fill="#2e5aa8" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.06em">SIGNED POST</text>
+          <rect x="40" y="120" width="256" height="180" rx="6" fill="#f5f5f5"/>
+          <rect x="40" y="120" width="256" height="180" rx="6" fill="#4f5d75" stroke="#5a6580" stroke-width="1" fill-opacity="0.10"/>
+          <rect x="48" y="126" width="40" height="12" rx="2" fill="none" stroke="#5a6580" stroke-width="0.8" stroke-opacity="0.50"/>
+          <text x="68" y="135" fill="#5a6580" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.08em">PEOPLE</text>
+          <text x="168" y="156" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', system-ui, sans-serif" text-anchor="middle">People</text>
+          <rect x="48" y="168" width="240" height="24" rx="4" fill="#2d3142" stroke="#4f5d75" stroke-width="0.8" fill-opacity="0.05"/>
+          <text x="56" y="184" fill="#2d3142" font-size="12" font-family="'Geist', system-ui, sans-serif">Employee</text>
+          <text x="280" y="184" fill="#4f5d75" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="end">browser · PWA</text>
+          <rect x="48" y="200" width="240" height="24" rx="4" fill="#2d3142" stroke="#4f5d75" stroke-width="0.8" fill-opacity="0.05"/>
+          <text x="56" y="216" fill="#2d3142" font-size="12" font-family="'Geist', system-ui, sans-serif">Manager</text>
+          <text x="280" y="216" fill="#4f5d75" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="end">sees reporting line</text>
+          <rect x="48" y="232" width="240" height="24" rx="4" fill="#2d3142" stroke="#4f5d75" stroke-width="0.8" fill-opacity="0.05"/>
+          <text x="56" y="248" fill="#2d3142" font-size="12" font-family="'Geist', system-ui, sans-serif">Owner / Admin</text>
+          <text x="280" y="248" fill="#4f5d75" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="end">Admin · AI oversight</text>
+          <rect x="48" y="264" width="240" height="24" rx="4" fill="#2d3142" stroke="#4f5d75" stroke-width="0.8" fill-opacity="0.05"/>
+          <text x="56" y="280" fill="#2d3142" font-size="12" font-family="'Geist', system-ui, sans-serif">Guest</text>
+          <text x="280" y="280" fill="#4f5d75" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="end">meet link · no account</text>
+          <rect x="40" y="328" width="256" height="72" rx="6" fill="#f5f5f5"/>
+          <rect x="40" y="328" width="256" height="72" rx="6" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+          <rect x="48" y="334" width="56" height="12" rx="2" fill="none" stroke="#2d3142" stroke-width="0.8" stroke-opacity="0.40"/>
+          <text x="76" y="343" fill="#2d3142" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.08em">EXTENSION</text>
+          <text x="168" y="365" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', system-ui, sans-serif" text-anchor="middle">Browser extension</text>
+          <text x="168" y="380" fill="#4f5d75" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">POST /api/ai-monitor/events</text>
+          <text x="168" y="393" fill="#4f5d75" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">Bearer aim_ connection code</text>
+          <rect x="40" y="456" width="256" height="56" rx="6" fill="#f5f5f5"/>
+          <rect x="40" y="456" width="256" height="56" rx="6" fill="#2d3142" stroke="#2d3142" stroke-width="1" fill-opacity="0.03" stroke-opacity="0.30"/>
+          <rect x="48" y="462" width="52" height="12" rx="2" fill="none" stroke="#2d3142" stroke-width="0.8" stroke-opacity="0.22"/>
+          <text x="74" y="471" fill="#5a6580" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.08em">EXTERNAL</text>
+          <text x="168" y="491.5" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', system-ui, sans-serif" text-anchor="middle">Public AI tools</text>
+          <text x="168" y="506.5" fill="#4f5d75" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">chatgpt · claude · gemini · copilot · +12</text>
+          <rect x="400" y="64" width="272" height="72" rx="6" fill="#f5f5f5"/>
+          <rect x="400" y="64" width="272" height="72" rx="6" fill="#2d3142" stroke="#2d3142" stroke-width="1" fill-opacity="0.03" stroke-opacity="0.30"/>
+          <rect x="408" y="70" width="52" height="12" rx="2" fill="none" stroke="#2d3142" stroke-width="0.8" stroke-opacity="0.22"/>
+          <text x="434" y="79" fill="#5a6580" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.08em">EXTERNAL</text>
+          <text x="536" y="99.5" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', system-ui, sans-serif" text-anchor="middle">Integrations · AI clients</text>
+          <text x="536" y="114.5" fill="#4f5d75" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">wos_ API keys · MCP (OAuth) · hooks</text>
+          <text x="536" y="127.5" fill="#4f5d75" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">workspace-connect on a computer</text>
+          <rect x="440" y="232" width="320" height="128" rx="6" fill="#f5f5f5"/>
+          <rect x="440" y="232" width="320" height="128" rx="6" fill="#bf4520" stroke="#bf4520" stroke-width="1" fill-opacity="0.08"/>
+          <rect x="448" y="238" width="40" height="12" rx="2" fill="none" stroke="#bf4520" stroke-width="0.8" stroke-opacity="0.50"/>
+          <text x="468" y="247" fill="#bf4520" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.08em">SYSTEM</text>
+          <text x="600" y="297" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', system-ui, sans-serif" text-anchor="middle">workspace installation</text>
+          <text x="600" y="312" fill="#4f5d75" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">one company workspace, self-hosted</text>
+          <text x="600" y="325" fill="#4f5d75" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">web + server · Postgres</text>
+          <rect x="480" y="472" width="240" height="56" rx="6" fill="#f5f5f5"/>
+          <rect x="480" y="472" width="240" height="56" rx="6" fill="#4f5d75" stroke="#5a6580" stroke-width="1" fill-opacity="0.10"/>
+          <rect x="488" y="478" width="40" height="12" rx="2" fill="none" stroke="#5a6580" stroke-width="0.8" stroke-opacity="0.50"/>
+          <text x="508" y="487" fill="#5a6580" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.08em">PERSON</text>
+          <text x="600" y="507.5" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', system-ui, sans-serif" text-anchor="middle">Operator</text>
+          <text x="600" y="522.5" fill="#4f5d75" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">Docker Compose · .env · backups</text>
+          <rect x="960" y="96" width="280" height="56" rx="6" fill="#f5f5f5"/>
+          <rect x="960" y="96" width="280" height="56" rx="6" fill="#2d3142" stroke="#2d3142" stroke-width="1" stroke-dasharray="4,3" fill-opacity="0.02" stroke-opacity="0.20"/>
+          <rect x="968" y="102" width="52" height="12" rx="2" fill="none" stroke="#2d3142" stroke-width="0.8" stroke-opacity="0.22"/>
+          <text x="994" y="111" fill="#5a6580" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.08em">OPTIONAL</text>
+          <text x="1100" y="131.5" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', system-ui, sans-serif" text-anchor="middle">Company AI provider</text>
+          <text x="1100" y="146.5" fill="#4f5d75" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">API key · LLM API · Ollama · a computer</text>
+          <rect x="960" y="240" width="280" height="56" rx="6" fill="#f5f5f5"/>
+          <rect x="960" y="240" width="280" height="56" rx="6" fill="#2d3142" stroke="#2d3142" stroke-width="1" fill-opacity="0.03" stroke-opacity="0.30"/>
+          <rect x="968" y="246" width="52" height="12" rx="2" fill="none" stroke="#2d3142" stroke-width="0.8" stroke-opacity="0.22"/>
+          <text x="994" y="255" fill="#5a6580" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.08em">EXTERNAL</text>
+          <text x="1100" y="275.5" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', system-ui, sans-serif" text-anchor="middle">SMTP server</text>
+          <text x="1100" y="290.5" fill="#4f5d75" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">invites · password reset · digests</text>
+          <rect x="960" y="312" width="280" height="56" rx="6" fill="#f5f5f5"/>
+          <rect x="960" y="312" width="280" height="56" rx="6" fill="#2d3142" stroke="#2d3142" stroke-width="1" stroke-dasharray="4,3" fill-opacity="0.02" stroke-opacity="0.20"/>
+          <rect x="968" y="318" width="52" height="12" rx="2" fill="none" stroke="#2d3142" stroke-width="0.8" stroke-opacity="0.22"/>
+          <text x="994" y="327" fill="#5a6580" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.08em">OPTIONAL</text>
+          <text x="1100" y="347.5" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', system-ui, sans-serif" text-anchor="middle">Web Push service</text>
+          <text x="1100" y="362.5" fill="#4f5d75" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">browser push endpoints · VAPID</text>
+          <rect x="960" y="384" width="280" height="56" rx="6" fill="#f5f5f5"/>
+          <rect x="960" y="384" width="280" height="56" rx="6" fill="#2d3142" stroke="#2d3142" stroke-width="1" fill-opacity="0.03" stroke-opacity="0.30"/>
+          <rect x="968" y="390" width="52" height="12" rx="2" fill="none" stroke="#2d3142" stroke-width="0.8" stroke-opacity="0.22"/>
+          <text x="994" y="399" fill="#5a6580" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.08em">EXTERNAL</text>
+          <text x="1100" y="419.5" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', system-ui, sans-serif" text-anchor="middle">Calendar clients</text>
+          <text x="1100" y="434.5" fill="#4f5d75" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">GET /api/calendar/:token.ics</text>
+          <rect x="960" y="456" width="280" height="56" rx="6" fill="#f5f5f5"/>
+          <rect x="960" y="456" width="280" height="56" rx="6" fill="#2d3142" stroke="#2d3142" stroke-width="1" fill-opacity="0.03" stroke-opacity="0.30"/>
+          <rect x="968" y="462" width="52" height="12" rx="2" fill="none" stroke="#2d3142" stroke-width="0.8" stroke-opacity="0.22"/>
+          <text x="994" y="471" fill="#5a6580" font-size="7" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle" letter-spacing="0.08em">EXTERNAL</text>
+          <text x="1100" y="491.5" fill="#2d3142" font-size="12" font-weight="600" font-family="'Geist', system-ui, sans-serif" text-anchor="middle">Webhook receivers</text>
+          <text x="1100" y="506.5" fill="#4f5d75" font-size="9" font-family="'Geist Mono', ui-monospace, monospace" text-anchor="middle">HMAC-SHA256 · x-workspace-signature</text>
+          <line x1="40" y1="552" x2="1240" y2="552" stroke="#2d3142" stroke-width="0.8" stroke-opacity="0.10"/>
+          <text x="40" y="568" fill="#4f5d75" font-size="8" font-family="'Geist Mono', ui-monospace, monospace" letter-spacing="0.18em">LEGEND</text>
+          <rect x="40" y="584" width="14" height="10" rx="2" fill="#bf4520" stroke="#bf4520" stroke-width="1" fill-opacity="0.08"/>
+          <text x="60" y="592" fill="#4f5d75" font-size="8.5" font-family="'Geist', system-ui, sans-serif">workspace (focal)</text>
+          <rect x="188" y="584" width="14" height="10" rx="2" fill="#4f5d75" stroke="#5a6580" stroke-width="1" fill-opacity="0.10"/>
+          <text x="208" y="592" fill="#4f5d75" font-size="8.5" font-family="'Geist', system-ui, sans-serif">People</text>
+          <rect x="336" y="584" width="14" height="10" rx="2" fill="#ffffff" stroke="#2d3142" stroke-width="1"/>
+          <text x="356" y="592" fill="#4f5d75" font-size="8.5" font-family="'Geist', system-ui, sans-serif">Shipped component</text>
+          <rect x="484" y="584" width="14" height="10" rx="2" fill="#2d3142" stroke="#2d3142" stroke-width="1" fill-opacity="0.03" stroke-opacity="0.30"/>
+          <text x="504" y="592" fill="#4f5d75" font-size="8.5" font-family="'Geist', system-ui, sans-serif">External system</text>
+          <rect x="632" y="584" width="14" height="10" rx="2" fill="#2d3142" stroke="#2d3142" stroke-width="1" stroke-dasharray="4,3" fill-opacity="0.02" stroke-opacity="0.20"/>
+          <text x="652" y="592" fill="#4f5d75" font-size="8.5" font-family="'Geist', system-ui, sans-serif">Optional external</text>
+          <line x1="780" y1="589" x2="808" y2="589" stroke="#2e5aa8" stroke-width="1.2" marker-end="url(#system-context-arrow-link)"/>
+          <text x="816" y="592" fill="#4f5d75" font-size="8.5" font-family="'Geist', system-ui, sans-serif">HTTPS call</text>
+          <line x1="928" y1="589" x2="956" y2="589" stroke="#bf4520" stroke-width="1.2" marker-end="url(#system-context-arrow-accent)"/>
+          <text x="964" y="592" fill="#4f5d75" font-size="8.5" font-family="'Geist', system-ui, sans-serif">AI activity feed</text>
+          <line x1="1076" y1="589" x2="1104" y2="589" stroke="#4f5d75" stroke-width="1.2" stroke-dasharray="5,4" marker-end="url(#system-context-arrow)"/>
+          <text x="1112" y="592" fill="#4f5d75" font-size="8.5" font-family="'Geist', system-ui, sans-serif">Optional / passive</text>
+        </svg>

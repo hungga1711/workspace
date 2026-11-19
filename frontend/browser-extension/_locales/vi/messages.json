@@ -1,0 +1,187 @@
+{
+  "extName": {
+    "message": "workspace AI Insights"
+  },
+  "extDescription": {
+    "message": "AI Insights cho công ty của bạn: ghi nhận việc dùng ChatGPT, Claude, Gemini, Copilot và các trang AI phổ biến khác theo chính sách công ty, có thông báo trên từng trang và bộ lọc dữ liệu nhạy cảm."
+  },
+  "optIntro": {
+    "message": "AI Insights: ghi nhận việc dùng AI trong công việc theo chính sách của công ty bạn, và cảnh báo, che hoặc chặn dữ liệu nhạy cảm trước khi gửi."
+  },
+  "optCodeLabel": {
+    "message": "Mã kết nối"
+  },
+  "optCodePlaceholder": {
+    "message": "Dán mã từ workspace › Của tôi › AI"
+  },
+  "optConnect": {
+    "message": "Kết nối"
+  },
+  "optDisconnect": {
+    "message": "Ngắt kết nối"
+  },
+  "optNote1": {
+    "message": "Chỉ ghi nhận khi bạn bấm gửi, và chỉ trên các trang AI này: $sites$.",
+    "placeholders": {
+      "sites": {
+        "content": "$1"
+      }
+    }
+  },
+  "optNote2": {
+    "message": "Mỗi trang AI hiện một thông báo nhỏ ở góc phải."
+  },
+  "optNote3": {
+    "message": "Bạn xem lại được những gì đã ghi nhận ở workspace › Của tôi › AI."
+  },
+  "optWhatSent": {
+    "message": "Chi tiết từng thông tin tiện ích gửi đi"
+  },
+  "statusExpired": {
+    "message": "Mã không còn hiệu lực. Tạo mã mới trong workspace."
+  },
+  "statusConnected": {
+    "message": "Đã kết nối với $host$",
+    "placeholders": {
+      "host": {
+        "content": "$1"
+      }
+    }
+  },
+  "statusLastSent": {
+    "message": " · gửi lần cuối $when$",
+    "placeholders": {
+      "when": {
+        "content": "$1"
+      }
+    }
+  },
+  "statusNone": {
+    "message": "Chưa kết nối."
+  },
+  "statusBadCode": {
+    "message": "Mã không đúng. Hãy sao chép lại toàn bộ mã trong workspace."
+  },
+  "noticeOn": {
+    "message": "AI Insights: công ty ghi nhận việc dùng AI ở trang này"
+  },
+  "noticeOff": {
+    "message": "workspace AI Insights chưa kết nối"
+  },
+  "noticeWhatPrompts": {
+    "message": "Nội dung bạn gửi được lưu vào workspace để công ty biết AI giúp được những việc gì. Chưa bấm gửi thì không có gì được ghi lại."
+  },
+  "noticeWhatBoth": {
+    "message": "Nội dung bạn gửi và câu trả lời của AI được lưu vào workspace để công ty biết AI giúp được những việc gì. Chưa bấm gửi thì không có gì được ghi lại."
+  },
+  "noticePolicy": {
+    "message": "Xem chính sách và những gì đã ghi"
+  },
+  "noticeConnect": {
+    "message": "Mở tiện ích để dán mã kết nối từ workspace › Của tôi › AI."
+  },
+  "confirmSensitive": {
+    "message": "Tin nhắn này có vẻ chứa $kinds$.\n\nGửi dữ liệu này cho AI bên ngoài có thể vi phạm quy định của công ty. Bạn vẫn muốn gửi?",
+    "placeholders": {
+      "kinds": {
+        "content": "$1"
+      }
+    }
+  },
+  "kindPersonalId": {
+    "message": "số CCCD/hộ chiếu"
+  },
+  "kindCard": {
+    "message": "số thẻ"
+  },
+  "kindSecret": {
+    "message": "mật khẩu/khoá API"
+  },
+  "kindContacts": {
+    "message": "thông tin liên hệ (email, số điện thoại)"
+  },
+  "kindBankAccount": {
+    "message": "số tài khoản"
+  },
+  "optHint": {
+    "message": "Gợi ý gắn với việc đang mở trong workspace"
+  },
+  "optHintNote": {
+    "message": "Câu hỏi gửi cho AI trong vòng 2 giờ sau khi bạn mở một việc trong workspace sẽ được gợi ý gắn với việc đó; bạn xác nhận ở Của tôi › AI. Tiện ích chỉ đọc mã việc, không đọc gì khác."
+  },
+  "optHintDenied": {
+    "message": "Trình duyệt chưa cho phép tiện ích đọc trang workspace, nên chưa bật được gợi ý."
+  },
+  "noticeRedact": {
+    "message": "Dữ liệu nhạy cảm được che trước khi gửi."
+  },
+  "noticeBlock": {
+    "message": "Tin nhắn có dữ liệu nhạy cảm sẽ không được gửi."
+  },
+  "kindKeyword": {
+    "message": "từ khoá riêng của công ty"
+  },
+  "redactTitle": {
+    "message": "Đã che dữ liệu nhạy cảm"
+  },
+  "redactBody": {
+    "message": "Công ty bạn yêu cầu che $kinds$ trước khi gửi cho AI bên ngoài. Đây là bản sẽ được gửi:",
+    "placeholders": {
+      "kinds": {
+        "content": "$1"
+      }
+    }
+  },
+  "redactSend": {
+    "message": "Gửi bản đã che"
+  },
+  "redactCancel": {
+    "message": "Huỷ"
+  },
+  "blockTitle": {
+    "message": "Tin nhắn chưa được gửi"
+  },
+  "blockBody": {
+    "message": "Tin nhắn này có $kinds$. Công ty bạn không cho phép gửi loại dữ liệu này cho AI bên ngoài. Hãy xoá phần đó rồi gửi lại.",
+    "placeholders": {
+      "kinds": {
+        "content": "$1"
+      }
+    }
+  },
+  "blockOk": {
+    "message": "Đã hiểu"
+  },
+  "feedbackAsk": {
+    "message": "AI có giúp không?"
+  },
+  "feedbackYes": {
+    "message": "Có"
+  },
+  "feedbackPartly": {
+    "message": "Một phần"
+  },
+  "feedbackNo": {
+    "message": "Không"
+  },
+  "feedbackDismiss": {
+    "message": "Đóng"
+  },
+  "linkAsk": {
+    "message": "Gắn cuộc trò chuyện này với $code$ trong workspace?",
+    "placeholders": {
+      "code": {
+        "content": "$1"
+      }
+    }
+  },
+  "linkYes": {
+    "message": "Gắn"
+  },
+  "linkNo": {
+    "message": "Không phải việc này"
+  },
+  "statusPaused": {
+    "message": "Công ty đã tắt AI Insights. Không có gì được ghi nhận."
+  }
+}

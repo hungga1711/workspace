@@ -1,0 +1,48 @@
+{
+  "check": { "routes": { "/v1/me$": { "handle": "Lily", "email": "lily@brightline.test" } }, "account": "lily@brightline.test" },
+  "noMatch": ["https://www.figma.com/files/recent", "https://www.figma.com/community/file/123", "https://example.com/design/AbCdEfGhIjKlMnOp/Checkout"],
+  "cases": [
+    {
+      "url": "https://www.figma.com/design/AbCdEfGhIjKlMnOp/Checkout-flow?node-id=12-340&t=xyz",
+      "key": "AbCdEfGhIjKlMnOp@12:340",
+      "routes": {
+        "/v1/files/AbCdEfGhIjKlMnOp\\?depth=1$": {
+          "name": "Checkout flow",
+          "lastModified": "2026-11-12T14:05:00Z",
+          "thumbnailUrl": "https://s3-alpha.figma.com/thumbnails/file.png"
+        },
+        "/v1/files/AbCdEfGhIjKlMnOp/nodes": { "nodes": { "12:340": { "document": { "name": "Cart" } } } },
+        "/v1/images/AbCdEfGhIjKlMnOp": { "images": { "12:340": "https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/cart.png" } }
+      },
+      "card": {
+        "kind": "design",
+        "title": "Cart",
+        "ref": "Checkout flow › Cart",
+        "state": "none",
+        "updatedAt": "2026-11-12T14:05:00.000Z",
+        "thumbnailUrl": "https://figma-alpha-api.s3.us-west-2.amazonaws.com/images/cart.png",
+        "embedUrl": "https://www.figma.com/embed?embed_host=workspace&url=https%3A%2F%2Fwww.figma.com%2Fdesign%2FAbCdEfGhIjKlMnOp%3Fnode-id%3D12-340"
+      }
+    },
+    {
+      "url": "https://www.figma.com/file/AbCdEfGhIjKlMnOp/Checkout-flow",
+      "key": "AbCdEfGhIjKlMnOp",
+      "routes": {
+        "/v1/files/AbCdEfGhIjKlMnOp\\?depth=1$": {
+          "name": "Checkout flow",
+          "lastModified": "2026-11-12T14:05:00Z",
+          "thumbnailUrl": "https://s3-alpha.figma.com/thumbnails/file.png"
+        }
+      },
+      "card": {
+        "kind": "design",
+        "title": "Checkout flow",
+        "ref": "Checkout flow",
+        "state": "none",
+        "updatedAt": "2026-11-12T14:05:00.000Z",
+        "thumbnailUrl": "https://s3-alpha.figma.com/thumbnails/file.png",
+        "embedUrl": "https://www.figma.com/embed?embed_host=workspace&url=https%3A%2F%2Fwww.figma.com%2Fdesign%2FAbCdEfGhIjKlMnOp"
+      }
+    }
+  ]
+}

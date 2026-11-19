@@ -1,0 +1,66 @@
+---
+title: Introduction
+description: An open-source, self-hosted workspace connected to your team's AI agents, measuring how AI is used and whether it helps. Every feature works without AI.
+---
+
+Workspace is an **open-source, self-hosted workspace connected to your team's AI agents**. Three things, in one app
+on your own server:
+
+1. **A workspace**: tasks and projects, progress and goals, chat, documents, whiteboards, meetings, requests and time.
+2. **Connected to AI agents**: the coding agents and local models on people's computers (Claude Code, Codex, Gemini
+   CLI, Ollama…), AI chat sites through a browser extension, the company's own model, and MCP in both directions.
+   Assign a task to an agent with a **workflow** that stops wherever a person has to decide.
+3. **Measured**: what AI is used for, by whom, with which data and at what cost, and whether tasks done with AI
+   finish sooner and on time, with sample sizes.
+
+One installation is one company, created at `/setup`. MIT licensed; it sends nothing to its authors.
+
+## What is in it
+
+| Area                   | Features                                                                                                |
+| ---------------------- | ------------------------------------------------------------------------------------------------------- |
+| **Tasks and projects** | Kanban, list and Gantt; custom fields, subtasks, blockers, recurring tasks, templates                    |
+| **Progress and goals** | Open, overdue, at-risk and blocked work per person, project and department; goals with key results      |
+| **AI**                 | Progress (who needs attention), Ask, AI adoption (usage, weekly report, prompt library), Workflows       |
+| **Chat**               | Channels, direct messages, threads, mentions, polls, file sharing, calls                                 |
+| **Documents**          | Spaces, pages and files with real-time co-editing and comments                                          |
+| **Whiteboards**        | Shared boards with templates, drawn together live; a sticky note becomes a task                         |
+| **Calendar**           | Recurring meetings with agenda, minutes and action items; video meetings (optional)                     |
+| **Requests**           | Purchases, payments, advances and trips, with delegation                                                 |
+| **People and time**    | Org chart and profiles; clock-in, attendance, leave and holidays                                        |
+| **Admin**              | Members, teams, roles and permissions, audit log, webhooks, API keys                                    |
+
+English, Vietnamese, Chinese and Spanish. Bring existing work in from Jira, Trello, Asana, ClickUp, Notion, Slack or CSV.
+Progress and AI adoption run on rules over the work and need no model; Ask and Workflows need one.
+
+## AI, only if you want it
+
+Workspace needs no AI model and has no AI switched on by default. Two optional parts can be turned on by an
+admin at any time ([how](/docs/ai-insights/turn-on-off)):
+
+- **The company's own AI**: an assistant, summaries and translation through a provider you connect.
+- **AI Insights**: for companies whose staff already use AI chat tools, it shows inside the same app:
+
+| Question            | Answer                                                                                                        |
+| ------------------- | ------------------------------------------------------------------------------------------------------------- |
+| **What for?**       | Conversations by topic, person and department, for the company's own AI and AI chat tools in the browser.     |
+| **With what data?** | ID numbers, cards, secrets and your own keywords are caught before the prompt is sent: warn, redact or block. |
+| **Does it help?**   | Tasks done with AI help against tasks done without: finished, on time, days to done.                          |
+
+<Callout type="info">Nothing is recorded until the company turns AI Insights on and each person connects the browser extension. Staff see everything recorded about them.</Callout>
+
+## Three things that never change
+
+1. **Every feature works without AI.** AI surfaces hide when no provider is connected.
+2. **One installation, one company.** No plans, seat limits or platform admin; a second company is a second
+   installation.
+3. **Your data stays on your server.** Nothing is sent to the project's authors or a third party.
+
+## Next
+
+<Cards>
+  <Card title="Quick start" href="/docs/quick-start" description="Install on a server in five minutes." />
+  <Card title="Domain, IP and HTTPS" href="/docs/self-hosting/domain-and-https" description="DNS, certificates, a bare IP, your own proxy." />
+  <Card title="Turn AI on or off" href="/docs/ai-insights/turn-on-off" description="Both AI parts are optional and off by default." />
+  <Card title="Contributor guide" href="/docs/advanced" description="System design, code structure, database, events and agent workflows." />
+</Cards>

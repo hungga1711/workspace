@@ -1,0 +1,23 @@
+# Plain-HTTP proxy for the one-click templates (infra/templates/): the platform's own proxy (Coolify, Portainer
+# behind a load balancer, CasaOS, Unraid) terminates TLS and sends every request for the app's domain here.
+# Same routing as infra/production/caddy/Caddyfile, without TLS and domain handling. The workspace image ships this
+# file; the compose `init` job copies it into the Caddy container's /etc/caddy.
+{
+	admin off
+	auto_https off
+	# The platform's proxy sits on a private network: keep the X-Forwarded-* headers it sets (https, client IP).
+	servers {
+		trusted_proxies static private_ranges
+	}
+}
+
+:80 {
+	# Socket.IO, local files, MCP and the API docs go to the server; everything else to the web app.
+	@server path /socket.io/* /storage/* /api/mcp /api/mcp/* /api/docs /api/docs/*
+	handle @server {
+		reverse_proxy app:4000
+	}
+	handle {
+		reverse_proxy app:3000
+	}
+}

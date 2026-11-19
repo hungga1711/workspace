@@ -1,0 +1,27 @@
+{
+  "version": "3",
+  "templates": [
+    {
+      "id": 1,
+      "type": 3,
+      "title": "workspace",
+      "name": "workspace",
+      "description": "Tasks, goals, docs, chat, meetings and HR in one self-hosted app, with AI Insights.",
+      "note": "Put a TLS-terminating proxy in front of the published port and set APP_URL to its address. The setup token is in the logs of the app container (\"setup token\").",
+      "categories": ["productivity", "project management"],
+      "platform": "linux",
+      "logo": "https://raw.githubusercontent.com/hungga1711/workspace/main/frontend/browser-extension/icon128.png",
+      "repository": {
+        "url": "https://github.com/hungga1711/workspace",
+        "stackfile": "infra/templates/docker-compose.yml"
+      },
+      "env": [
+        { "name": "APP_URL", "label": "Public address (https://work.example.com)", "default": "http://localhost:8080" },
+        { "name": "WORKSPACE_PORT", "label": "Published HTTP port", "default": "8080" },
+        { "name": "WORKSPACE_IMAGE", "label": "Image", "default": "ghcr.io/hungga1711/workspace:latest" },
+        { "name": "SMTP_URL", "label": "SMTP URL (optional, smtp://user:pass@host:587)", "default": "" },
+        { "name": "MAIL_FROM", "label": "Sender (optional)", "default": "" }
+      ]
+    }
+  ]
+}

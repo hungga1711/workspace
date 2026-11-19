@@ -1,0 +1,187 @@
+{
+  "extName": {
+    "message": "workspace AI 洞察"
+  },
+  "extDescription": {
+    "message": "了解团队在工作中如何使用 ChatGPT、Claude、Gemini 和 Copilot：页面上有明显提示，敏感数据在发送前被拦截。"
+  },
+  "optIntro": {
+    "message": "AI 洞察：按照公司政策记录工作中的 AI 使用情况，并在发送前对敏感数据进行提醒、脱敏或拦截。"
+  },
+  "optCodeLabel": {
+    "message": "连接码"
+  },
+  "optCodePlaceholder": {
+    "message": "粘贴 workspace › 我的 › AI 中的连接码"
+  },
+  "optConnect": {
+    "message": "连接"
+  },
+  "optDisconnect": {
+    "message": "断开连接"
+  },
+  "optNote1": {
+    "message": "仅在你点击发送时记录，且仅限这些 AI 网站：$sites$。",
+    "placeholders": {
+      "sites": {
+        "content": "$1"
+      }
+    }
+  },
+  "optNote2": {
+    "message": "每个 AI 页面角落都会显示一个小提示。"
+  },
+  "optNote3": {
+    "message": "你可以在 workspace › 我的 › AI 中查看记录了什么。"
+  },
+  "optWhatSent": {
+    "message": "本扩展发送的内容（逐项说明）"
+  },
+  "statusExpired": {
+    "message": "此连接码已失效，请在 workspace 中重新生成。"
+  },
+  "statusConnected": {
+    "message": "已连接到 $host$",
+    "placeholders": {
+      "host": {
+        "content": "$1"
+      }
+    }
+  },
+  "statusLastSent": {
+    "message": " · 上次发送于 $when$",
+    "placeholders": {
+      "when": {
+        "content": "$1"
+      }
+    }
+  },
+  "statusNone": {
+    "message": "未连接。"
+  },
+  "statusBadCode": {
+    "message": "连接码无效，请从 workspace 重新完整复制。"
+  },
+  "noticeOn": {
+    "message": "AI 洞察：公司会记录此页面上的 AI 使用情况"
+  },
+  "noticeOff": {
+    "message": "workspace AI 洞察未连接"
+  },
+  "noticeWhatPrompts": {
+    "message": "你发送的内容会保存到 workspace，以便公司了解 AI 在哪些方面有帮助。点击发送前不会记录任何内容。"
+  },
+  "noticeWhatBoth": {
+    "message": "你发送的内容和 AI 的回答会保存到 workspace，以便公司了解 AI 在哪些方面有帮助。点击发送前不会记录任何内容。"
+  },
+  "noticePolicy": {
+    "message": "查看政策和已记录的内容"
+  },
+  "noticeConnect": {
+    "message": "打开扩展，粘贴 workspace › 我的 › AI 中的连接码。"
+  },
+  "confirmSensitive": {
+    "message": "此消息似乎包含 $kinds$。\n\n发送给外部 AI 可能违反公司规定。仍要发送吗？",
+    "placeholders": {
+      "kinds": {
+        "content": "$1"
+      }
+    }
+  },
+  "kindPersonalId": {
+    "message": "身份证/护照号码"
+  },
+  "kindCard": {
+    "message": "银行卡号"
+  },
+  "kindSecret": {
+    "message": "密码/API 密钥"
+  },
+  "kindContacts": {
+    "message": "联系方式（邮箱、电话）"
+  },
+  "kindBankAccount": {
+    "message": "银行账号"
+  },
+  "optHint": {
+    "message": "推荐我在 workspace 中打开的任务"
+  },
+  "optHintNote": {
+    "message": "在 workspace 中打开任务后 2 小时内发送的提示会被推荐关联到该任务，由你在 我的 › AI 中确认。扩展只读取任务 ID，不读取其他内容。"
+  },
+  "optHintDenied": {
+    "message": "浏览器未允许扩展读取 workspace 页面，因此推荐已关闭。"
+  },
+  "noticeRedact": {
+    "message": "敏感数据会在发送前脱敏。"
+  },
+  "noticeBlock": {
+    "message": "包含敏感数据的消息不会被发送。"
+  },
+  "kindKeyword": {
+    "message": "公司关键词"
+  },
+  "redactTitle": {
+    "message": "敏感数据已脱敏"
+  },
+  "redactBody": {
+    "message": "公司要求在发送给外部 AI 前对 $kinds$ 进行脱敏。将发送以下内容：",
+    "placeholders": {
+      "kinds": {
+        "content": "$1"
+      }
+    }
+  },
+  "redactSend": {
+    "message": "发送脱敏后的文本"
+  },
+  "redactCancel": {
+    "message": "取消"
+  },
+  "blockTitle": {
+    "message": "此消息未发送"
+  },
+  "blockBody": {
+    "message": "此消息包含 $kinds$。公司不允许将此类数据发送给外部 AI。请删除后重新发送。",
+    "placeholders": {
+      "kinds": {
+        "content": "$1"
+      }
+    }
+  },
+  "blockOk": {
+    "message": "知道了"
+  },
+  "feedbackAsk": {
+    "message": "AI 有帮助吗？"
+  },
+  "feedbackYes": {
+    "message": "有"
+  },
+  "feedbackPartly": {
+    "message": "部分有"
+  },
+  "feedbackNo": {
+    "message": "没有"
+  },
+  "feedbackDismiss": {
+    "message": "关闭"
+  },
+  "linkAsk": {
+    "message": "将此对话关联到 workspace 中的 $code$？",
+    "placeholders": {
+      "code": {
+        "content": "$1"
+      }
+    }
+  },
+  "linkYes": {
+    "message": "关联"
+  },
+  "linkNo": {
+    "message": "不是这个任务"
+  },
+  "statusPaused": {
+    "message": "公司已关闭 AI 洞察，不会记录任何内容。"
+  }
+}

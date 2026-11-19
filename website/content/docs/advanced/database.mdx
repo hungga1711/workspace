@@ -1,0 +1,121 @@
+---
+title: Database design
+description: One Postgres database with a schema and a login role per module, forward-only migrations, ids and codes, and the core tables of the work schema.
+---
+
+Workspace stores everything in **one Postgres 16 database**, `workspace`, with **one schema per module**. Each
+module connects as its own login role that can reach only its own schema. There are no foreign keys between
+schemas, no workspace column and no row-level security
+([ADR-0015](https://github.com/hungga1711/workspace/blob/main/docs/adr/0015-single-database-schema-per-module.md),
+[ADR-0023](https://github.com/hungga1711/workspace/blob/main/docs/adr/0023-one-workspace-data-model.md)).
+
+<Diagram name="containers-data" caption="Every module writes its own schema; events carry changes between them." />
+
+## Schemas
+
+| Schema | Module | Main aggregates |
+|---|---|---|
+| `identity` | identity | members, roles and grants, teams, AI agents, API keys, sign-in events, audit |
+| `platform` | platform | the workspace row and its config, master data, webhooks, the audit trail |
+| `work` | work | projects and boards, tasks, docs and spaces, drive, whiteboards, calendar and meetings, approvals, goals, agent workflows |
+| `chat` | chat | channels, messages (threads, reactions, pins), attachments, polls, scheduled messages, co-editing drafts |
+| `employee` | employee | employees and departments, attendance, leave, holidays, announcements |
+| `home` | home | per-person read model ("Needs you", activity), notifications, push, reminders, preferences |
+| `ai` | ai | usage, costs and budgets, AI conversations, content views, policy, connections |
+| `search` | search | a rebuildable copy of searchable rows (full-text, typo correction) |
+| `web` | the web app | server-side sessions, keyed by a hash of the cookie |
+
+Every table of every schema is documented in
+[docs/database](https://github.com/hungga1711/workspace/blob/main/docs/database/README.md), one page per schema.
+
+## Roles
+
+| Role | Can log in | Used for |
+|---|---|---|
+| `workspace_owner` | yes | Owns every schema; runs migrations, each relay's `LISTEN` and the job locks. Never used for requests |
+| `workspace_<m>_rw` | no | Everything module `<m>` may do: `USAGE` on its schema and the grants in its baseline |
+| `workspace_<m>` | yes | What the server connects as for module `<m>` (`WORK_DATABASE_URL`…), member of `<m>_rw` only, `search_path = <m>, public` |
+| `workspace_search_reader` | no | Lets chat's search endpoint read the `search` schema: the one deliberate exception |
+| `workspace_maintenance` | no | Owns the narrow `SECURITY DEFINER` functions (prune, claim the outbox) that do what a module role may not |
+
+Because unqualified names resolve in the module's own schema, **never schema-qualify your own module's objects**,
+and never reach for another module's: its role cannot, by design.
+
+## One workspace, and the `singleton` key
+
+An installation holds exactly one company, so keys are the entity's own (`PRIMARY KEY (id)`, `UNIQUE (code)`).
+Settings that exist once (the workspace config, each module's `workspace_settings` projection, `ai_policy`…) use
+a key that allows one row at most:
+
+```sql
+singleton boolean NOT NULL DEFAULT true CHECK (singleton) PRIMARY KEY
+-- writes: INSERT … ON CONFLICT (singleton) DO UPDATE …
+```
+
+## Ids, codes and time
+
+- **Ids are ULIDs** stored as `text` (`newId()` in `@workspace/shared`): unique, sortable by creation time.
+- **Codes people read** (`T-041`, `P-003`, `D-012`) are never primary keys. They come from transactional counters
+  (`work.code_counters`) with formats from the workspace config. Links use the code
+  (`/app/work/tasks/T-041`); the id opens the same page.
+- **Time** is `timestamptz` everywhere, named `*_at`; calendar-day facts use `date`. "Today" is computed in the
+  workspace's time zone, projected into each module's `workspace_settings`.
+- **Status enums** are `text` with a `CHECK`, never Postgres enum types, so widening one is a plain migration.
+
+## The work schema
+
+The largest schema, and the one most features touch.
+
+<Diagram name="work-erd" caption="The core of the work schema. Foreign keys stay inside it; people are referenced by id." />
+
+| Table | What to know |
+|---|---|
+| `tasks` | `status` is `todo · in_progress · review · done · cancelled`; `rank` is a lexicographic order within a column; `column_id` is kept in step with the project by the trigger `tasks_column_sync`; `source` jsonb records where a task came from (a chat message, a meeting); `version` for optimistic updates |
+| `board_columns` | A project's columns, each mapped to a status, with an optional WIP limit. Moving a card changes its status |
+| `task_dependencies` | `predecessor_id → successor_id`, never the same task |
+| `documents`, `document_versions` | Versioned pages; visibility `private · project · workspace · space` |
+| `agent_workflows` | A workflow: ordered `steps` (jsonb), `runner` `server` or `local`, an optional `template` key |
+| `task_agent_runs` | One run on a task; `steps` is a **copy** made at start, so editing a workflow never rewrites history |
+| `task_agent_run_questions` | The questions an AI step asked and the answers, one row per (run, step, round) |
+
+The other schemas follow the same patterns. Two worth knowing early: `ai.ai_usage` records every model call with
+the work it served (a task, a document), and `ai.ai_content_views` logs every time someone opens a recorded
+conversation, which the person can see.
+
+## Migrations
+
+`migrate(ownerUrl, dir, schema)` (`backend/packages/service-kit/src/migrate.ts`) connects as `workspace_owner`,
+sets the module's `search_path`, and applies every `*.sql` file in `backend/server/migrations/<module>/` not yet in
+`<schema>.schema_migrations`, **sorted by name, each in its own transaction**. It runs when a module starts and
+when you run `pnpm migrate`.
+
+Each schema starts from `001_baseline.sql`. New changes are new files:
+
+```sql
+-- backend/server/migrations/work/020_task_estimate.sql (an example, not in the repository)
+ALTER TABLE tasks ADD COLUMN IF NOT EXISTS estimate_hours numeric(6,2);
+ALTER TABLE tasks DROP CONSTRAINT IF EXISTS tasks_estimate_check;
+ALTER TABLE tasks ADD CONSTRAINT tasks_estimate_check CHECK (estimate_hours IS NULL OR estimate_hours >= 0);
+```
+
+- `NNN_short_name.sql`, three digits, after the highest number in that folder.
+- Forward-only: there are no down migrations. Never edit a file that has been applied.
+- Idempotent where possible: `IF NOT EXISTS`, `CREATE OR REPLACE`, drop a `CHECK` before re-adding a wider one.
+- New tables get their grants from the default privileges set at the end of the baseline; narrow them with
+  `REVOKE` when the role must not update or delete.
+- Backfills are plain `UPDATE` or `INSERT … SELECT` in the same file.
+
+## Transactions and request context
+
+1. The principal middleware runs every request inside `runWithContext({ actorId, requestId }, fn)`
+   (`AsyncLocalStorage`); audit rows and log lines read it.
+2. Writes that belong together run in `withTransaction(pool, fn)`: `BEGIN`, your function, `COMMIT` or
+   `ROLLBACK`. Business rows and their outbox event commit together or not at all.
+3. No session state may outlive a transaction (the optional PgBouncer runs in transaction mode), so nothing is
+   `SET` outside one.
+
+## Connections
+
+The server opens one small pool per module role (work and chat 15, the others 10), about 95 connections in all,
+plus one `LISTEN` connection per relay. Postgres runs with `max_connections=200`; PgBouncer is an optional profile
+for a shared or managed database.

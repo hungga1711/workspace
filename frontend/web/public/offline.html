@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>workspace · Offline</title>
+<style>
+  /* Same look as the app's StatusScreen (404/403/error): mark (concept C), title, one sentence, one solid pill
+     button, on the faint dot grid. Static: it is served by the service worker when there is no network. */
+  :root { --ground:#f3f3f1; --ink:#18181b; --ink-2:#6b6b72; --hairline:#ececea; --brand:#18181b; }
+  * { box-sizing: border-box; }
+  body { margin:0; min-height:100dvh; display:grid; place-items:center; background:var(--ground); color:var(--ink);
+         font: 14px/1.5 Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; padding:48px 16px; position:relative; }
+  body::before { content:""; position:fixed; inset:0; z-index:-1; pointer-events:none;
+         background-image: radial-gradient(var(--hairline) 1px, transparent 1px); background-size:22px 22px;
+         -webkit-mask-image: radial-gradient(ellipse 60% 55% at 50% 45%, #000, transparent);
+         mask-image: radial-gradient(ellipse 60% 55% at 50% 45%, #000, transparent); }
+  main { max-width:420px; width:100%; display:grid; justify-items:center; gap:12px; text-align:center; }
+  .mark { display:block; width:40px; height:40px; margin-bottom:8px; }
+  h1 { font-size:24px; line-height:32px; font-weight:600; margin:0; letter-spacing:-.025em; }
+  p { margin:0; color:var(--ink-2); max-width:24rem; }
+  .en { font-size:12px; }
+  button { margin-top:12px; min-height:36px; padding:0 16px; border:0; border-radius:999px; background:var(--brand); color:#fff; font:600 14px/1 inherit; cursor:pointer; }
+  button:hover { background:rgb(24 24 27 / .85); }
+  button:focus-visible { outline:2px solid var(--ink-2); outline-offset:2px; }
+</style>
+</head>
+<body>
+<main>
+  <svg class="mark" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><defs><linearGradient id="m" gradientUnits="userSpaceOnUse" x1="6" y1="8" x2="34" y2="32"><stop offset="0" stop-color="#3b6bff"/><stop offset="1" stop-color="#8b5cf6"/></linearGradient></defs><rect width="40" height="40" rx="10" fill="#ffffff"/><rect x=".5" y=".5" width="39" height="39" rx="9.5" fill="none" stroke="#18181b" stroke-opacity=".12"/><path d="M10 17 C11.5 30 16 30 17.6 22.5 C18.6 18 21.4 18 22.4 22.5 C24 30 28.5 30 30 17" fill="none" stroke="url(#m)" stroke-width="4.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M18.2 12.6 H21.8 L20 15.2z" fill="url(#m)" stroke="url(#m)" stroke-width=".8" stroke-linejoin="round"/></svg>
+  <h1>Bạn đang ngoại tuyến</h1>
+  <p>Không kết nối được tới workspace. Trang sẽ tự tải lại khi có mạng.</p>
+  <p class="en" lang="en">You're offline. This page reloads by itself when the connection is back.</p>
+  <button type="button" onclick="location.reload()">Thử lại · Retry</button>
+</main>
+<script>addEventListener("online", function () { location.reload(); });</script>
+</body>
+</html>

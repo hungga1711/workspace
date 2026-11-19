@@ -1,0 +1,49 @@
+# Weekly, grouped so a week's updates arrive as a few pull requests instead of dozens.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 10
+    labels: [dependencies]
+    groups:
+      minor-and-patch:
+        update-types: [minor, patch]
+  # The website is its own pnpm project with its own lockfile.
+  - package-ecosystem: npm
+    directory: /website
+    schedule:
+      interval: weekly
+      day: monday
+    labels: [dependencies, website]
+    groups:
+      minor-and-patch:
+        update-types: [minor, patch]
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+    labels: [dependencies, ci]
+    groups:
+      actions:
+        patterns: ["*"]
+  - package-ecosystem: docker
+    directory: /infra/docker
+    schedule:
+      interval: weekly
+      day: monday
+    labels: [dependencies, infra]
+  # Postgres, SeaweedFS, Caddy, LiveKit and PgBouncer pinned in the compose files; the templates and the demo pin the
+  # same images, so they move in the same grouped pull request.
+  - package-ecosystem: docker-compose
+    directories: [/infra/production, /infra/local, /infra/demo, /infra/templates, /infra/templates/coolify, /infra/templates/casaos]
+    schedule:
+      interval: weekly
+      day: monday
+    labels: [dependencies, infra]
+    groups:
+      images:
+        patterns: ["*"]

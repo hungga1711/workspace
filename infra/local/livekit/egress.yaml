@@ -1,0 +1,10 @@
+# LiveKit Egress (meeting recordings). Records the room as one composite MP4 and uploads it straight
+# to object storage (R2 in production, SeaweedFS locally): recordings never pass through the server.
+# Start with: LIVEKIT_CONFIG=livekit-recording.yaml docker compose -f infra/local/docker-compose.yml --profile recording up -d
+api_key: workspace_dev
+api_secret: workspace-dev-livekit-secret-change-me-32b
+ws_url: ws://livekit:7880
+redis:
+  address: livekit-redis:6379
+logging:
+  level: info

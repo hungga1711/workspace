@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>workspace</title>
+<style>
+  /* Same look as the web app's offline page (frontend/web/public/offline.html): the only screen the desktop app draws
+     itself, shown until a server address is saved. Everything after it is the web app. */
+  :root { --ground:#fafafa; --surface:#fff; --ink:#171717; --ink-2:#666; --hairline:#ebebeb; --signal:#2563eb; --danger:#dc2626; --ink-soft:#4d4d4d; }
+  @media (prefers-color-scheme: dark) {
+    :root { --ground:#0a0a0a; --surface:#171717; --ink:#fafafa; --ink-2:#a3a3a3; --hairline:#262626; --signal:#60a5fa; --danger:#f87171; --ink-soft:#d4d4d4; }
+  }
+  * { box-sizing: border-box; }
+  body { margin:0; min-height:100dvh; display:grid; place-items:center; background:var(--ground); color:var(--ink);
+         font: 14px/1.5 Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; padding:48px 16px; }
+  main { max-width:380px; width:100%; display:grid; justify-items:center; gap:12px; text-align:center; }
+  .mark { width:48px; height:48px; margin-bottom:8px; }
+  h1 { font-size:24px; line-height:32px; font-weight:600; margin:0; letter-spacing:-.025em; }
+  p { margin:0; color:var(--ink-2); }
+  form { width:100%; display:grid; gap:8px; margin-top:12px; }
+  input { width:100%; min-height:40px; padding:0 12px; border:1px solid var(--hairline); border-radius:8px; background:var(--surface);
+          color:var(--ink); font:inherit; }
+  input:focus { outline:2px solid var(--signal); outline-offset:-1px; }
+  button { min-height:40px; border:0; border-radius:999px; background:var(--ink); color:var(--ground); font:inherit; font-weight:600; cursor:pointer; }
+  button:disabled { opacity:.6; cursor:default; }
+  #error { color:var(--danger); min-height:21px; font-size:13px; }
+  /* Opening the saved server: the same thin bar the web app shows when it loses the network (ConnectionBanner). */
+  #offline { position:fixed; top:0; left:0; right:0; display:flex; align-items:center; justify-content:center; gap:8px; min-height:32px;
+             padding:4px 16px; background:var(--ink); color:var(--ground);
+             font-size:13px; font-weight:500; text-align:center; }
+  #offline svg { width:16px; height:16px; flex:none; }
+  #retry { padding:0 16px; margin-top:8px; min-height:32px; background:var(--surface); color:var(--ink); font-weight:500;
+           box-shadow:0 0 0 1px var(--hairline); }
+  [hidden] { display:none !important; }
+</style>
+</head>
+<body>
+<div id="offline" role="status" aria-live="polite" hidden>
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3l18 18M7.4 7.4A5 5 0 0 0 7 17h10.6M10.6 5.2A6 6 0 0 1 18 10.2a3.8 3.8 0 0 1 2.4 6.5"/></svg>
+  <span id="offline-text"></span>
+</div>
+<main>
+  <svg class="mark" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><defs><linearGradient id="m" gradientUnits="userSpaceOnUse" x1="6" y1="8" x2="34" y2="32"><stop offset="0" stop-color="#3b6bff"/><stop offset="1" stop-color="#8b5cf6"/></linearGradient></defs><rect width="40" height="40" rx="10" fill="#ffffff"/><rect x=".5" y=".5" width="39" height="39" rx="9.5" fill="none" stroke="#18181b" stroke-opacity=".12"/><path d="M10 17 C11.5 30 16 30 17.6 22.5 C18.6 18 21.4 18 22.4 22.5 C24 30 28.5 30 30 17" fill="none" stroke="url(#m)" stroke-width="4.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M18.2 12.6 H21.8 L20 15.2z" fill="url(#m)" stroke="url(#m)" stroke-width=".8" stroke-linejoin="round"/></svg>
+  <h1 data-t="title"></h1>
+  <p data-t="body"></p>
+  <button id="retry" type="button" hidden data-t="retry"></button>
+  <form id="form" novalidate>
+    <input id="url" type="url" inputmode="url" autocomplete="url" spellcheck="false" placeholder="work.company.com" required autofocus>
+    <div id="error" role="alert"></div>
+    <button id="go" type="submit" data-t="connect"></button>
+  </form>
+</main>
+<script>
+  // Few enough words to keep here; the rest of the app's text lives in frontend/web/src/lib/i18n/messages.
+  var T = {
+    en: { opening: "Opening workspace…", retry: "Try again", noNet: "No internet connection. Check your computer's network.", noServer: "Cannot reach your company's workspace. Retrying…",
+          title: "Connect to workspace", body: "Enter your company's workspace address.", connect: "Connect", checking: "Connecting…",
+          invalid: "Enter an address such as work.company.com.", unreachable: "Could not reach this address. Check it and your network." },
+    vi: { opening: "Đang mở workspace…", retry: "Thử lại", noNet: "Không có kết nối internet. Vui lòng kiểm tra lại mạng của máy tính.", noServer: "Không kết nối được tới workspace của công ty. Đang thử lại…",
+          title: "Kết nối workspace", body: "Nhập địa chỉ workspace của công ty bạn.", connect: "Kết nối", checking: "Đang kết nối…",
+          invalid: "Nhập một địa chỉ như work.congty.vn.", unreachable: "Không kết nối được tới địa chỉ này. Kiểm tra lại địa chỉ và mạng." },
+    zh: { opening: "正在打开 workspace…", retry: "重试", noNet: "没有网络连接。请检查电脑的网络。", noServer: "无法连接到公司的 workspace。正在重试…",
+          title: "连接 workspace", body: "输入你公司的 workspace 地址。", connect: "连接", checking: "正在连接…",
+          invalid: "请输入地址，例如 work.company.com。", unreachable: "无法访问该地址。请检查地址和网络。" },
+    es: { opening: "Abriendo workspace…", retry: "Reintentar", noNet: "Sin conexión a internet. Revisa la red del equipo.", noServer: "No se puede acceder al workspace de tu empresa. Reintentando…",
+          title: "Conectar con workspace", body: "Escribe la dirección de workspace de tu empresa.", connect: "Conectar", checking: "Conectando…",
+          invalid: "Escribe una dirección como work.empresa.com.", unreachable: "No se pudo acceder a esta dirección. Revísala y revisa tu red." },
+  };
+  var lang = (navigator.language || "en").slice(0, 2);
+  var t = T[lang] || T.en;
+  document.documentElement.lang = T[lang] ? lang : "en";
+  document.querySelectorAll("[data-t]").forEach(function (el) { el.textContent = t[el.dataset.t]; });
+
+  var input = document.getElementById("url"), error = document.getElementById("error"), go = document.getElementById("go");
+  var query = new URLSearchParams(location.search);
+  input.value = query.get("last") || "";
+
+  // An answer of any kind (even opaque) proves the address is reachable; the web app shows its own errors after that.
+  function reachable(url) {
+    return fetch(new URL("/manifest.webmanifest", url), { mode: "no-cors", cache: "no-store", signal: AbortSignal.timeout(10000) });
+  }
+
+  // ?server=…: the app starts here with the saved address and goes on once it answers, so a computer without network
+  // sees why (and gets in by itself when the network is back) instead of a blank window.
+  var server = query.get("server");
+  if (server) {
+    var form = document.getElementById("form"), retry = document.getElementById("retry"), body = document.querySelector('[data-t="body"]');
+    var strip = document.getElementById("offline"), stripText = document.getElementById("offline-text");
+    form.hidden = true;
+    body.hidden = true;
+    document.querySelector('[data-t="title"]').textContent = t.opening;
+    var trying = false, timer = 0;
+    var attempt = async function () {
+      if (trying) return;
+      trying = true;
+      clearTimeout(timer);
+      try {
+        await reachable(server);
+        await window.__TAURI_INTERNALS__.invoke("connect", { url: server, page: query.get("page") });
+      } catch (err) {
+        stripText.textContent = navigator.onLine === false ? t.noNet : t.noServer;
+        strip.hidden = false;
+        retry.hidden = false;
+        timer = setTimeout(attempt, 5000);
+      }
+      trying = false;
+    };
+    retry.addEventListener("click", attempt);
+    window.addEventListener("online", attempt);
+    attempt();
+  }
+
+  function normalize(raw) {
+    raw = raw.trim();
+    if (!raw) return null;
+    // A bare host means https, except a local address (a server on this machine or the office network).
+    if (!/^https?:\/\//i.test(raw)) raw = (/^(localhost|127\.|10\.|192\.168\.|[^/]+\.local\b)/i.test(raw) ? "http://" : "https://") + raw;
+    try {
+      var u = new URL(raw);
+      return u.hostname ? u.origin : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  document.getElementById("form").addEventListener("submit", async function (e) {
+    e.preventDefault();
+    var url = normalize(input.value);
+    error.textContent = "";
+    if (!url) { error.textContent = t.invalid; return; }
+    go.disabled = true;
+    go.textContent = t.checking;
+    try {
+      await reachable(url);
+      await window.__TAURI_INTERNALS__.invoke("connect", { url: url });
+    } catch (err) {
+      error.textContent = t.unreachable;
+      go.disabled = false;
+      go.textContent = t.connect;
+    }
+  });
+</script>
+</body>
+</html>

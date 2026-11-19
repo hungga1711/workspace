@@ -1,0 +1,32 @@
+---
+title: Importers
+description: Move tasks, projects, documents and chat history into Workspace from Jira, Trello, Asana, ClickUp, Notion, Slack or a CSV file.
+---
+
+Files are read in the browser and previewed before anything is created; nothing goes to a third party.
+
+## Tasks
+
+Open a project and choose **Import tasks**. Up to 1,000 tasks per run.
+
+| Source | File | What comes over |
+|---|---|---|
+| Jira | CSV export | Summary, status, priority, assignee, due date, labels, key |
+| Trello | CSV or board JSON | Cards, list as status, labels, member, due date |
+| Asana | CSV export | Name, section as status, assignee, due date, tags |
+| ClickUp | CSV, or list JSON | Tasks with **subtasks**; optionally one project per list |
+| Notion | Markdown & CSV export (.zip) | A database becomes tasks; pages become documents |
+| Any spreadsheet | CSV (comma or semicolon, UTF-8) | Columns guessed from their names |
+
+- People are matched by e-mail, then by name; unmatched tasks import without an assignee.
+- For CSV, **Pick columns** lets you fix a wrong guess.
+- Statuses map to To do, In progress, Review or Done; common date formats are understood.
+- Not imported: comments, attachments, time tracking, sprints, custom fields.
+
+## Chat history
+
+**Admin › Security & integrations › Integrations & API › Move from Slack** turns a Slack workspace export (.zip) into channels with their history.
+
+Full reference, in the repository:
+[docs/integrations/importers.md](https://github.com/hungga1711/workspace/blob/main/docs/integrations/importers.md):
+exact fields per source, date formats, ClickUp subtasks and lists, Notion databases and pages.

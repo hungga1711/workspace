@@ -1,0 +1,166 @@
+---
+title: Code structure
+description: The repository map, the anatomy of a backend module, the shared packages, the web app, and the rules the linter enforces.
+---
+
+## Repository map
+
+```text
+backend/
+  server/                      @workspace/server: one package, one process
+    src/main.ts                composes the modules, opens the event bus, listens on :4000 and :4001
+    src/modules/<module>/      gateway · identity · platform · search · chat · home · work · employee · ai
+    migrations/<module>/       NNN_name.sql, forward-only, applied at start
+    test/<module>/             integration tests against real Postgres and S3
+    evals/                     offline AI quality evals
+  packages/
+    contracts/                 event envelope and the registry of every event type and payload
+    shared/                    request context, withTransaction, authorize(), appendToOutbox, ids
+    service-kit/               principal middleware, migrate, EventBus, consumers, ServiceClient, kv, storage, mail
+    testkit/                   helpers for integration tests
+frontend/
+  web/                         Next.js 15 App Router: the UI and the BFF
+  browser-extension/           MV3 extension: AI Insights intake and the safety net
+  desktop/                     Tauri shell around the web app
+  web/public/runner/           workspace-connect, workspace-runner, workspace-usage (Node 22, no dependencies)
+infra/
+  local/                       development compose: Postgres, SeaweedFS, LiveKit, optional PgBouncer
+  production/, docker/         production compose (postgres, app, Caddy), install, backup, restore, upgrade
+tooling/scripts/               dev-server, migrate-all, seed-demo, events-catalog, openapi, new-module.sh
+docs/                          system design, database, events, ADRs, runbooks, diagrams
+website/                       this site (Next.js and Fumadocs, static export)
+```
+
+Each area has its own guide for humans and coding agents:
+[backend/AGENTS.md](https://github.com/hungga1711/workspace/blob/main/backend/AGENTS.md),
+[frontend/web/AGENTS.md](https://github.com/hungga1711/workspace/blob/main/frontend/web/AGENTS.md),
+[infra/AGENTS.md](https://github.com/hungga1711/workspace/blob/main/infra/AGENTS.md).
+
+## The server and its modules
+
+`backend/server/src/main.ts` only composes. Each module's `start.ts` migrates its schema, builds its app, starts its
+outbox relay, consumers and jobs, and returns an HTTP handler. The server then listens on two ports:
+
+| Port | What answers |
+|---|---|
+| 4000 (public) | the gateway (`/api/…`, `/health`), Socket.IO (`/socket.io`, set up by chat), local files (`/storage/…`) |
+| 4001 (127.0.0.1) | each module's own API under `/<module>/…`, for tools and tests |
+
+| Module | Owns |
+|---|---|
+| **gateway** | Verifies sessions and `wos_` API keys, resolves the principal, rate limits, signs a 60-second internal token, routes `/api/<module>/*`; MCP server, extension intake, public meeting and calendar links |
+| **identity** | Sign-in (passwords, Ed25519 tokens, two-step), members, roles and grants, teams, agents, API keys, audit |
+| **platform** | The workspace row and its config, first-run setup, master data, feature switches, outbound webhooks, audit trail |
+| **chat** | Channels, DMs, threads, files, calls, the unified search endpoint; Socket.IO realtime and Yjs co-editing relay |
+| **work** | Projects, tasks, docs and spaces, drive, whiteboards, calendar and meetings, approvals, goals, follow-up, **agent workflows** |
+| **home** | The "Needs you" read model, notifications, reminders, daily digest, Web Push |
+| **employee** | Profiles, departments and reporting lines, attendance, leave, holidays, announcements |
+| **ai** | Model gateway and connections, assistant, usage and budgets, AI Insights intake, policy, retention |
+| **search** | Postgres full-text index built from events, rebuilt with `reindex` |
+
+## Anatomy of a module
+
+<Diagram name="module-anatomy" caption="A request through the work module, and the two ways it reaches other modules." />
+
+```text
+src/modules/work/
+  start.ts                 migrate → createWorkApp → startEvents (relay) → consumers → scheduleJob(...)
+  app.ts                   createWorkApp(deps): Nest wiring, testable without start
+  http/
+    index.ts               the controllers, in registration order
+    tasks.controller.ts    parse (zod) → authorize → domain function → DTO
+    workflows.controller.ts
+  tasks.ts                 domain logic: plain functions over a PoolClient, no Nest
+  workflows.ts
+  common.ts                emit(), activity(), shared helpers of this module
+  errors.ts                NotFound · Forbidden · Invalid · Conflict, mapped to HTTP by guard()
+```
+
+A controller method keeps the HTTP concerns and hands the rest to a domain function. This one, from
+`http/workflows.controller.ts`, starts a workflow run on a task:
+
+```ts
+@Post("tasks/:ref/runs")
+async start(@Req() req: Request, @Param("ref") ref: string) {
+  const p = requirePrincipal(req);   // the principal the gateway signed
+  // one transaction: the run row, the activity line, the outbox event and the audit row commit together
+  const r = await guard(() => withTransaction(this.pool, async (c) => startRun(c, p, await resolveRef(c, "task", ref))));
+  if (r.runner === "server") kickServerRun(this.pool, this.aiSteps, p, r.id, String(req.requestId ?? ""));
+  return runDto(r);
+}
+```
+
+`startRun` (in `workflows.ts`) is plain TypeScript over a `PoolClient`: it reads the task as `p` (which rechecks
+access), refuses a local run started by anyone but the assignee, requires `task.edit` for a server run, inserts the
+row and calls `emit(c, "work.run.started.v1", …)`.
+
+- **Validation** happens at the edge with zod; domain functions take typed input.
+- **Authorization** happens in the module, never only at the gateway:
+  `assertAllowed(principal, "task.edit", resource)`. Permissions are declared once in
+  `src/modules/identity/catalog.ts`; roles may grant only those.
+- **Errors** are domain errors (`NotFound`, `Forbidden`, `Invalid`, `Conflict`); `guard()` maps them to HTTP.
+- **Periodic work** goes through `scheduleJob(name, everyMs, fn, { pool })`, which takes a Postgres advisory lock so
+  only one runs at a time. Never a bare `setInterval`.
+- **AI** goes through the ai module only (`meteredGenerate` → the workspace's model gateway). No other module calls a
+  model vendor.
+
+## Module boundaries
+
+The ESLint rule `workspace/module-boundaries` refuses an import from one module folder into another. That leaves
+two ways to cross a boundary:
+
+| You need… | Use | Why |
+|---|---|---|
+| Data another module owns, now | `ServiceClient` at `moduleUrl("<module>")`, **as the caller's principal** | The owning module authorizes again, so scope can never widen. `serviceFetch` delivers it in memory: no network hop |
+| Another module to react to a change | Register an event, `emit()` it in your transaction, add a consumer | Decoupled, durable, retried; see [Events](/docs/advanced/events) |
+| Code both modules need | Move it to `backend/packages/*` | Packages are shared; modules are not |
+
+The database enforces the same line: each module's login role can use only its own schema, so a query against
+another module's table fails with `permission denied`.
+
+## The web app
+
+```text
+frontend/web/src/
+  app/
+    (auth)/            sign-in, first-run /setup, password reset
+    app/               the product: home, work, chat, ai, me, search…
+    admin/             members, roles, AI connections, agents, settings
+    api/               proxy to the gateway, extension intake, client errors, web vitals
+  components/<area>/   UI by product area (work, chat, docs, admin, ai-hub, shell, ui…)
+  lib/                 gateway (server), client (browser), i18n, format, features, ai gating
+  styles/globals.css   design tokens (@theme inline): the only stylesheet
+e2e/                   Playwright specs: flows, CSP, accessibility (axe), Core Web Vitals
+```
+
+- **Server components** call the gateway directly with `gw<T>("/api/<module>/<path>")` (`src/lib/gateway.ts`),
+  forwarding the session. **Client components** call `api<T>("<module>/<path>")` (`src/lib/client.ts`), which goes
+  through the same-origin `/api/proxy` with the CSRF header and a request id. Start independent requests together.
+- **Text** lives only in `src/lib/i18n/messages/`. `en.ts` is the source catalog and its keys are the type;
+  `vi.ts`, `zh.ts` and `es.ts` translate it, and a missing key reads in English.
+- **Styling** is Tailwind v4 with the tokens from [DESIGN.md](https://github.com/hungga1711/workspace/blob/main/DESIGN.md):
+  no hex values, no new CSS files.
+- **AI surfaces** render only when `aiStatus().assistant` (server, `src/lib/ai.ts`) or `useAiEnabled()` (client) is
+  true. AI Insights views
+  never depend on it.
+- **Optional features**: a page of one starts with `await requireFeature("docs")`; client code hides links with
+  `useFeature("docs")`. Never fetch a left-out feature's API: it answers 404.
+- **Performance**: each route has a gzip budget for its initial JavaScript (`scripts/check-bundle-budget.mjs`, 200 KB
+  ceiling). Editor, Yjs, LiveKit, dnd-kit and charts load with `next/dynamic` or on interaction.
+
+## The pieces that run elsewhere
+
+| Piece | Where | What it does |
+|---|---|---|
+| Browser extension | `frontend/browser-extension` | Records prompts on AI chat sites after the person connects it, with a notice on every page; runs the safety net before send |
+| Connect program | `frontend/web/public/runner/workspace-connect.mjs` | One pasted line per computer: finds the AI on it, keeps the runner and token collector running, adds the Claude Code safety hook |
+| Workflow runner | `frontend/web/public/runner/workspace-runner.mjs` | Claims the person's local workflow runs and drives their coding agent; see [Agent workflows](/docs/advanced/workflows) |
+| Desktop app | `frontend/desktop` | Tauri shell that loads the company's server and adds notifications and `workspace://` links |
+
+## Conventions
+
+- TypeScript strict, ESM, Node 22. Prettier formats; ESLint must be clean.
+- Backend files are `kebab-case.ts`; React components are `PascalCase.tsx`; events are `domain.entity.verb.v1`.
+- Comments explain **why** (a constraint, a product decision), not what the next line does.
+- Pure logic is tested next to the code (`*.test.ts`); anything touching Postgres is tested in `backend/server/test/`.
+- Never commit secrets. A new environment variable is documented in `.env.example`.
