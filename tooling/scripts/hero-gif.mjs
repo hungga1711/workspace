@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
- * README hero GIF (docs/assets/hero.gif): the AI Insights flow end to end against a running workspace with the demo
- * seed (`pnpm seed:demo`), headless:
+ * AI Insights GIF (docs/assets/hero.gif; the README shows docs/assets/tour.gif instead): the AI Insights flow end to
+ * end against a running workspace with the demo seed (`pnpm seed:demo`), headless:
  *
  *   1. a staff member writes to an AI chat (a neutral stand-in page served at the chat site's address, with the real
  *      browser extension loaded and connected to this workspace), the extension redacts the ID number and the

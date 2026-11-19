@@ -34,7 +34,9 @@ without AI. English, Tiếng Việt, 中文 and Español.
 
 ## Video
 
-[![The product tour: a staff member asks the company AI, the extension redacts sensitive data, the owner sees the team's AI use](docs/assets/hero.gif)](https://workspace.hungga1711.dev/media/tour.mp4)
+[![Product tour: pick a task, attach a workflow your team built, an AI agent runs it to review; then see whether AI pays off](docs/assets/tour.gif)](https://workspace.hungga1711.dev/media/tour.mp4)
+
+[Watch the full 65-second tour with sound](https://workspace.hungga1711.dev/media/tour.mp4)
 
 ## Install
 

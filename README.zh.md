@@ -23,7 +23,9 @@
 对负责人：**首页** 显示谁卡住了及原因、等你决定的事项和本周的 AI 使用情况。**进度** 显示每个人和每个部门。
 不会向我们或任何第三方发送任何数据；没有 AI 时所有功能照常可用。界面支持英语、越南语、中文和西班牙语。
 
-[![员工询问公司 AI，扩展遮盖敏感数据，负责人查看团队的 AI 使用情况](docs/assets/hero.gif)](https://workspace.hungga1711.dev/media/tour.mp4)
+[![产品演示：选一个任务，挂上团队搭建的工作流，AI 智能体一路执行到评审；再看 AI 是否真正带来回报](docs/assets/tour.gif)](https://workspace.hungga1711.dev/media/tour.mp4)
+
+[观看完整的 65 秒有声演示](https://workspace.hungga1711.dev/media/tour.mp4)
 
 ## 安装
 

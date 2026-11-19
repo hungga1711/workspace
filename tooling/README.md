@@ -18,7 +18,7 @@ Developer tooling shared by the whole repository. Nothing here ships in the prod
 | `scripts/release.mjs` | Prepares a release: bumps every manifest and writes the CHANGELOG.md section (run by the release workflow; `--dry-run` previews the notes) |
 | `scripts/desktop-build.mjs` | Builds the desktop app with one company's server address built in (`pnpm desktop:build https://work.company.com`; needs Rust and the Tauri prerequisites) |
 | `scripts/mcp-stdio.mjs` | stdio ↔ HTTP bridge for MCP clients that can only start a local command |
-| `scripts/screenshots.mjs`, `scripts/hero-gif.mjs`, `scripts/social-preview.mjs` | README screenshots, the hero GIF and the GitHub social preview, from a seeded demo (headless Chromium) |
+| `scripts/screenshots.mjs`, `scripts/hero-gif.mjs`, `scripts/social-preview.mjs` | README screenshots, a GIF of the AI Insights flow and the GitHub social preview, from a seeded demo (headless Chromium). The README's `docs/assets/tour.gif` is the first 18 seconds of the product tour (`website/public/media/tour.mp4`): `ffmpeg -t 17.9 -i tour.mp4 -vf "fps=10,scale=800x450:flags=lanczos,split[a][b];[a]palettegen=max_colors=128:stats_mode=diff[p];[b][p]paletteuse=dither=bayer:bayer_scale=5:diff_mode=rectangle" -loop 0 docs/assets/tour.gif` |
 | `loadtest/` | k6 load tests and the million-row database benchmark ([loadtest/README.md](loadtest/README.md)) |
 
 Root-level config stays at the root where tools look for it: `eslint.config.mjs`, `.prettierrc.json`,
