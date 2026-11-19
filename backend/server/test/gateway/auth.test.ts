@@ -242,8 +242,14 @@ describe("refresh, sign-out and revocation", () => {
 
 describe("two-step sign-in", () => {
   const code = (secret: string, offset = 0) => hotp(secret, currentStep() + offset);
+  // The replay checks compare codes made at different moments: they hold only inside one 30-second step.
+  const startOfAStep = async () => {
+    const left = 30_000 - (Date.now() % 30_000);
+    if (left < 15_000) await new Promise((r) => setTimeout(r, left + 100));
+  };
 
   it("set-up, sign-in with a code, no replay, recovery codes once each, attempts limited", async () => {
+    await startOfAStep();
     const { email } = await signup("totp");
     const s = (await login(email)).body;
     const setup = await call(s.accessToken, "POST", "/api/identity/me/mfa/setup");
