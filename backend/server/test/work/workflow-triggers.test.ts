@@ -179,11 +179,17 @@ describe("loops", () => {
     const b = await workflowOf([{ kind: "task", on: "status", status: "done", labels: ["x-pair"] }], minh, { output: { status: "review" } });
     const task = await taskIn(minh, { labels: ["x-pair"] });
     await move(minh, task, "review");
-    for (let i = 0; i < 8; i++) {
+    // A run is settled a moment before its output moves the task (which writes the next fire), so keep going until the
+    // chain is refused rather than for a fixed number of turns: a slow runner finished eight turns before the first move.
+    const fires = async () => [...(await firesOf(a.id)).fires, ...(await firesOf(b.id)).fires];
+    const end = Date.now() + 15_000;
+    while (Date.now() < end) {
       await fireTriggers(engine);
       await settled(minh, task.id);
+      if ((await fires()).some((f) => f.status === "refused")) break;
+      await new Promise((r) => setTimeout(r, 50));
     }
-    const all = [...(await firesOf(a.id)).fires, ...(await firesOf(b.id)).fires];
+    const all = await fires();
     // a (0) → b (1) → a (2) → b (3), then the chain ends.
     expect(all.filter((f) => f.status === "started")).toHaveLength(4);
     expect(all.find((f) => f.status === "refused")?.reason).toMatch(/chain of more than 3 workflows/);
