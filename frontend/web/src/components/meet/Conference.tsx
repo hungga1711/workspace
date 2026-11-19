@@ -460,10 +460,13 @@ function Dock({
       {p === "people" ? (
         <span
           aria-hidden="true"
-          className={cx("absolute right-1.5 top-1.5 rounded-sm px-1.5 text-xs tabular-nums", waiting ? "bg-accent text-on-brand" : "bg-selected text-ink-2")}
-        >
-          {waiting ? `+${waiting}` : people}
-        </span>
+          // The count is drawn by CSS: text inside the button would have to be part of its name (WCAG 2.5.3).
+          data-count={waiting ? `+${waiting}` : people}
+          className={cx(
+            "absolute right-1.5 top-1.5 rounded-sm px-1.5 text-xs tabular-nums before:content-[attr(data-count)]",
+            waiting ? "bg-accent text-on-brand" : "bg-selected text-ink-2",
+          )}
+        />
       ) : null}
     </button>
   );

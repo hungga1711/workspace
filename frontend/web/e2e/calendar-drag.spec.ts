@@ -56,5 +56,5 @@ test("the week view is the default; dragging an event moves it and clicking empt
   await col.click({ position: { x: 20, y: 48 * 15 + 5 } });
   const dlg = page.getByRole("dialog", { name: "Tạo lịch" });
   await expect(dlg).toBeVisible();
-  await expect(dlg.getByRole("button", { name: "Từ", exact: true })).toHaveText("15:00");
+  await expect(dlg.getByRole("button", { name: /^Từ:/ })).toHaveText("15:00");
 });

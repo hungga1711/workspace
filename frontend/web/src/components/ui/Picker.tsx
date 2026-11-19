@@ -150,7 +150,8 @@ export function Picker({
       <button
         type="button"
         id={id}
-        aria-label={variant === "title" && current ? `${label}: ${current.label}` : label}
+        // The name carries what the button shows (WCAG 2.5.3, label in name): "Role: Admin", not just "Role".
+        aria-label={`${label}: ${[prefix, current?.label ?? placeholder ?? "—"].filter(Boolean).join(" ")}`}
         aria-haspopup="listbox"
         aria-expanded={open}
         disabled={disabled}

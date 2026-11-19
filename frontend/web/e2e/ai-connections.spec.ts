@@ -123,7 +123,7 @@ test("AI connections: self-hosted model tested, saved as default, used by the as
     await owner.goto("/admin/workspace/ai/cost");
     await spend.getByRole("button", { name: "Áp dụng cho" }).click();
     await spend.getByRole("option", { name: "Một người" }).click();
-    await spend.getByRole("button", { name: "Một người" }).click();
+    await spend.getByRole("button", { name: /^Một người:/ }).click();
     await spend.getByRole("option", { name: "Trần Minh Hưng" }).click();
     await spend.getByLabel("Token mỗi tháng").fill("10");
     await spend.getByRole("button", { name: "Đặt hạn mức" }).click();

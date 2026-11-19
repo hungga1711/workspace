@@ -85,7 +85,7 @@ test.describe.serial("Me tabs", () => {
     await box.getByLabel("Việc được giao, bình luận, sắp đến hạn và hoàn thành").uncheck();
     await expect(box.getByRole("status")).toContainText("Đã lưu");
     // Until the person picks one, their zone follows the workspace's.
-    const zone = box.getByRole("button", { name: "Múi giờ", exact: true });
+    const zone = box.getByRole("button", { name: /^Múi giờ:/ });
     // Chromium may report the zone by its older alias.
     await expect(zone).toContainText(/Theo công ty \(Asia\/(Ho_Chi_Minh|Saigon)\)/);
     await zone.click();
@@ -140,7 +140,7 @@ test.describe.serial("Me tabs", () => {
   test("out-of-office: approvals go to the chosen colleague until the end date", async () => {
     await emp.goto("/app/me?tab=away");
     const away = emp.getByRole("main");
-    await away.getByRole("button", { name: "Người duyệt thay", exact: true }).click();
+    await away.getByRole("button", { name: /^Người duyệt thay:/ }).click();
     const first = away.getByRole("option").first();
     const delegateName = (await first.locator("span.flex-1").textContent())?.trim();
     await first.click();

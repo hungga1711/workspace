@@ -2,7 +2,7 @@
 
 import type { Participant } from "livekit-client";
 import { personTone } from "@/lib/identity";
-import { initials } from "@/lib/people";
+import { Initials } from "@/lib/people";
 import { cx } from "@/lib/ui";
 
 /**
@@ -17,7 +17,7 @@ export function Monogram({ name, seed, className }: { name: string; seed?: strin
   const tone = personTone(toneSeed(seed, name));
   return (
     <span aria-hidden="true" className={cx("grid aspect-square shrink-0 select-none place-items-center rounded-full font-semibold", tone.wash, tone.text, className)}>
-      {initials(name || "?")}
+      <Initials name={name || "?"} />
     </span>
   );
 }
