@@ -61,8 +61,15 @@ test("whiteboard: template, sticky, live, task, reload, view only", async ({ bro
   const badge = owner.getByRole("link", { name: /^Mở việc T-\d+: Gọi nhà cung cấp$/ });
   await expect(badge).toBeVisible();
 
-  // Saved: a reload brings the stickies and the badges back.
+  // Saved: a reload brings the stickies and the badges back. The label must be the save of the task links (it used to
+  // stay on while that change waited out its two seconds), and the stored scene must hold both stickies.
   await expect(owner.getByText("Đã lưu")).toBeVisible();
+  await expect
+    .poll(async () => {
+      const text = JSON.stringify((await api(owner, "GET", "work/whiteboards/W-001")).body.scene.elements);
+      return text.includes("Gọi nhà cung cấp") && text.includes("Lan bổ sung");
+    })
+    .toBe(true);
   await owner.reload();
   await expect(canvas(owner)).toHaveAttribute("data-sticky-text", /Gọi nhà cung cấp.*Lan bổ sung|Lan bổ sung.*Gọi nhà cung cấp/);
   await expect(badge).toBeVisible();

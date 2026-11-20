@@ -329,9 +329,11 @@ export function Canvas({
   const markDirty = useCallback(() => {
     const s = save.current;
     s.dirty = true;
+    // "Saved" no longer holds once there is a change still waiting for its save; a save under way keeps "Saving".
+    if (!s.running) onSaveState("idle");
     clearTimeout(s.timer);
     s.timer = setTimeout(() => void runSaveRef.current(), SAVE_AFTER_MS);
-  }, []);
+  }, [onSaveState]);
 
   /* ── images: bytes to work files, the scene keeps only where they are ─────────────────────────── */
   const uploadFile = useCallback(
