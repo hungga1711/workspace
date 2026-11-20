@@ -23,6 +23,10 @@
 # Also read: WORKSPACE_IMAGE (image to run), WORKSPACE_RAW_URL (where the compose files are downloaded from),
 # TLS, HTTP_PORT, HTTPS_PORT, BIND_ADDRESS (written into .env when set).
 set -eu
+# Piped into sh (curl … | sh), the shell reads this script from stdin while it runs, and a command that reads stdin
+# (docker compose exec or run) swallowed the rest of it: everything after the wait loop vanished without an error.
+# Inside braces, sh reads the whole script before running any of it.
+{
 
 OWNER="hungga1711"
 VERSION=${WORKSPACE_VERSION:-}
@@ -403,3 +407,4 @@ row "Stop" "docker compose down (data stays in the Docker volumes)"
 row "Upgrade" "./upgrade.sh"
 row "Backups" "./backup.sh (see docs/runbooks/backup-restore.md)"
 row "Start over" "docker compose down -v (deletes every volume: the database and files too)"
+}
