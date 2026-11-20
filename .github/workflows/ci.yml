@@ -17,7 +17,7 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
-# Third-party actions are pinned to a commit (the tag is in the comment); Dependabot keeps them current.
+# Third-party actions are pinned to a commit (the tag is in the comment) and updated by hand.
 jobs:
   test:
     if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository || github.actor == 'dependabot[bot]'
