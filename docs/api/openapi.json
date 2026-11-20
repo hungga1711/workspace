@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "workspace API",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "license": {
       "name": "MIT",
       "identifier": "MIT"

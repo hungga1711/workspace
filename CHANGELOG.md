@@ -8,6 +8,19 @@ previous release. Add anything an operator must do by hand before upgrading unde
 
 ## [Unreleased]
 
+## [1.0.3] - 2026-11-20
+
+### Commits
+
+**README**
+
+- step 4, connect an AI in AI › Connect (#39)
+- the product image leads, instead of the AI adoption screenshot (#41)
+
+**Task page and Ask**
+
+- no reload after answers or a run's comment; agent card buttons; history rail (#40)
+
 ## [1.0.2] - 2026-11-20
 
 ### Commits
