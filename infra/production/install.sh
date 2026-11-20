@@ -82,7 +82,7 @@ if [ "$FROM_CHECKOUT" = 0 ]; then
     curl -fsSL "$RAW_URL/$f" -o "$f.tmp" || die "could not download $f"
     mv "$f.tmp" "$f"
   done
-  chmod +x caddy/run.sh load-secrets.sh backup.sh restore.sh upgrade.sh
+  chmod +x caddy/run.sh load-secrets.sh backup.sh restore.sh upgrade.sh postgres/init.sh
 fi
 
 # ── .env: created once from .env.example, then only filled in ──────────────────────────────────────────────
