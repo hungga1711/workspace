@@ -8,6 +8,8 @@ previous release. Add anything an operator must do by hand before upgrading unde
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-11-20
+
 First public release: a self-hosted work app for one company, with tasks, chat and the company's own AI.
 
 - **Tasks and projects:** board, list and timeline views, subtasks, dependencies, recurring tasks, templates, bulk
