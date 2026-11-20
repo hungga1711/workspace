@@ -1,0 +1,17 @@
+name: test-stack
+description: Postgres, S3 and LiveKit, the module schemas migrated, and the test server running on workspace_test (:4100/:4101).
+runs:
+  using: composite
+  steps:
+    - name: Infrastructure (Postgres, S3, LiveKit)
+      shell: bash
+      run: docker compose -f infra/local/docker-compose.yml up -d --wait
+    - name: Migrate module schemas
+      shell: bash
+      run: node tooling/scripts/migrate-all.mjs
+    - name: Start the test server
+      # The test installation: database workspace_test, :4100/:4101, TEST_FIXTURES=1 (tooling/scripts/test-db.mjs).
+      shell: bash
+      run: |
+        MAIL_OUTBOX_DIR=$RUNNER_TEMP/mail RATE_SIGNUP_PER_HOUR=1000 AI_LOCAL_MODEL=1 WEBHOOK_ALLOW_PRIVATE=1 pnpm test:server > server.log 2>&1 &
+        npx --yes wait-on@8.0.3 -t 120000 http://localhost:4100/health http://localhost:4101/health
