@@ -6,7 +6,7 @@
 
 <p align="center"><a href="README.md">English</a> · <a href="README.zh.md">中文</a> · <a href="README.es.md">Español</a></p>
 
-![Mức dùng AI: số token trong 30 ngày, AI có giúp làm xong việc không, ai đang dùng, và token đi đâu theo phòng ban, tính năng và model](docs/assets/screenshots/en/ai-adoption.png)
+![Workspace: việc, chat và tài liệu trong một bản cài tự host. Bảng dự án, một việc và workflow AI đang chạy trên việc đó](docs/assets/hero.png)
 
 Bản dịch này tóm tắt [README.md](README.md); khi hai bản khác nhau, bản tiếng Anh là bản đúng.
 

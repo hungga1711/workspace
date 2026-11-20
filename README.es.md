@@ -6,7 +6,7 @@
 
 <p align="center"><a href="README.md">English</a> · <a href="README.vi.md">Tiếng Việt</a> · <a href="README.zh.md">中文</a></p>
 
-![Uso de IA: tokens usados en 30 días, si la IA ayudó a terminar tareas, quién la usa y a dónde van los tokens por departamento, función y modelo](docs/assets/screenshots/en/ai-adoption.png)
+![Workspace: tareas, chat y documentos en una sola instalación autoalojada. Un tablero de proyecto, una tarea y un flujo de IA en marcha sobre ella](docs/assets/hero.png)
 
 Esta traducción resume [README.md](README.md); si no coinciden, manda la versión en inglés.
 
