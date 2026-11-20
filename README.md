@@ -13,7 +13,7 @@
 
 <p align="center"><a href="README.vi.md">Tiếng Việt</a> · <a href="README.zh.md">中文</a> · <a href="README.es.md">Español</a></p>
 
-![AI adoption: tokens used in 30 days, whether AI helped finish tasks, who uses it, and where the tokens go by department, feature and model](docs/assets/screenshots/en/ai-adoption.png)
+![Workspace: tasks, chat and docs in one self-hosted install. A project board, a task and an agent workflow running on it](docs/assets/hero.png)
 
 ## What it is for
 
