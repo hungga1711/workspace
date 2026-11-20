@@ -141,17 +141,17 @@ HTTPS; sign-in cookies lose the `Secure` flag, so keep such an installation on a
 trusted network. Walk-through, and moving to another address later:
 [Your own domain or IP](https://workspace.hungga1711.dev/docs/self-hosting/domain-and-https).
 
-Ports: `HTTP_PORT`/`HTTPS_PORT` (default 80/443) are where people connect, through Caddy; `WEB_PORT`/`API_PORT`
+Ports: `HTTP_PORT`/`HTTPS_PORT` (default 80/443) are where people connect, through Caddy; `WEB_HOST_PORT`/`API_HOST_PORT`
 (default 3000/4000) are the app's direct web and API ports on `BIND_ADDRESS`. When one of them already belongs to
 another program, install.sh asks for another port (with `--non-interactive` it takes the next free one) and writes it
-into `.env`. To choose up front: `curl -fsSL …/install.sh | HTTP_PORT=8080 WEB_PORT=3100 sh`, or set the variables in
+into `.env`. To choose up front: `curl -fsSL …/install.sh | HTTP_PORT=8080 WEB_HOST_PORT=3100 sh`, or set the variables in
 `.env` and run `docker compose up -d`. A port other than 80 is part of the address (`http://localhost:8080`), and
 Let's Encrypt needs 80 and 443 reachable from outside, so on another HTTP/HTTPS port use `TLS=off` behind your own
 proxy, or your own certificate. The sites are in `caddy/Caddyfile`; `caddy/run.sh` turns the domain settings into
 their addresses.
 
 **Your own proxy on the host** (an existing nginx, a load balancer): `docker compose up -d --scale caddy=0`. The
-app's ports are published on `BIND_ADDRESS` (default `127.0.0.1`): web `WEB_PORT` (3000), server `API_PORT` (4000), S3 8333, LiveKit 7880.
+app's ports are published on `BIND_ADDRESS` (default `127.0.0.1`): web `WEB_HOST_PORT` (3000), server `API_HOST_PORT` (4000), S3 8333, LiveKit 7880.
 Route exactly as in the table. Host nginx example:
 
 ```nginx

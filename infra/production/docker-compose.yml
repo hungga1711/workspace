@@ -223,10 +223,14 @@ services:
       LOGIN_MAX_FAILS_PER_IP: ${LOGIN_MAX_FAILS_PER_IP:-50}
       # env_file passes all of .env; the Postgres superuser password is not the app's to have.
       POSTGRES_PASSWORD: ""
+      # The ports inside the container, which Caddy and the health check use. Fixed here so nothing in .env moves them;
+      # the host side is WEB_HOST_PORT / API_HOST_PORT below.
+      WEB_PORT: "3000"
+      SERVER_PORT: "4000"
     ports:
-      # Host ports for direct access (Caddy reaches the app inside Docker): WEB_PORT / API_PORT when 3000/4000 are taken.
-      - "${BIND_ADDRESS:-127.0.0.1}:${WEB_PORT:-3000}:3000"
-      - "${BIND_ADDRESS:-127.0.0.1}:${API_PORT:-4000}:4000"
+      # Host ports for direct access (Caddy reaches the app inside Docker): WEB_HOST_PORT / API_HOST_PORT when 3000/4000 are taken.
+      - "${BIND_ADDRESS:-127.0.0.1}:${WEB_HOST_PORT:-3000}:3000"
+      - "${BIND_ADDRESS:-127.0.0.1}:${API_HOST_PORT:-4000}:4000"
     volumes:
       - data:/data
       - *secrets-volume
