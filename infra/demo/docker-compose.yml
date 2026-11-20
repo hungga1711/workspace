@@ -31,7 +31,7 @@ services:
 
   # One-shot: set up the workspace, seed it, take the snapshot the hourly reset restores. Skips when it exists.
   demo-seed:
-    image: postgres:16.4-alpine
+    image: postgres:16.15-alpine
     restart: "no"
     depends_on:
       app: { condition: service_healthy }
@@ -59,7 +59,7 @@ services:
   # Every DEMO_RESET_SECONDS (default an hour): the database back to the snapshot (sign-in sessions included),
   # uploaded files removed. Waits for the first snapshot.
   demo-reset:
-    image: postgres:16.4-alpine
+    image: postgres:16.15-alpine
     restart: unless-stopped
     depends_on:
       postgres: { condition: service_healthy }
