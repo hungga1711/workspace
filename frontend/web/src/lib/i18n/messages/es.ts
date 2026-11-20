@@ -1399,7 +1399,11 @@ export const es: Catalog = {
       getCode: "Crear un código de conexión",
       newCode: "Crear un código nuevo",
       codeLabel: "Pega esto en la extensión",
-      extSteps: "Descomprime, abre chrome://extensions, activa el modo de desarrollador, elige «Cargar descomprimida» y pega el código.",
+      howTitle: "Cómo instalarla en Chrome o Edge",
+      how1: "Pulsa «Obtener la extensión» y descomprime el workspace-ai.zip descargado.",
+      how2: "Abre chrome://extensions (Edge: edge://extensions) y activa el modo de desarrollador.",
+      how3: "Pulsa «Cargar descomprimida» y elige la carpeta workspace-ai descomprimida.",
+      how4: "Pulsa «Crear un código de conexión», abre la extensión desde el icono de pieza de puzle de la barra y pega el código.",
     },
     sitesMore: "y {count} más",
     admin: {

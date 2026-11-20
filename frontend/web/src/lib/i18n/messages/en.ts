@@ -1317,7 +1317,11 @@ export const en = {
       getCode: "Create a connection code",
       newCode: "Create a new code",
       codeLabel: "Paste this into the extension",
-      extSteps: "Unzip, open chrome://extensions, turn on Developer mode, choose “Load unpacked”, then paste the code.",
+      howTitle: "How to install it in Chrome or Edge",
+      how1: "Click “Get the extension” and unzip the downloaded workspace-ai.zip.",
+      how2: "Open chrome://extensions (Edge: edge://extensions) and turn on Developer mode.",
+      how3: "Click “Load unpacked” and choose the unzipped workspace-ai folder.",
+      how4: "Click “Create a connection code”, open the extension from the puzzle icon in the toolbar and paste the code.",
     },
     sitesMore: "and {count} more",
     admin: {

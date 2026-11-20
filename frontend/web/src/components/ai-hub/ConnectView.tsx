@@ -503,6 +503,18 @@ export function ConnectView({ initial, origin, providers }: { initial: ConnectDa
                   {d.extension ? t("aiConnect.guard.newCode") : t("aiConnect.guard.getCode")}
                 </button>
               </div>
+              {/* The extension is not in a store yet: without these steps people download the zip and stop there. */}
+              {guardBrowser ? null : (
+                <div className="grid min-w-0 gap-1" data-testid="ext-how">
+                  <span className="text-ink-2 text-xs font-semibold">{t("aiConnect.guard.howTitle")}</span>
+                  <ol className="text-ink-soft m-0 grid list-decimal gap-1 pl-5 text-sm">
+                    <li>{t("aiConnect.guard.how1")}</li>
+                    <li>{t("aiConnect.guard.how2")}</li>
+                    <li>{t("aiConnect.guard.how3")}</li>
+                    <li>{t("aiConnect.guard.how4")}</li>
+                  </ol>
+                </div>
+              )}
               {extCode ? (
                 <div className="bg-ground grid min-w-0 gap-1.5 rounded-lg p-3">
                   <span className="text-ink-2 text-xs font-medium">{t("aiConnect.guard.codeLabel")}</span>
@@ -514,7 +526,6 @@ export function ConnectView({ initial, origin, providers }: { initial: ConnectDa
                       <CopyIcon />
                     </button>
                   </span>
-                  <span className="text-ink-2 text-xs">{t("aiConnect.guard.extSteps")}</span>
                 </div>
               ) : null}
             </>
