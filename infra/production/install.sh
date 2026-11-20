@@ -21,7 +21,8 @@
 #   --version TAG            WORKSPACE_VERSION: image tag and files to download [latest release: main/latest]
 #   --no-start               write the files and .env only
 # Also read: WORKSPACE_IMAGE (image to run), WORKSPACE_RAW_URL (where the compose files are downloaded from),
-# TLS, HTTP_PORT, HTTPS_PORT, BIND_ADDRESS (written into .env when set).
+# TLS, HTTP_PORT, HTTPS_PORT, WEB_PORT, API_PORT, BIND_ADDRESS (written into .env when set). A port another program
+# already uses is asked for again (the next free one with --non-interactive), e.g. curl … | HTTP_PORT=8080 sh
 set -eu
 # Piped into sh (curl … | sh), the shell reads this script from stdin while it runs, and a command that reads stdin
 # (docker compose exec or run) swallowed the rest of it: everything after the wait loop vanished without an error.
@@ -53,7 +54,7 @@ while [ $# -gt 0 ]; do
     --email) EMAIL_IN=${2-}; shift ;;
     --dir) DIR=${2-}; shift ;;
     --version) VERSION=${2-}; shift ;;
-    -h | --help) sed -n '2,26p' "$0" | sed 's/^# \{0,1\}//'; exit 0 ;;
+    -h | --help) sed -n '2,/^set -eu/p' "$0" | sed '$d' | sed 's/^# \{0,1\}//'; exit 0 ;;
     *) die "unknown option $1 (see --help)" ;;
   esac
   shift
@@ -155,10 +156,43 @@ if [ -n "$smtp" ]; then
   if [ -n "${MAIL_FROM:-}" ]; then mail_from=$MAIL_FROM; else ask mail_from "Sender shown on those emails" "$(get MAIL_FROM | sed "s/^$/workspace <no-reply@$app>/")"; fi
 fi
 
-for v in TLS HTTP_PORT HTTPS_PORT BIND_ADDRESS WORKSPACE_IMAGE; do
+for v in TLS HTTP_PORT HTTPS_PORT WEB_PORT API_PORT BIND_ADDRESS WORKSPACE_IMAGE; do
   eval "val=\${$v:-}"
   [ -z "$val" ] || set_var "$v" "$val"
 done
+
+# Ports another program already listens on (a web server on 80, a dev server on 3000): ask for another one (the next
+# free port without a terminal) instead of failing at `docker compose up` with "port is already allocated". Skipped
+# when this stack is running already, since the ports are then its own.
+port_busy() {
+  if command -v ss > /dev/null 2>&1; then
+    ss -ltnH 2> /dev/null | awk '{print $4}' | grep -qE "[:.]$1\$"
+  elif command -v lsof > /dev/null 2>&1; then
+    lsof -nP -iTCP:"$1" -sTCP:LISTEN > /dev/null 2>&1
+  else
+    return 1
+  fi
+}
+if [ "$START" = 1 ] && [ -z "$(docker compose ps -q 2> /dev/null)" ]; then
+  for spec in HTTP_PORT:80:"web, HTTP" HTTPS_PORT:443:"web, HTTPS" WEB_PORT:3000:"direct web app" API_PORT:4000:"direct API"; do
+    var=${spec%%:*} rest=${spec#*:}
+    default=${rest%%:*} label=${rest#*:}
+    port=$(get "$var")
+    port=${port:-$default}
+    port_busy "$port" || continue
+    free=$((port + 1))
+    while port_busy "$free"; do free=$((free + 1)); done
+    [ "$port" -lt 1024 ] && [ "$free" -lt 8000 ] && free=$((8000 + port))
+    while port_busy "$free"; do free=$((free + 1)); done
+    if [ "$INTERACTIVE" = 1 ]; then
+      ask chosen "Port $port ($label) is used by another program. Port to use instead ($var)" "$free"
+    else
+      chosen=$free
+      echo "  Port $port ($label) is used by another program: using $chosen ($var in .env)"
+    fi
+    set_var "$var" "$chosen"
+  done
+fi
 tls=$(get TLS)
 [ "$app" = localhost ] && [ -z "$tls" ] && tls=off
 http_port=$(get HTTP_PORT)
@@ -221,7 +255,8 @@ for v in $secret_names; do printf '%s=%s\n' "$v" "$(get "$v")"; done |
     mv "$f.new" "$f"' "$secret_names" > /dev/null 2>&1 ||
   echo "  (could not copy the secrets into the secrets volume; keep $DIR/.env safe)"
 
-docker compose up -d --remove-orphans
+docker compose up -d --remove-orphans ||
+  die "could not start the containers. A port already in use? Set HTTP_PORT, HTTPS_PORT, WEB_PORT or API_PORT in $DIR/.env and run install.sh again"
 
 # ── Wait: one line per container (redrawn in place on a terminal), until the app answers ──────────────────
 if [ -t 1 ]; then
@@ -380,8 +415,8 @@ echo
 say "Services"
 if [ "$tls" = off ]; then caddy_ports="port ${http_port:-80}"; else caddy_ports="ports ${http_port:-80} and $(get HTTPS_PORT | grep . || echo 443)"; fi
 row "Web" "$url (through Caddy, $caddy_ports)"
-row "Web app" "http://$local_host:3000 (direct, $reach)"
-row "API" "http://$local_host:4000 (direct, $reach)$([ -n "$(get API_DOCS)" ] && echo "; docs at $url/api/docs")"
+row "Web app" "http://$local_host:$(get WEB_PORT | grep . || echo 3000) (direct, $reach)"
+row "API" "http://$local_host:$(get API_PORT | grep . || echo 4000) (direct, $reach)$([ -n "$(get API_DOCS)" ] && echo "; docs at $url/api/docs")"
 row "Database" "Postgres 16, inside Docker only (not published). Database workspace, user workspace_owner,"
 row "" "password PG_OWNER_PASSWORD in .env. Shell: docker compose exec postgres psql -U postgres -d workspace"
 if [ -n "$files" ]; then
