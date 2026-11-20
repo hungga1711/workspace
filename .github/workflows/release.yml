@@ -2,7 +2,8 @@ name: release
 # One button for a release (Actions › release › Run workflow, pick patch, minor or major). From main it:
 #   1. sets the next version in every manifest and writes its CHANGELOG.md section from "## [Unreleased]" and the
 #      commits since the previous tag (tooling/scripts/release.mjs);
-#   2. commits "Release x.y.z", tags vx.y.z and pushes both;
+#   2. commits "Release x.y.z", tags vx.y.z and pushes both (with the deploy key in RELEASE_DEPLOY_KEY, which may bypass
+#      the rule that main takes pull requests only);
 #   3. creates the GitHub Release with those notes and a source SBOM;
 #   4. builds, tests and publishes the image as :x.y.z and :latest, signed, with its SBOM on the release.
 on:
@@ -34,6 +35,9 @@ jobs:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
           fetch-depth: 0
+          # main only takes pull requests; this repository's deploy key is on the ruleset's bypass list, so the
+          # "Release x.y.z" commit and its tag are pushed with it (the Actions token cannot bypass a ruleset).
+          ssh-key: ${{ secrets.RELEASE_DEPLOY_KEY }}
       - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with: { node-version: 22 }
       - name: Next version and its changelog
