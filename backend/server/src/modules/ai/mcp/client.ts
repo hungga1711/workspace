@@ -92,7 +92,7 @@ export async function openSession(pool: Pool, row: ServerRow, userId: string, op
     const headers: Record<string, string> =
       row.auth === "header" ? headerOf(row) : row.auth === "oauth" ? { authorization: `Bearer ${await accessToken(pool, row, userId, forceRefresh)}` } : {};
     const transport = new GuardedHttpTransport(row.url, () => headers, opts.timeoutMs ?? CALL_TIMEOUT_MS, opts.env);
-    const client = new Client({ name: "workspace", version: "1.0.0" }, { capabilities: {} });
+    const client = new Client({ name: "workspace", version: "1.0.1" }, { capabilities: {} });
     await client.connect(transport, { timeout: opts.timeoutMs ?? 15_000 });
     return client;
   };

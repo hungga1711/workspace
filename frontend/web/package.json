@@ -2,7 +2,7 @@
   "name": "@workspace/web",
   "description": "workspace web app (Next.js): the employee and manager UI, admin and first-run setup",
   "license": "MIT",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
   "type": "module",
   "scripts": {

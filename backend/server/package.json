@@ -2,7 +2,7 @@
   "name": "@workspace/server",
   "description": "The backend: one process hosting every module (gateway, identity, platform, search, chat, home, work, employee, ai), each with its own folder, schema, role, migrations and HTTP API",
   "license": "MIT",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
   "type": "module",
   "scripts": {

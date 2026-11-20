@@ -2,7 +2,7 @@
   "name": "@workspace/contracts",
   "description": "Event envelope and payload schemas shared by every service (the event catalog), and the public API schemas",
   "license": "MIT",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
   "type": "module",
   "main": "./dist/index.js",

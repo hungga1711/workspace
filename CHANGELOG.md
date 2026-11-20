@@ -8,6 +8,40 @@ previous release. Add anything an operator must do by hand before upgrading unde
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-11-20
+
+### Commits
+
+**Extension**
+
+- Workspace logo, and the connection code points to AI › Connect (#37)
+
+**Image**
+
+- the web app's CSS and JS load again; install.sh asks for another port when one is taken (#33)
+
+**Jobs**
+
+- a tick waiting for its lock when stop() is called no longer runs the job afterwards (#34)
+
+**Production**
+
+- the host ports are WEB_HOST_PORT / API_HOST_PORT, so choosing one no longer moves the app inside its container (#35)
+
+**Production install**
+
+- Postgres init no longer fails on a non-executable init.sh; install.sh shows each container (#29)
+- a deleted .env no longer locks the app out of its database; the summary says what to open and where everything is (#30)
+- curl | sh prints the setup address and summary again (#31)
+
+**Setup**
+
+- a new workspace starts with #general and one welcome message, no sample content (#36)
+
+**Whiteboard**
+
+- "Saved" goes away while a change waits for its save, so a reload on "Saved" keeps it (#32)
+
 ## [1.0.0] - 2026-11-20
 
 First public release: a self-hosted work app for one company, with tasks, chat and the company's own AI.
