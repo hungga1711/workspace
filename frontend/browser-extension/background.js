@@ -1,6 +1,6 @@
 // workspace AI Insights: the background worker queues what the pages captured and sends it in small batches
 // to the company's workspace (POST <server>/api/ai-monitor/events, Bearer <connection code>).
-// Nothing is sent until the person has pasted the connection code from workspace › Của tôi › AI.
+// Nothing is sent until the person has pasted the connection code from workspace › AI › Connect (/app/ai/connect).
 
 const QUEUE_KEY = "queue";
 const MAX_QUEUE = 500;

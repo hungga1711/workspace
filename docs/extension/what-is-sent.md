@@ -126,7 +126,7 @@ Privacy policy for the store listing: [privacy-policy.md](privacy-policy.md).
 
 - **Chỉ chạy** trên các trang chat AI liệt kê trong `manifest.json` (ChatGPT, Claude, Gemini, Copilot, Perplexity,
   DeepSeek, Grok, Meta AI, Poe, Qwen, Kimi, Doubao, You.com, HuggingChat, Z.ai, Duck.ai). Trang khác không có script nào của tiện ích.
-- **Chỉ sau khi bạn tự kết nối** bằng mã lấy ở workspace › Của tôi › AI, và **chỉ lúc bạn bấm gửi**. Gõ, sửa, dán
+- **Chỉ sau khi bạn tự kết nối** bằng mã lấy ở workspace › AI › Kết nối, và **chỉ lúc bạn bấm gửi**. Gõ, sửa, dán
   mà chưa gửi thì không ghi. Trang nào đang ghi đều có thông báo ở góc dưới bên phải.
 - **Chỉ gửi về một nơi**: máy chủ workspace của công ty trong mã kết nối. Người làm dự án không nhận gì.
 - **Ba loại sự kiện**: câu bạn gửi (đúng nội dung đã gửi, đã che nếu chính sách là che; câu trả lời chỉ khi công ty

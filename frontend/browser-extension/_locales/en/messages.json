@@ -12,7 +12,7 @@
     "message": "Connection code"
   },
   "optCodePlaceholder": {
-    "message": "Paste the code from workspace › Me › AI"
+    "message": "Paste the code from workspace › AI › Connect (/app/ai/connect)"
   },
   "optConnect": {
     "message": "Connect"
@@ -78,7 +78,7 @@
     "message": "See the policy and what was recorded"
   },
   "noticeConnect": {
-    "message": "Open the extension and paste the connection code from workspace › Me › AI."
+    "message": "Open the extension and paste the connection code from workspace › AI › Connect (/app/ai/connect)."
   },
   "confirmSensitive": {
     "message": "This message seems to contain $kinds$.\n\nSending it to an outside AI may break company rules. Send anyway?",

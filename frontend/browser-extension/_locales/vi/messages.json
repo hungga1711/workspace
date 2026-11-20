@@ -12,7 +12,7 @@
     "message": "Mã kết nối"
   },
   "optCodePlaceholder": {
-    "message": "Dán mã từ workspace › Của tôi › AI"
+    "message": "Dán mã từ workspace › AI › Kết nối (/app/ai/connect)"
   },
   "optConnect": {
     "message": "Kết nối"
@@ -78,7 +78,7 @@
     "message": "Xem chính sách và những gì đã ghi"
   },
   "noticeConnect": {
-    "message": "Mở tiện ích để dán mã kết nối từ workspace › Của tôi › AI."
+    "message": "Mở tiện ích để dán mã kết nối từ workspace › AI › Kết nối (/app/ai/connect)."
   },
   "confirmSensitive": {
     "message": "Tin nhắn này có vẻ chứa $kinds$.\n\nGửi dữ liệu này cho AI bên ngoài có thể vi phạm quy định của công ty. Bạn vẫn muốn gửi?",

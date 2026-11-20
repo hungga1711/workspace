@@ -12,7 +12,7 @@
     "message": "连接码"
   },
   "optCodePlaceholder": {
-    "message": "粘贴 workspace › 我的 › AI 中的连接码"
+    "message": "粘贴 workspace › AI › 连接（/app/ai/connect）中的连接码"
   },
   "optConnect": {
     "message": "连接"
@@ -78,7 +78,7 @@
     "message": "查看政策和已记录的内容"
   },
   "noticeConnect": {
-    "message": "打开扩展，粘贴 workspace › 我的 › AI 中的连接码。"
+    "message": "打开扩展，粘贴 workspace › AI › 连接（/app/ai/connect）中的连接码。"
   },
   "confirmSensitive": {
     "message": "此消息似乎包含 $kinds$。\n\n发送给外部 AI 可能违反公司规定。仍要发送吗？",
