@@ -57,6 +57,9 @@ jobs:
           grep -q "Next: create the company" /tmp/install.log
           grep -q "Start over" /tmp/install.log
           curl -fsS -o /dev/null -w "web /setup %{http_code}\n" http://localhost/setup
+          # The page's own stylesheet must load too: a 200 page with 404 CSS and JS is an unstyled, dead page.
+          css=$(curl -fsS http://localhost/setup | grep -oE '/_next/static/css/[^"]+[.]css' | head -n 1)
+          test -n "$css" && curl -fsS -o /dev/null -w "web $css %{http_code}\n" "http://localhost$css"
           curl -fsS http://127.0.0.1:4000/api/setup
           test "$(curl -s -o /dev/null -w '%{http_code}' http://localhost/storage/forged.token)" = 403
           docker compose ps

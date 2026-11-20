@@ -54,8 +54,13 @@ RUN pnpm install --frozen-lockfile --store-dir /tmp/pnpm-store \
  && cd /app \
  && mkdir -p /out/web \
  && cp -a frontend/web/.next/standalone/. /out/web/ \
- && cp -a frontend/web/.next/static /out/web/frontend/web/.next/static \
- && cp -a frontend/web/public /out/web/frontend/web/public \
+ # Contents into the folders (/.): the standalone output may already hold part of .next/static (traced chunks), and
+ # `cp -a dir existing-dir` then nested the build's files at .next/static/static, where every page's CSS and JS 404s.
+ && mkdir -p /out/web/frontend/web/.next/static /out/web/frontend/web/public \
+ && cp -a frontend/web/.next/static/. /out/web/frontend/web/.next/static/ \
+ && cp -a frontend/web/public/. /out/web/frontend/web/public/ \
+ && test ! -e /out/web/frontend/web/.next/static/static \
+ && ls /out/web/frontend/web/.next/static/css/*.css > /dev/null \
  # Nothing in the runtime reads source maps, type declarations or package docs, except the web app's own browser
  # maps (.next/static): the error screen's code resolves to file and line with them (Admin › Lỗi trình duyệt).
  && find /out -path /out/web/frontend/web/.next/static -prune -o \( -name '*.map' -o -name '*.d.ts' -o -name '*.d.mts' -o -name '*.d.cts' \
