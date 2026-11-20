@@ -47,16 +47,38 @@ afterAll(async () => {
 describe("onboarding", () => {
   const created = event("platform.workspace.created.v1", { name: "Lâm An", ownerUserId: owner.id, ownerName: "Minh", teamType: "sales", locale: "vi" });
 
-  it("provisions #general with a system welcome thread and the team's starter channels", async () => {
+  it("provisions #general with one welcome message from system, and nothing else", async () => {
     await deliver(created);
     const { channels } = (await call(owner, "/channels")).body as { channels: { id: string; name: string }[] };
-    expect(channels.map((c) => c.name).sort()).toEqual(["bao-gia", "co-hoi", "general", "khach-hang"]);
+    expect(channels.map((c) => c.name)).toEqual(["general"]);
     const general = channels.find((c) => c.name === "general")!;
     const { messages } = (await call(owner, `/channels/${general.id}/messages?limit=10`)).body;
     expect(messages).toHaveLength(1);
     expect(messages[0].authorType).toBe("system");
-    expect(messages[0].replyCount).toBe(3);
+    expect(messages[0].replyCount).toBe(0);
     expect(messages[0].body).toContain("Lâm An");
+    expect(messages[0].body).toContain("@AI");
+    expect(messages[0].body).toContain("AI › Kết nối");
+  });
+
+  it("leaves the AI line out when the AI assistant was switched off at setup", async () => {
+    await resetTestDatabase();
+    await deliver(
+      event("platform.workspace.created.v1", {
+        name: "Không AI",
+        ownerUserId: owner.id,
+        ownerName: "Minh",
+        teamType: "product",
+        locale: "en",
+        ai: { assistant: false, monitoring: false },
+      }),
+    );
+    const { channels } = (await call(owner, "/channels")).body as { channels: { id: string; name: string }[] };
+    const { messages } = (await call(owner, `/channels/${channels[0]!.id}/messages?limit=10`)).body;
+    expect(messages[0].body).toContain("This is #general");
+    expect(messages[0].body).not.toContain("@AI");
+    await resetTestDatabase();
+    await deliver(created);
   });
 
   it("is idempotent when the event is processed again", async () => {
@@ -65,14 +87,14 @@ describe("onboarding", () => {
     expect(channels.filter((c) => c.name === "general")).toHaveLength(1);
   });
 
-  it("adds a newly joined member to #general and the starter channels, already caught up", async () => {
+  it("adds a newly joined member to #general, already caught up", async () => {
     await deliver(event("identity.member.joined.v1", { userId: lan.id }));
     const { channels } = (await call(lan, "/channels")).body as { channels: { id: string; name: string; unread: number }[] };
-    expect(channels.map((c) => c.name).sort()).toEqual(["bao-gia", "co-hoi", "general", "khach-hang"]);
+    expect(channels.map((c) => c.name)).toEqual(["general"]);
     expect(channels.every((c) => c.unread === 0)).toBe(true);
     // Only workspace admins may change who joins automatically; a member sees the setting but cannot.
-    const starter = (await call(lan, `/channels/${channels.find((c) => c.name === "bao-gia")!.id}`)).body;
-    expect(starter).toMatchObject({ autoJoin: true, canSetAutoJoin: false });
+    const general = (await call(lan, `/channels/${channels[0]!.id}`)).body;
+    expect(general).toMatchObject({ autoJoin: true, canSetAutoJoin: false });
   });
 
   it("invited people can be added to channels before they sign in; disabled people cannot", async () => {

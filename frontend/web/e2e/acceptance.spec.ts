@@ -25,7 +25,7 @@ let channelUrl: string;
 let taskUrl: string;
 
 test.describe.serial("Company A end-to-end", () => {
-  test("signs up, skips invites, and turns the #general welcome thread into a task", async ({ browser }) => {
+  test("signs up, skips invites, and lands in #general with only its welcome message", async ({ browser }) => {
     ctxA = await browser.newContext();
     ownerA = await ctxA.newPage();
     await setupWorkspace(ownerA, A);
@@ -34,11 +34,11 @@ test.describe.serial("Company A end-to-end", () => {
     await ownerA.getByRole("link", { name: "Bỏ qua", exact: true }).click();
     await ownerA.waitForURL(/\/app\/chat\/[0-9A-Z]{26}/);
     await expect(ownerA.getByRole("heading", { level: 1, name: "general" })).toBeVisible();
-    await ownerA.getByRole("button", { name: "Thử: @AI tạo việc từ luồng này" }).click();
-    const thread = ownerA.getByLabel("Luồng thảo luận", { exact: true });
-    await expect(thread.getByText("Tóm tắt", { exact: true })).toBeVisible();
-    await thread.getByRole("button", { name: "Tạo việc", exact: true }).first().click();
-    await expect(thread.getByText(/Đã tạo T-/)).toBeVisible();
+    // A new workspace holds no sample content: #general is its only channel, with one welcome message that says
+    // where AI comes in.
+    await expect(ownerA.getByText(/Đây là #general, kênh chung của cả công ty\. Gõ @AI .* AI › Kết nối\./)).toBeVisible();
+    const channels = (await api(ownerA, "GET", "chat/channels")).body.channels as { name: string; kind: string }[];
+    expect(channels.filter((c) => c.kind === "public").map((c) => c.name)).toEqual(["general"]);
     await ownerA.goto("/app/home");
     await expect(ownerA.getByRole("heading", { level: 1 })).toContainText("Minh");
     // Desktop: eight destinations (conversations are listed below them); Trợ lý AI is the top bar's "Hỏi AI".

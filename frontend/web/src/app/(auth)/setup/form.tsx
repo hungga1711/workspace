@@ -20,11 +20,6 @@ const TimeZoneField = dynamic(() => import("@/components/ui/TimeZoneField").then
 const field = `${control} min-h-10 w-full font-normal aria-[invalid=true]:border-block`;
 const label = "grid gap-1.5 text-sm font-medium";
 const hint = "text-ink-2 text-xs font-normal";
-const TEAMS = [
-  { value: "product", key: "setup.teamProduct" },
-  { value: "sales", key: "setup.teamSales" },
-  { value: "ops", key: "setup.teamOps" },
-] as const;
 
 /**
  * Two steps in one form: the company first, then the admin account. Step 2 opens as soon as the company name is
@@ -34,7 +29,6 @@ export function SetupForm({ tokenRequired, ai = true, aiDefault = false }: { tok
   const tx = useT();
   const [state, action, pending] = useActionState<SetupState, FormData>(setup, { error: null, fields: {} });
   const [company, setCompany] = useState(state.fields.companyName ?? "");
-  const team = state.fields.teamType ?? "product";
   // The company's language and time zone: the browser's until the admin says otherwise. Picking a language here
   // also switches this page (the cookie), so the admin reads the rest of setup in it.
   const locale = useLocale();
@@ -133,23 +127,6 @@ export function SetupForm({ tokenRequired, ai = true, aiDefault = false }: { tok
             autoFocus
           />
         </label>
-        <div className="grid gap-1.5">
-          <span id="setup-team" className="text-sm font-medium">
-            {tx("setup.teamLabel")}
-          </span>
-          <div role="radiogroup" aria-labelledby="setup-team" className="bg-hover grid grid-cols-3 gap-0.5 rounded-full p-0.5">
-            {TEAMS.map((t) => (
-              <label
-                key={t.value}
-                className="has-[:checked]:bg-surface has-[:checked]:text-ink has-[:focus-visible]:outline-ink-2 text-ink-2 hover:text-ink has-[:checked]:shadow-raised grid h-8 cursor-pointer place-items-center rounded-full text-sm transition-colors has-[:checked]:font-medium has-[:focus-visible]:outline has-[:focus-visible]:outline-2"
-              >
-                <input type="radio" name="teamType" value={t.value} defaultChecked={t.value === team} className="sr-only" />
-                {tx(t.key)}
-              </label>
-            ))}
-          </div>
-          <span className={hint}>{tx("setup.teamHint")}</span>
-        </div>
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="grid gap-1.5">
             <span id="setup-language" className="text-sm font-medium">
