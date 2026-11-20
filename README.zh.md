@@ -47,7 +47,16 @@ https://github.com/user-attachments/assets/2c138cb5-2642-4455-aca1-fa205fef1153
    用于 HTTPS 证书通知的邮箱（`localhost` 时留空）和 SMTP 邮件服务器（可跳过，之后在 管理 › 设置与功能 中添加）。
    它把所有密码和密钥生成到 `workspace/.env`，启动应用，并打印 `/setup` 地址和一个令牌。
 3. **创建公司。** 打开该地址，输入令牌，填写公司名称，选择国家（节假日、年假、币种和工作周随之设置），创建
-   负责人账号。然后在 **管理 › 成员** 邀请同事；需要的话在 **管理 › AI 连接** 接入 AI。
+   负责人账号。然后在 **管理 › 成员** 邀请同事。
+4. **接入 AI（可选）。** 不接 AI 一切照常可用。要使用 AI 功能（问答、工作流、聊天和任务里的 AI），先在
+   **AI › 连接**（`/app/ai/connect`）接入 AI：
+   1. **连接这台电脑。** 在装有 Claude Code、Codex、Gemini CLI、Ollama 或 LM Studio（以及 Node.js）的电脑上，把
+      页面给出的那一行粘贴到终端（Windows：PowerShell）。显示 “Connected” 后点 **重新检查**。
+   2. **在“问答”卡片里选择由哪个 AI 回答：**
+      - **公司 AI，全员使用。** 管理员点 **用 … 回答全公司的问题**：所有成员的问题都由那台电脑上的 AI 回答，
+        所以请保持它开机。若想改用 API 密钥、兼容 OpenAI 的服务器或服务器上的模型，在 **管理 › AI 连接** 添加。
+      - **自己的 AI。** 有自己 AI 账号的人用同样方式连接自己的电脑，并在 **我的问题使用** 里选它。什么都不连接的人
+        使用公司 AI。
 
 其他运行方式：[Coolify、Portainer、Railway、Unraid 和 CasaOS 模板](infra/templates/README.md)，或使用你自己的
 反向代理（[自托管指南](infra/production/README.md)）。

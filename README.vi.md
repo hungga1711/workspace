@@ -51,8 +51,17 @@ và một tên miền trỏ về nó. Để thử, máy tính xách tay của b�
    qua được, thêm sau ở Quản trị › Cài đặt & tính năng). Nó tạo mọi mật khẩu và khoá vào `workspace/.env`, khởi
    động và in ra địa chỉ `/setup` cùng một token.
 3. **Tạo công ty.** Mở địa chỉ đó, nhập token, đặt tên công ty, chọn quốc gia (ngày lễ, phép năm, tiền tệ và tuần
-   làm việc theo đó) và tạo tài khoản chủ. Sau đó mời mọi người ở **Quản trị › Thành viên**, và kết nối AI ở
-   **Quản trị › Kết nối AI** nếu muốn.
+   làm việc theo đó) và tạo tài khoản chủ. Sau đó mời mọi người ở **Quản trị › Thành viên**.
+4. **Kết nối AI (không bắt buộc).** Mọi thứ chạy được khi không có AI. Muốn dùng tính năng AI (Hỏi đáp, workflow,
+   AI trong chat và việc) thì kết nối AI trước ở **AI › Kết nối** (`/app/ai/connect`):
+   1. **Kết nối máy này.** Trên một máy có Claude Code, Codex, Gemini CLI, Ollama hoặc LM Studio (và Node.js), dán
+      dòng lệnh trang đưa vào Terminal (Windows: PowerShell). Khi nó báo "Connected", bấm **Kiểm tra lại**.
+   2. **Chọn AI trả lời cho Hỏi đáp**, ở thẻ **Hỏi đáp**:
+      - **AI của công ty, cho mọi người.** Quản trị viên bấm **Dùng … để trả lời cho cả công ty**: câu hỏi của mọi
+        nhân viên được AI trên máy đó trả lời, nên giữ máy luôn bật. Muốn dùng API key, máy chủ tương thích OpenAI
+        hoặc model chạy trên máy chủ thay vào đó, thêm ở **Quản trị › Kết nối AI**.
+      - **AI của riêng bạn.** Ai có tài khoản AI riêng thì tự kết nối máy của mình theo cách trên và chọn nó ở
+        **Câu hỏi của tôi dùng**. Ai không kết nối gì thì dùng AI của công ty.
 
 Cách chạy khác: [mẫu cho Coolify, Portainer, Railway, Unraid và CasaOS](infra/templates/README.md), hoặc reverse
 proxy của bạn ([hướng dẫn tự cài](infra/production/README.md)).

@@ -86,8 +86,22 @@ Token  4f8a…
 ### 3. Create your company
 
 Open that address, enter the token, name the company, pick its country (holidays, annual leave, currency and work
-week follow it) and create the owner account. Then invite people from **Admin › Members**, and connect an AI in
-**Admin › AI connections** if you want one.
+week follow it) and create the owner account. Then invite people from **Admin › Members**.
+
+### 4. Connect an AI (optional)
+
+Everything works without AI. To use the AI features (Ask AI, workflows, AI in chat and tasks), connect an AI first
+in **AI › Connect** (`/app/ai/connect`):
+
+1. **Connect this computer.** On a computer that has Claude Code, Codex, Gemini CLI, Ollama or LM Studio (and
+   Node.js), paste the line it shows into Terminal (Windows: PowerShell). When it says "Connected", press
+   **Check again**.
+2. **Choose who Ask AI answers with,** in the **Ask AI** card:
+   - **Company AI, for everyone.** An admin presses **Use … for everyone's questions**: every member's questions are
+     answered by the AI on that computer, so keep it on. To use an API key, an OpenAI-compatible server or a model
+     on your server instead, add it in **Admin › AI connections**.
+   - **Your own AI.** Someone with their own AI account connects their own computer the same way and picks it under
+     **My questions go to**. People who connect nothing use the company AI.
 
 Other ways to run it: [Coolify, Portainer, Railway, Unraid and CasaOS templates](infra/templates/README.md), or
 your own reverse proxy ([self-host guide](infra/production/README.md)).

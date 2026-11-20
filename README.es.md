@@ -53,7 +53,19 @@ empresa, usa un servidor Linux (cualquier VPS) y un dominio que apunte a él. Pa
    un token.
 3. **Crea tu empresa.** Abre esa dirección, introduce el token, pon el nombre de la empresa, elige su país (festivos,
    vacaciones anuales, moneda y semana laboral lo siguen) y crea la cuenta del propietario. Luego invita a la gente
-   desde **Administración › Miembros** y conecta una IA en **Administración › Conexiones de IA** si quieres.
+   desde **Administración › Miembros**.
+4. **Conecta una IA (opcional).** Todo funciona sin IA. Para usar las funciones de IA (Preguntar a la IA, flujos de
+   trabajo, IA en el chat y en las tareas), conecta primero una IA en **IA › Conectar** (`/app/ai/connect`):
+   1. **Conectar este ordenador.** En un ordenador con Claude Code, Codex, Gemini CLI, Ollama o LM Studio (y
+      Node.js), pega la línea que muestra en la Terminal (Windows: PowerShell). Cuando diga "Connected", pulsa
+      **Comprobar de nuevo**.
+   2. **Elige qué IA responde,** en la tarjeta **Preguntar a la IA**:
+      - **IA de la empresa, para todos.** Un administrador pulsa **Usar … para las preguntas de todos**: las preguntas
+        de todos los miembros las responde la IA de ese ordenador, así que mantenlo encendido. Para usar una clave de
+        API, un servidor compatible con OpenAI o un modelo en tu servidor, añádelo en **Administración › Conexiones
+        de IA**.
+      - **Tu propia IA.** Quien tenga su propia cuenta de IA conecta su ordenador del mismo modo y lo elige en
+        **Mis preguntas van a**. Quien no conecte nada usa la IA de la empresa.
 
 Otras formas de ejecutarlo: [plantillas para Coolify, Portainer, Railway, Unraid y CasaOS](infra/templates/README.md),
 o tu propio proxy inverso ([guía de autoalojamiento](infra/production/README.md)).
