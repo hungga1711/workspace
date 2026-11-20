@@ -3,6 +3,8 @@ name: ci
 # :latest. Pull requests are tested when their branch is not already pushed here: forks, and Dependabot's (its branches
 # are tested once, as pull requests, not again on push).
 # Free-plan friendly: a docs-only change runs nothing, and a newer push to the same branch cancels the older run.
+# The checks, the backend suites and four slices of the browser specs run side by side; `test` gathers them (the name
+# branch protection requires and the image waits for).
 on:
   push:
     branches: ["**", "!dependabot/**"]
@@ -19,60 +21,98 @@ concurrency:
 
 # Third-party actions are pinned to a commit (the tag is in the comment) and updated by hand.
 jobs:
-  test:
+  checks:
     if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository || github.actor == 'dependabot[bot]'
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
-      - uses: pnpm/action-setup@7088e561eb65bb68695d245aa206f005ef30921d # v4.1.0
-        with: { version: 10.33.0 }
-      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
-        with: { node-version: 22, cache: pnpm }
-      - run: pnpm install --frozen-lockfile
+      - uses: ./.github/actions/setup
       - name: Lint
         run: pnpm lint
       - name: Format
         run: pnpm format:check
       - name: Shell scripts
         run: git ls-files -z '*.sh' | xargs -0 shellcheck -S style
-      - name: Infrastructure (Postgres, S3, LiveKit)
-        run: docker compose -f infra/local/docker-compose.yml up -d --wait
-      - name: Build shared packages
-        run: pnpm build:packages
       - name: Event catalog in sync with @workspace/contracts
         run: node tooling/scripts/events-catalog.mjs --check
       - name: OpenAPI document in sync with @workspace/contracts
         run: node tooling/scripts/openapi.mjs --check
       - name: Typecheck
         run: pnpm -r typecheck
-      - name: Migrate module schemas
-        run: node tooling/scripts/migrate-all.mjs
-      - name: Start the test server (some integration tests talk to the running stack)
-        # The test installation: database workspace_test, :4100/:4101, TEST_FIXTURES=1 (tooling/scripts/test-db.mjs).
-        run: |
-          MAIL_OUTBOX_DIR=$RUNNER_TEMP/mail RATE_SIGNUP_PER_HOUR=1000 AI_LOCAL_MODEL=1 WEBHOOK_ALLOW_PRIVATE=1 pnpm test:server > server.log 2>&1 &
-          npx --yes wait-on@8.0.3 -t 120000 http://localhost:4100/health http://localhost:4101/health
+
+  backend:
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository || github.actor == 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: ./.github/actions/setup
+      - uses: ./.github/actions/test-stack
       - name: Unit + integration tests (real Postgres/S3)
         # On workspace_test; a suite that needs first-run setup empties it first (one workspace per installation).
         run: pnpm -r --workspace-concurrency=1 test
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: failure()
+        with: { name: backend-server-log, path: server.log }
+
+  e2e:
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository || github.actor == 'dependabot[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4]
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: ./.github/actions/setup
+      - uses: ./.github/actions/test-stack
       - name: Browser extension zip (served from Của tôi › AI; built, never committed)
         run: cd frontend/web && pnpm ext:zip
-      - name: Web build + performance budget
+      - name: Next build cache
+        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
+        with:
+          path: frontend/web/.next/cache
+          key: next-${{ hashFiles('pnpm-lock.yaml') }}-${{ hashFiles('frontend/web/src/**', 'frontend/web/next.config.mjs') }}
+          restore-keys: next-${{ hashFiles('pnpm-lock.yaml') }}-
+      - name: Web build (+ performance budget, once)
         # GATEWAY_URL at build: the rewrites that hand /api/mcp, the runner and the connect program to the server are
         # fixed when the app is built (next.config.mjs), and the E2E specs for them go through the app's address.
-        run: cd frontend/web && GATEWAY_URL=http://localhost:4100 NEXT_PUBLIC_CHAT_URL=http://localhost:4100 STORAGE_PUBLIC_ORIGIN="http://localhost:8333 http://localhost:4100" LIVEKIT_URL=ws://localhost:7880 pnpm build && pnpm budget
-      - name: Browser E2E, performance and accessibility
+        run: |
+          cd frontend/web && GATEWAY_URL=http://localhost:4100 NEXT_PUBLIC_CHAT_URL=http://localhost:4100 STORAGE_PUBLIC_ORIGIN="http://localhost:8333 http://localhost:4100" LIVEKIT_URL=ws://localhost:7880 pnpm build
+          if [ "${{ matrix.shard }}" = 1 ]; then pnpm budget; fi
+      - name: Playwright browser cache
+        id: browsers
+        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ hashFiles('pnpm-lock.yaml') }}
+      - name: Playwright browser
+        run: |
+          cd frontend/web
+          if [ "${{ steps.browsers.outputs.cache-hit }}" = true ]; then npx playwright install-deps chromium; else npx playwright install --with-deps chromium; fi
+      - name: Browser E2E, performance and accessibility (slice ${{ matrix.shard }} of 4)
         # Headed on a virtual display: headless Chromium on Linux has no mouse, and every page served with
         # Cross-Origin-Opener-Policy (all of the app's) then matches (hover: none), so hover-only controls such as the
         # message toolbar never appear. Xvfb gives the browser a pointer, like the desktops the specs drive.
         run: |
           (cd frontend/web && TEST_FIXTURES=1 GATEWAY_URL=http://localhost:4100 WEB_DATABASE_URL=postgres://workspace_web:app_pw@localhost:5432/workspace_test pnpm start > web.log 2>&1 &)
           npx --yes wait-on@8.0.3 -t 120000 http://localhost:3000
-          cd frontend/web && npx playwright install --with-deps chromium && GATEWAY_URL=http://localhost:4100 MAIL_OUTBOX_DIR=$RUNNER_TEMP/mail xvfb-run -a npx playwright test --headed
+          cd frontend/web && GATEWAY_URL=http://localhost:4100 MAIL_OUTBOX_DIR=$RUNNER_TEMP/mail xvfb-run -a npx playwright test --headed --shard=${{ matrix.shard }}/4
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         if: failure()
-        with: { name: e2e-artifacts, path: "frontend/web/test-results\nserver.log" }
+        with: { name: "e2e-artifacts-${{ matrix.shard }}", path: "frontend/web/test-results\nserver.log\nfrontend/web/web.log" }
+
+  test:
+    needs: [checks, backend, e2e]
+    if: always() && (github.event_name == 'push' || github.event.pull_request.head.repo.full_name != github.repository || github.actor == 'dependabot[bot]')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Every check passed
+        run: |
+          echo "checks=${{ needs.checks.result }} backend=${{ needs.backend.result }} e2e=${{ needs.e2e.result }}"
+          test "${{ needs.checks.result }}" = success && test "${{ needs.backend.result }}" = success && test "${{ needs.e2e.result }}" = success
 
   image:
     needs: test

@@ -30,7 +30,10 @@ test("doc live editing: two people edit one draft together", async ({ browser })
     });
   const typeAt = async (p: Page, where: "start" | "end", text: string) => {
     const paras = body(p).locator("p");
-    await (where === "start" ? paras.first() : paras.last()).click();
+    // Click at the paragraph's own start or end: the key below alone did not always move the caret on Linux.
+    const para = where === "start" ? paras.first() : paras.last();
+    const box = await para.boundingBox();
+    await para.click({ position: where === "start" ? { x: 1, y: (box?.height ?? 20) / 2 } : { x: Math.max(1, (box?.width ?? 2) - 1), y: (box?.height ?? 20) / 2 } });
     // Start or end of the page (macOS has no Home/End for that in an editor).
     const mac = process.platform === "darwin";
     await p.keyboard.press(where === "start" ? (mac ? "Meta+ArrowUp" : "Control+Home") : mac ? "Meta+ArrowDown" : "Control+End");
