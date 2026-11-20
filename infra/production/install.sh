@@ -21,7 +21,7 @@
 #   --version TAG            WORKSPACE_VERSION: image tag and files to download [latest release: main/latest]
 #   --no-start               write the files and .env only
 # Also read: WORKSPACE_IMAGE (image to run), WORKSPACE_RAW_URL (where the compose files are downloaded from),
-# TLS, HTTP_PORT, HTTPS_PORT, WEB_PORT, API_PORT, BIND_ADDRESS (written into .env when set). A port another program
+# TLS, HTTP_PORT, HTTPS_PORT, WEB_HOST_PORT, API_HOST_PORT, BIND_ADDRESS (written into .env when set). A port another program
 # already uses is asked for again (the next free one with --non-interactive), e.g. curl … | HTTP_PORT=8080 sh
 set -eu
 # Piped into sh (curl … | sh), the shell reads this script from stdin while it runs, and a command that reads stdin
@@ -156,7 +156,17 @@ if [ -n "$smtp" ]; then
   if [ -n "${MAIL_FROM:-}" ]; then mail_from=$MAIL_FROM; else ask mail_from "Sender shown on those emails" "$(get MAIL_FROM | sed "s/^$/workspace <no-reply@$app>/")"; fi
 fi
 
-for v in TLS HTTP_PORT HTTPS_PORT WEB_PORT API_PORT BIND_ADDRESS WORKSPACE_IMAGE; do
+# install.sh of 20 Nov 2026 wrote the host ports as WEB_PORT / API_PORT, a name the container reads as the web app's
+# own port (the web app then listened where nothing called it): carry them over to the host-port names.
+for pair in WEB_PORT:WEB_HOST_PORT API_PORT:API_HOST_PORT; do
+  old=${pair%%:*} new=${pair#*:}
+  value=$(get "$old")
+  [ -n "$value" ] || continue
+  [ -n "$(get "$new")" ] || set_var "$new" "$value"
+  sed "/^$old=/d" .env > .env.tmp && cat .env.tmp > .env && rm -f .env.tmp
+done
+
+for v in TLS HTTP_PORT HTTPS_PORT WEB_HOST_PORT API_HOST_PORT BIND_ADDRESS WORKSPACE_IMAGE; do
   eval "val=\${$v:-}"
   [ -z "$val" ] || set_var "$v" "$val"
 done
@@ -174,7 +184,7 @@ port_busy() {
   fi
 }
 if [ "$START" = 1 ] && [ -z "$(docker compose ps -q 2> /dev/null)" ]; then
-  for spec in HTTP_PORT:80:"web, HTTP" HTTPS_PORT:443:"web, HTTPS" WEB_PORT:3000:"direct web app" API_PORT:4000:"direct API"; do
+  for spec in HTTP_PORT:80:"web, HTTP" HTTPS_PORT:443:"web, HTTPS" WEB_HOST_PORT:3000:"direct web app" API_HOST_PORT:4000:"direct API"; do
     var=${spec%%:*} rest=${spec#*:}
     default=${rest%%:*} label=${rest#*:}
     port=$(get "$var")
@@ -256,7 +266,7 @@ for v in $secret_names; do printf '%s=%s\n' "$v" "$(get "$v")"; done |
   echo "  (could not copy the secrets into the secrets volume; keep $DIR/.env safe)"
 
 docker compose up -d --remove-orphans ||
-  die "could not start the containers. A port already in use? Set HTTP_PORT, HTTPS_PORT, WEB_PORT or API_PORT in $DIR/.env and run install.sh again"
+  die "could not start the containers. A port already in use? Set HTTP_PORT, HTTPS_PORT, WEB_HOST_PORT or API_HOST_PORT in $DIR/.env and run install.sh again"
 
 # ── Wait: one line per container (redrawn in place on a terminal), until the app answers ──────────────────
 if [ -t 1 ]; then
@@ -415,8 +425,8 @@ echo
 say "Services"
 if [ "$tls" = off ]; then caddy_ports="port ${http_port:-80}"; else caddy_ports="ports ${http_port:-80} and $(get HTTPS_PORT | grep . || echo 443)"; fi
 row "Web" "$url (through Caddy, $caddy_ports)"
-row "Web app" "http://$local_host:$(get WEB_PORT | grep . || echo 3000) (direct, $reach)"
-row "API" "http://$local_host:$(get API_PORT | grep . || echo 4000) (direct, $reach)$([ -n "$(get API_DOCS)" ] && echo "; docs at $url/api/docs")"
+row "Web app" "http://$local_host:$(get WEB_HOST_PORT | grep . || echo 3000) (direct, $reach)"
+row "API" "http://$local_host:$(get API_HOST_PORT | grep . || echo 4000) (direct, $reach)$([ -n "$(get API_DOCS)" ] && echo "; docs at $url/api/docs")"
 row "Database" "Postgres 16, inside Docker only (not published). Database workspace, user workspace_owner,"
 row "" "password PG_OWNER_PASSWORD in .env. Shell: docker compose exec postgres psql -U postgres -d workspace"
 if [ -n "$files" ]; then

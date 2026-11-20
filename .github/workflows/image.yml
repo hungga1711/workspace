@@ -52,15 +52,18 @@ jobs:
         run: |
           # Piped into sh, as `curl … | sh` runs it: a command reading stdin once swallowed the end of the script, so
           # the summary it prints last must be there.
-          cat install.sh | WORKSPACE_IMAGE=workspace:local sh -s -- --non-interactive --app-domain localhost \
-            --files-domain "" --email "" | tee /tmp/install.log
+          # On other host ports than 3000/4000: those settings once reached the container and moved the web app off
+          # the port Caddy and the health check call.
+          cat install.sh | WORKSPACE_IMAGE=workspace:local WEB_HOST_PORT=3100 API_HOST_PORT=4100 sh -s -- --non-interactive \
+            --app-domain localhost --files-domain "" --email "" | tee /tmp/install.log
           grep -q "Next: create the company" /tmp/install.log
           grep -q "Start over" /tmp/install.log
           curl -fsS -o /dev/null -w "web /setup %{http_code}\n" http://localhost/setup
           # The page's own stylesheet must load too: a 200 page with 404 CSS and JS is an unstyled, dead page.
           css=$(curl -fsS http://localhost/setup | grep -oE '/_next/static/css/[^"]+[.]css' | head -n 1)
           test -n "$css" && curl -fsS -o /dev/null -w "web $css %{http_code}\n" "http://localhost$css"
-          curl -fsS http://127.0.0.1:4000/api/setup
+          curl -fsS http://127.0.0.1:4100/api/setup
+          curl -fsS -o /dev/null -w "web direct %{http_code}\n" http://127.0.0.1:3100/robots.txt
           test "$(curl -s -o /dev/null -w '%{http_code}' http://localhost/storage/forged.token)" = 403
           docker compose ps
       - name: Compose logs
