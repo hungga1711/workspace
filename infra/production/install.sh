@@ -201,12 +201,101 @@ if ! docker image inspect "$image" > /dev/null 2>&1; then
 fi
 docker compose up -d --remove-orphans
 
-say "Waiting for workspace to start"
-i=0
-until docker compose exec -T app sh -c 'wget -q -O /dev/null http://127.0.0.1:4000/health && wget -q -O /dev/null http://127.0.0.1:3000/robots.txt' 2> /dev/null; do
-  i=$((i + 1))
-  [ $i -lt 90 ] || die "not healthy after 7 minutes: docker compose ps; docker compose logs app"
-  sleep 5
+# ── Wait: one line per container (redrawn in place on a terminal), until the app answers ──────────────────
+if [ -t 1 ]; then
+  c_ok=$(printf '\033[32m') c_wait=$(printf '\033[33m') c_bad=$(printf '\033[31m') c_off=$(printf '\033[0m')
+else
+  c_ok="" c_wait="" c_bad="" c_off=""
+fi
+# The last error line a crashing container printed (Node: "error: …", Postgres: "FATAL: …").
+last_error() {
+  docker compose logs --no-log-prefix --tail 80 "$1" 2> /dev/null |
+    grep -E '^([A-Za-z]*Error|error|Error|FATAL|fatal)[: ]|FATAL:' | tail -n 1 | cut -c1-110
+}
+# describe SERVICE STATE HEALTH EXIT_CODE → "ok|wait|bad" and a short text, separated by |
+describe() {
+  case "$2" in
+    running)
+      if [ "$1" = app ]; then
+        if [ "$app_ready" = 1 ]; then echo "ok|ready"; else echo "wait|starting: migrations, then the server and the web app"; fi
+      elif [ "$3" = healthy ]; then echo "ok|ready"
+      elif [ "$3" = unhealthy ]; then echo "bad|unhealthy: docker compose logs $1"
+      elif [ -n "$3" ]; then echo "wait|starting"
+      else echo "ok|running"; fi ;;
+    exited)
+      if [ "$1" = init ] && [ "$4" = 0 ]; then echo "ok|done (secrets ready)"; else echo "bad|stopped with exit code $4: $(last_error "$1")"; fi ;;
+    restarting) echo "bad|crashed, restarting: $(last_error "$1")" ;;
+    created) echo "wait|waiting for the containers it depends on" ;;
+    *) echo "wait|$2" ;;
+  esac
+}
+board() {
+  rows=$(docker compose ps -a --format '{{.Service}}|{{.State}}|{{.Health}}|{{.ExitCode}}' 2> /dev/null || true)
+  for s in init postgres pgbouncer s3 app caddy livekit $(printf '%s\n' "$rows" | cut -d'|' -f1); do
+    case " $seen " in *" $s "*) continue ;; esac
+    seen="$seen $s"
+    row=$(printf '%s\n' "$rows" | grep "^$s|" | head -n 1)
+    [ -n "$row" ] || continue
+    IFS='|' read -r _ state health code << EOF
+$row
+EOF
+    d=$(describe "$s" "$state" "$health" "$code")
+    case "${d%%|*}" in
+      ok) mark="${c_ok}✓${c_off}" ;;
+      bad) mark="${c_bad}✗${c_off}" ;;
+      *) mark="${c_wait}…${c_off}" ;;
+    esac
+    printf '  %s %-10s %s\n' "$mark" "$s" "${d#*|}"
+  done
+  seen=""
+}
+# A database whose first start failed before its init script ran (an install.sh before this check, or init.sh without
+# its execute bit) has no workspace roles, and Postgres never runs init scripts again: create them now. Only when
+# neither the owner role nor the database exists, so a working database is never touched.
+check_database() {
+  found=$(docker compose exec -T postgres psql -U postgres -d postgres -Atc \
+    "select (select count(*) from pg_roles where rolname = 'workspace_owner') || ',' || (select count(*) from pg_database where datname = 'workspace')" 2> /dev/null || true)
+  case "$found" in
+    1,1) db_checked=1 ;;
+    0,0)
+      echo "  The database has no workspace roles (an earlier first start did not finish): creating them now."
+      init_path=/usr/local/share/wx-pg-init.sh
+      docker compose exec -T postgres test -f "$init_path" 2> /dev/null || init_path=/docker-entrypoint-initdb.d/00-init.sh
+      docker compose exec -T postgres sh -c ". /usr/local/bin/wx-load-secrets.sh && sh $init_path" > /dev/null ||
+        die "could not create the database roles: docker compose logs postgres"
+      docker compose restart app > /dev/null 2>&1 || true
+      db_checked=1
+      drawn=0 ;;
+    '') ;; # not answering yet: try again on the next round
+    *) die "the database is half set up (workspace_owner role, workspace database: $found); see docs/runbooks/backup-restore.md" ;;
+  esac
+}
+
+say "Starting workspace"
+started=$(date +%s)
+app_ready=0 db_checked=0 drawn=0 seen="" last=""
+while :; do
+  if [ "$db_checked" = 0 ] && docker compose ps --format '{{.Service}} {{.Health}}' 2> /dev/null | grep -q '^postgres healthy$'; then
+    check_database
+  fi
+  if docker compose exec -T app sh -c 'wget -q -O /dev/null http://127.0.0.1:4000/health && wget -q -O /dev/null http://127.0.0.1:3000/robots.txt' 2> /dev/null; then
+    app_ready=1
+  fi
+  elapsed=$(($(date +%s) - started))
+  current=$(board)
+  if [ -t 1 ]; then
+    # Back over the previous drawing, clear to the end of the screen, draw again.
+    [ "$drawn" -gt 0 ] && printf '\033[%dA\033[J' "$drawn"
+    printf '%s\n  %ss\n' "$current" "$elapsed"
+    drawn=$(($(printf '%s\n' "$current" | wc -l) + 1))
+  elif [ "$current" != "$last" ]; then
+    printf '%s\n  (%ss)\n' "$current" "$elapsed"
+  fi
+  last=$current
+  [ "$app_ready" = 0 ] || break
+  printf '%s\n' "$current" | grep -q '^  .* init .*stopped with exit code' && die "the init job failed: docker compose logs init"
+  [ "$elapsed" -lt 420 ] || die "not running after 7 minutes (the ✗ line above says why): docker compose ps; docker compose logs app"
+  sleep 3
 done
 
 echo
