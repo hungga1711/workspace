@@ -79,7 +79,19 @@ services:
     restart: unless-stopped
     depends_on:
       init: { condition: service_completed_successfully }
-    entrypoint: ["sh", "-c", '. /usr/local/bin/wx-load-secrets.sh && exec docker-entrypoint.sh "$$@"', "--"]
+    # init.sh is copied in with mode 755 rather than mounted into initdb.d: the entrypoint executes an executable
+    # script, and a host copy without the bit (curl, an unzip, a Windows checkout) failed with "bad interpreter",
+    # leaving a database without the workspace roles.
+    entrypoint:
+      - sh
+      - -c
+      - |
+        mkdir -p /docker-entrypoint-initdb.d
+        cp /usr/local/share/wx-pg-init.sh /docker-entrypoint-initdb.d/00-init.sh
+        chmod 755 /docker-entrypoint-initdb.d/00-init.sh
+        . /usr/local/bin/wx-load-secrets.sh
+        exec docker-entrypoint.sh "$$@"
+      - --
     # The server connects directly with a small pool per module (see docs/runbooks/operations.md "Connections").
     command: ["postgres", "-c", "max_connections=200"]
     environment:
@@ -89,7 +101,7 @@ services:
       PG_OWNER_PASSWORD: ${PG_OWNER_PASSWORD:-}
       PG_APP_PASSWORD: ${PG_APP_PASSWORD:-}
     volumes:
-      - ./postgres/init.sh:/docker-entrypoint-initdb.d/00-init.sh:ro
+      - ./postgres/init.sh:/usr/local/share/wx-pg-init.sh:ro
       - ./load-secrets.sh:/usr/local/bin/wx-load-secrets.sh:ro
       - *secrets-volume
       - pgdata:/var/lib/postgresql/data
