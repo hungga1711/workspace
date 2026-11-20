@@ -48,7 +48,7 @@ async function probe(url: string): Promise<{ status: number; resourceMetadata: s
       jsonrpc: "2.0",
       id: 1,
       method: "initialize",
-      params: { protocolVersion: "2025-03-26", capabilities: {}, clientInfo: { name: "workspace", version: "1.0.1" } },
+      params: { protocolVersion: "2025-03-26", capabilities: {}, clientInfo: { name: "workspace", version: "1.0.2" } },
     }),
     timeoutMs: 10_000,
   });

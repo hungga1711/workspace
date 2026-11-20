@@ -8,6 +8,14 @@ previous release. Add anything an operator must do by hand before upgrading unde
 
 ## [Unreleased]
 
+## [1.0.2] - 2026-11-20
+
+### Commits
+
+**Other**
+
+- AI › Connect: step-by-step install for the extension (#38)
+
 ## [1.0.1] - 2026-11-20
 
 ### Commits
