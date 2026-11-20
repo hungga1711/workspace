@@ -124,7 +124,8 @@ export function scheduleJob(name: string, everyMs: number, fn: () => Promise<unk
     if (stopped || running || (opts.when && !opts.when())) return;
     running = (async () => {
       try {
-        if (opts.pool) await runExclusive(opts.pool, name, () => runJob(name, fn));
+        // Stopped while this tick waited for the lock: the job does not start after stop() any more.
+        if (opts.pool) await runExclusive(opts.pool, name, () => (stopped ? Promise.resolve() : runJob(name, fn)));
         else await runJob(name, fn);
       } catch (err) {
         // Only the lock itself can throw here (database down): the next tick retries.
