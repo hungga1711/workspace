@@ -435,9 +435,9 @@ export function AssistantView({
   // Editing the held-back text dismisses the warning (the composer empties for a moment while it is put back).
   const onDraftChange = useCallback((text: string) => setWarn((w) => (w && text && text !== w.text ? null : w)), []);
 
-  // The history rail earns its 248 px only once there is something to switch between (a single earlier
-  // conversation counts while a new chat is open, or it could not be reopened on desktop); it can also be folded away.
-  const hasHistory = conversations.length > 1 || (conversations.length === 1 && conversations[0]!.id !== conv);
+  // The history rail shows as soon as there is one conversation, open or not: hiding it while the only one is open made
+  // the page change shape between that conversation and "New" (a bare title bar, then the rail). It can be folded away.
+  const hasHistory = conversations.length > 0;
   const [folded, setFolded] = useState(false);
   useEffect(() => {
     try {
