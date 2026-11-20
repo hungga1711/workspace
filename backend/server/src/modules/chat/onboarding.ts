@@ -5,126 +5,55 @@ import { emit, postMessage } from "./domain.js";
 
 export const ONBOARDING_TOPICS = ["workspace.platform.workspace", "workspace.identity.member"];
 
-export type TeamType = "product" | "sales" | "ops";
-
 type Lang = "vi" | "en";
 
-/** Starter channels per team type chosen at signup, in the signup language. */
-const TEAM_CHANNELS: Record<Lang, Record<TeamType, { name: string; displayName?: string; topic: string }[]>> = {
-  vi: {
-    product: [
-      { name: "san-pham", displayName: "Sản phẩm", topic: "Lộ trình và yêu cầu sản phẩm" },
-      { name: "thiet-ke", displayName: "Thiết kế", topic: "Thiết kế và phản hồi" },
-      { name: "phat-hanh", displayName: "Phát hành", topic: "Lịch phát hành và sự cố" },
-    ],
-    sales: [
-      { name: "khach-hang", displayName: "Khách hàng", topic: "Cập nhật từ khách hàng" },
-      { name: "co-hoi", displayName: "Cơ hội", topic: "Cơ hội bán hàng đang theo" },
-      { name: "bao-gia", displayName: "Báo giá", topic: "Báo giá và hợp đồng" },
-    ],
-    ops: [
-      { name: "van-hanh", displayName: "Vận hành", topic: "Việc vận hành hằng ngày" },
-      { name: "nhan-su", displayName: "Nhân sự", topic: "Tuyển dụng và nhân sự" },
-      { name: "mua-sam", displayName: "Mua sắm", topic: "Đề xuất mua sắm" },
-    ],
-  },
-  en: {
-    product: [
-      { name: "product", topic: "Roadmap and product requests" },
-      { name: "design", topic: "Design and feedback" },
-      { name: "releases", topic: "Release schedule and incidents" },
-    ],
-    sales: [
-      { name: "customers", topic: "Customer updates" },
-      { name: "deals", topic: "Open sales opportunities" },
-      { name: "quotes", topic: "Quotes and contracts" },
-    ],
-    ops: [
-      { name: "operations", topic: "Day-to-day operations" },
-      { name: "people", topic: "Hiring and HR" },
-      { name: "purchasing", topic: "Purchase requests" },
-    ],
-  },
-};
-
 /**
- * The welcome thread is ordinary messages authored by "system". Replies are
- * written so the thread summary yields one decision and two tasks; no @mentions,
- * so it does not create "needs you" items on the owner's first Home.
+ * A new workspace starts with #general and one welcome message from "system", nothing else: no sample discussion and no
+ * starter channels, so the company's chat holds only what its people write. The message says where AI comes in.
  */
-const WELCOME: Record<Lang, { general: string; root: (owner: string, company: string, ai: boolean) => string; replies: string[]; you: string }> = {
+const WELCOME: Record<Lang, { topic: string; body: (company: string, ai: boolean) => string }> = {
   vi: {
-    general: "Kênh chung của cả công ty",
-    root: (owner, company, ai) =>
-      `Chào mừng mọi người tới ${company} trên workspace (${owner} vừa tạo workspace). Đây là #general, kênh chung của cả công ty. ` +
-      (ai
-        ? `Luồng bên dưới là một cuộc thảo luận mẫu: bấm "Thử: @AI tạo việc từ luồng này" để xem AI biến thảo luận thành việc cần làm.`
-        : `Luồng bên dưới là một cuộc thảo luận mẫu: mở luồng và tạo việc từ một tin nhắn để xem thảo luận được biến thành việc cần làm thế nào.`),
-    replies: [
-      "Chúng ta thống nhất họp giao ban lúc 9h sáng thứ Hai hằng tuần.",
-      "Cần mời các trưởng nhóm vào workspace trước 15/10.",
-      "Hãy tạo một kênh riêng cho từng dự án đang chạy.",
-    ],
-    you: "bạn",
+    topic: "Kênh chung của cả công ty",
+    body: (company, ai) =>
+      `Chào mừng mọi người tới ${company} trên workspace. Đây là #general, kênh chung của cả công ty.` +
+      (ai ? ` Gõ @AI trong tin nhắn để hỏi AI hoặc nhờ AI tạo việc từ cuộc trò chuyện; chưa có AI thì kết nối ở AI › Kết nối.` : ""),
   },
   en: {
-    general: "The whole company's channel",
-    root: (owner, company, ai) =>
-      `Welcome, everyone, to ${company} on workspace (${owner} just set it up). This is #general, the channel for the whole company. ` +
-      (ai
-        ? `The thread below is a sample discussion: click "Try: @AI create tasks from this thread" to see AI turn a discussion into tasks.`
-        : `The thread below is a sample discussion: open it and create a task from a message to see how a discussion becomes work.`),
-    replies: [
-      "We agreed to hold the weekly sync at 9am every Monday.",
-      "Team leads need to be invited to the workspace by Oct 15.",
-      "Let's create a separate channel for each active project.",
-    ],
-    you: "there",
+    topic: "The whole company's channel",
+    body: (company, ai) =>
+      `Welcome to ${company} on workspace. This is #general, the channel for the whole company.` +
+      (ai ? ` Type @AI in a message to ask AI or have it turn a conversation into tasks; no AI yet? Connect one in AI › Connect.` : ""),
   },
 };
 
 const SYSTEM = { id: "system", type: "system" as const };
 
-async function insertChannel(c: PoolClient, name: string, topic: string, isDefault: boolean, ownerId: string, displayName: string | null = null): Promise<string> {
+async function insertChannel(c: PoolClient, name: string, topic: string, ownerId: string): Promise<string> {
   const id = newId();
-  // Starter channels: everyone who joins later is added too, so they are not empty rooms for the owner alone.
-  await c.query("INSERT INTO channels (id, kind, name, topic, created_by, is_default, auto_join, display_name) VALUES ($1,'public',$2,$3,$4,$5,true,$6)", [
-    id,
-    name,
-    topic,
-    ownerId,
-    isDefault,
-    displayName,
-  ]);
+  // The default channel: everyone who joins later is added to it.
+  await c.query("INSERT INTO channels (id, kind, name, topic, created_by, is_default, auto_join) VALUES ($1,'public',$2,$3,$4,true,true)", [id, name, topic, ownerId]);
   await c.query("INSERT INTO channel_members (channel_id, user_id, role) VALUES ($1,$2,'admin')", [id, ownerId]);
   await emit(c, "chat.channel.created.v1", "chat.channel", id, { channelId: id, kind: "public", name, topic, memberIds: [ownerId] });
   return id;
 }
 
-/** Creates #general (+ welcome thread) and the team's starter channels. Safe to re-run. */
-async function provisionWorkspace(
-  c: PoolClient,
-  input: { companyName: string; ownerId: string; ownerName: string; teamType: TeamType; locale?: Lang; ai?: boolean },
-): Promise<string> {
+/** Creates #general and its welcome message. Safe to re-run. */
+async function provisionWorkspace(c: PoolClient, input: { companyName: string; ownerId: string; locale?: Lang; ai?: boolean }): Promise<string> {
   const w = WELCOME[input.locale ?? "vi"];
   const existing = await c.query<{ id: string }>("SELECT id FROM channels WHERE kind = 'public' AND lower(name) = 'general'");
   if (existing.rows[0]) return existing.rows[0].id;
-  const general = await insertChannel(c, "general", w.general, true, input.ownerId);
-  for (const ch of TEAM_CHANNELS[input.locale ?? "vi"][input.teamType]) await insertChannel(c, ch.name, ch.topic, false, input.ownerId, ch.displayName ?? null);
+  const general = await insertChannel(c, "general", w.topic, input.ownerId);
   // Members whose "joined" event arrived before this one (topics are not ordered) join #general now.
   await c.query("INSERT INTO known_members (user_id) VALUES ($1) ON CONFLICT DO NOTHING", [input.ownerId]);
   await c.query(`INSERT INTO channel_members (channel_id, user_id) SELECT $1, user_id FROM known_members WHERE user_id <> $2 ON CONFLICT DO NOTHING`, [general, input.ownerId]);
-  const root = await postMessage(c, {
+  await postMessage(c, {
     channelId: general,
     threadRootId: null,
     attachments: [],
     author: SYSTEM,
     clientMsgId: "onboarding-welcome",
-    body: w.root(input.ownerName, input.companyName, input.ai ?? true),
+    body: w.body(input.companyName, input.ai ?? true),
   });
-  for (const [i, body] of w.replies.entries()) {
-    await postMessage(c, { channelId: general, threadRootId: root.message.id, attachments: [], author: SYSTEM, clientMsgId: `onboarding-welcome-${i}`, body });
-  }
   return general;
 }
 
@@ -135,9 +64,8 @@ export async function handleOnboardingEvent(event: EventEnvelope, c: PoolClient)
   if (e?.eventType === "platform.workspace.created.v1") {
     const p = e.payload;
     const locale: Lang = p.locale === "vi" ? "vi" : "en";
-    const teamType: TeamType = p.teamType in TEAM_CHANNELS[locale] ? (p.teamType as TeamType) : "product";
-    // An event without `ai` keeps the @AI hint.
-    await provisionWorkspace(c, { companyName: p.name, ownerId: p.ownerUserId, ownerName: p.ownerName || WELCOME[locale].you, teamType, locale, ai: p.ai?.assistant ?? true });
+    // An event without `ai` keeps the @AI line. Its teamType once picked starter channels; nothing reads it now.
+    await provisionWorkspace(c, { companyName: p.name, ownerId: p.ownerUserId, locale, ai: p.ai?.assistant ?? true });
     return;
   }
   // Invited people can be added to channels before they first sign in; disabled people cannot.

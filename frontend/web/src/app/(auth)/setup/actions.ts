@@ -29,7 +29,6 @@ export async function setup(_prev: SetupState, form: FormData): Promise<SetupSta
     companyName: String(form.get("companyName") ?? ""),
     ownerName: String(form.get("ownerName") ?? ""),
     ownerEmail: String(form.get("ownerEmail") ?? ""),
-    teamType: String(form.get("teamType") ?? "product"),
     timezone: String(form.get("timezone") ?? ""),
     country: String(form.get("country") ?? ""),
     setupToken: String(form.get("setupToken") ?? ""),
