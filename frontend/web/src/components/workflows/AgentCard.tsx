@@ -295,8 +295,12 @@ export function AgentCard({
               </div>
             </div>
           ) : null}
-          {/* Pause / Continue / Stop, and the pipeline large. */}
-          <div className="border-hairline flex items-center gap-0.5 whitespace-nowrap border-t px-1.5 py-1.5" role="group" aria-label={t("workflows.agent.controls")}>
+          {/* Pause / Continue / Stop, and the pipeline large. The card sits in a narrow column: the row wraps, a label never. */}
+          <div
+            className="border-hairline flex min-w-0 flex-wrap items-center gap-0.5 border-t px-1.5 py-1.5 [&_button]:whitespace-nowrap"
+            role="group"
+            aria-label={t("workflows.agent.controls")}
+          >
             {active && last.canControl !== false ? (
               <>
                 {last.status === "paused" ? (
@@ -316,30 +320,32 @@ export function AgentCard({
                 </button>
               </>
             ) : null}
-            <button
-              type="button"
-              className={cx(btnGhost, btnSm, "ml-auto")}
-              title={t("workflows.log.hint")}
-              onClick={() => {
-                setPipelineStep(undefined);
-                setLogView(true);
-                setPipeline(true);
-              }}
-            >
-              <ListIcon />
-              {t("workflows.log.view")}
-            </button>
-            <button
-              type="button"
-              className={cx(btnGhost, btnSm, "text-accent-text")}
-              onClick={() => {
-                setPipelineStep(undefined);
-                setLogView(false);
-                setPipeline(true);
-              }}
-            >
-              {t("workflows.pipeline.open")}
-            </button>
+            <span className="ml-auto flex items-center gap-0.5">
+              <button
+                type="button"
+                className={cx(btnGhost, btnSm)}
+                title={t("workflows.log.hint")}
+                onClick={() => {
+                  setPipelineStep(undefined);
+                  setLogView(true);
+                  setPipeline(true);
+                }}
+              >
+                <ListIcon />
+                {t("workflows.log.view")}
+              </button>
+              <button
+                type="button"
+                className={cx(btnGhost, btnSm, "text-accent-text")}
+                onClick={() => {
+                  setPipelineStep(undefined);
+                  setLogView(false);
+                  setPipeline(true);
+                }}
+              >
+                {t("workflows.pipeline.open")}
+              </button>
+            </span>
           </div>
         </section>
       ) : wf ? (

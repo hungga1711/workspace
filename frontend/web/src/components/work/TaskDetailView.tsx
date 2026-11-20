@@ -139,6 +139,20 @@ export function TaskDetailView({
   // The newest version, for an undo that runs after other saves.
   const latest = useRef(task);
   latest.current = task;
+  // A newer read of the task (router.refresh, e.g. when a workflow run ends and posts its result as a comment) replaces
+  // what the page holds; without this the state kept its first read and only a reload showed the new comment. The task
+  // itself only when the server's is newer, so an edit in flight is not overwritten.
+  const [seenDetail, setSeenDetail] = useState(detail);
+  if (seenDetail !== detail) {
+    setSeenDetail(detail);
+    setComments(detail.comments);
+    setSubtasks(detail.subtasks);
+    setFiles(detail.files);
+    if (detail.task.version > task.version) {
+      setTask(detail.task);
+      if (title === task.title) setTitle(detail.task.title);
+    }
+  }
   const [prefill, setPrefill] = useState<{ text: string; key: number } | null>(null);
 
   /** Resolves true when saved; on failure the message says why (conflict, permission). */

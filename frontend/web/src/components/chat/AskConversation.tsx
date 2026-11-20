@@ -506,12 +506,15 @@ export function AskConversation({ runId, initial }: { runId: string; initial: As
       // "Let the AI decide" sends what was already answered: the AI decides only the rest.
       await api(`work/agent-questions/${openRound.id}/answer`, { method: "POST", body: skip ? { skip: true, answers: filled } : { answers: filled } });
       asksChanged();
+      // Back to the task (router.back) would show the cached page, still asking: drop the router's cache.
+      router.refresh();
       await load();
     } catch (e) {
       if ((e as { status?: number }).status === 409) {
         // Someone else answered first: the thread shows their answers.
         toast({ message: t("workflows.ask.already") });
         asksChanged();
+        router.refresh();
         await load();
       } else setError((e as { body?: { message?: string } }).body?.message ?? t("workflows.ask.failed"));
     }
