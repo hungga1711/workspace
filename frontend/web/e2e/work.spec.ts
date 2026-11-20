@@ -154,7 +154,7 @@ test.describe.serial("Work tabs", () => {
       ["Từ", "09:00"],
       ["Đến", "09:30"],
     ]) {
-      await dlg.getByRole("button", { name: label, exact: true }).click();
+      await dlg.getByRole("button", { name: new RegExp(`^${label}:`) }).click();
       await dlg.getByRole("option", { name: time, exact: true }).click();
     }
     await dlg.getByRole("button", { name: "Lặp lại" }).click();

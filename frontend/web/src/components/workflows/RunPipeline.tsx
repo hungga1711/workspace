@@ -109,7 +109,9 @@ export function RunPipeline({
     return () => window.clearInterval(id);
   }, [active, taskId, runId, follow, onChanged]);
   const shownLog = run?.steps[sel]?.log;
-  useEffect(() => logEnd.current?.scrollIntoView({ block: "end" }), [shownLog, tab]);
+  useEffect(() => {
+    logEnd.current?.scrollIntoView({ block: "end" });
+  }, [shownLog, tab]);
   // What the agent does in the chosen stage; followed live while that stage is the one at work.
   const working = active && !!run && sel === run.currentStep && run.steps[sel]?.state === "running";
   const activity = useStepActivity(run?.id, sel, working);

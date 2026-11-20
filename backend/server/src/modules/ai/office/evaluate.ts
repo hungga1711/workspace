@@ -11,11 +11,7 @@ import { colIndex, colName } from "./xlsx.js";
 type CellRead = number | "empty" | "text" | "pending";
 type Get = (col: number, row: number) => CellRead;
 type Tok =
-  | { t: "num"; v: number }
-  | { t: "ref"; c: number; r: number }
-  | { t: "range"; c1: number; r1: number; c2: number; r2: number }
-  | { t: "fn"; v: string }
-  | { t: "op"; v: string };
+  { t: "num"; v: number } | { t: "ref"; c: number; r: number } | { t: "range"; c1: number; r1: number; c2: number; r2: number } | { t: "fn"; v: string } | { t: "op"; v: string };
 
 const FUNCS = new Set(["SUM", "AVERAGE", "MIN", "MAX", "COUNT", "ROUND", "ABS"]);
 

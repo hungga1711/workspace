@@ -85,7 +85,7 @@ beforeAll(async () => {
         return;
       }
       const parsed = JSON.parse(await body(req));
-      const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined });
+      const transport = new StreamableHTTPServerTransport({});
       const s = buildMcp();
       res.on("close", () => {
         void transport.close();

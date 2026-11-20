@@ -25,7 +25,7 @@ async function AuthLayoutInner({ children }: { children: React.ReactNode }) {
         {/* A list, not buttons, so more languages fit; <details> opens it without the app's JavaScript. */}
         <details className="group relative">
           <summary
-            aria-label={tx("common.language")}
+            aria-label={`${tx("common.language")}: ${LOCALE_NAME[locale]}`}
             className="text-ink-2 hover:bg-hover hover:text-ink flex h-8 cursor-pointer list-none items-center gap-1.5 rounded-md px-2.5 text-xs [&::-webkit-details-marker]:hidden"
           >
             <GlobeIcon className="size-4" />

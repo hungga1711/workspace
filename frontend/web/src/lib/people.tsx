@@ -118,6 +118,14 @@ export function DirectoryProvider({
 
 export const useDirectory = () => useContext(Ctx);
 
+/**
+ * Initials drawn by CSS rather than as text: a button around a face is named for the person ("Account: Lan Nguyen"),
+ * and any text inside it, even hidden, would have to appear in that name (WCAG 2.5.3, label in name).
+ */
+export function Initials({ name }: { name: string }) {
+  return <span data-initials={initials(name)} className="before:content-[attr(data-initials)]" />;
+}
+
 export function initials(name: string): string {
   if (name === "workspace") return "W";
   const parts = name.normalize("NFC").trim().split(/\s+/).filter(Boolean);
@@ -173,7 +181,7 @@ export function AvatarFace({
 }) {
   return (
     <span className={cx(face, SIZES[size], system ? systemFace : toneClass(seed ?? name, dept), className)} aria-hidden="true" title={name}>
-      {system ? <BrandMark variant="plain" className="size-[62%]" /> : initials(name)}
+      {system ? <BrandMark variant="plain" className="size-[62%]" /> : <Initials name={name} />}
     </span>
   );
 }
@@ -191,7 +199,7 @@ export function Avatar({ id, name, size = "md", online, dept, className }: { id:
   const photo = version > 0 && broken !== version;
   return (
     <span className={cx(face, SIZES[size], system ? systemFace : toneClass(id, dept), className)} aria-hidden="true" title={label}>
-      {system ? <BrandMark variant="plain" className="size-[62%]" /> : initials(label)}
+      {system ? <BrandMark variant="plain" className="size-[62%]" /> : <Initials name={label} />}
       {photo ? (
         // A small, already-sized photo behind the session proxy: a plain img (next/image would re-encode it).
         <img

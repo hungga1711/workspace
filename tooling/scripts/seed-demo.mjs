@@ -167,7 +167,7 @@ const weekend = (days) => [0, 6].includes(new Date(`${localDay(days)}T12:00:00Z`
  */
 function workday(n) {
   let d = 0;
-  for (let left = Math.abs(n), step = Math.sign(n); left > 0; ) {
+  for (let left = Math.abs(n), step = Math.sign(n); left > 0;) {
     d += step;
     if (!weekend(d)) left--;
   }

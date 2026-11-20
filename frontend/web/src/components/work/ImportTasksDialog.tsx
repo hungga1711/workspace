@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useId, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { api } from "@/lib/client";
 import { useFormat } from "@/lib/i18n/client";
 import type { MessageKey } from "@/lib/i18n/core";
@@ -41,12 +41,20 @@ export function ImportTasksDialog({ projectId, onClose }: { projectId: string; o
   // Assignees are matched by email or name. The app's directory carries no emails (it is kept light), so the dialog
   // asks for the member list once; until it answers, names still match.
   const [members, setMembers] = useState<{ userId: string; displayName: string; email: string }[] | null>(null);
+  const membersRef = useRef(members);
   useEffect(() => {
     void api<{ members: { userId: string; displayName: string; email: string | null }[] }>("identity/members")
-      .then((r) => setMembers(r.members.map((m) => ({ userId: m.userId, displayName: m.displayName, email: m.email ?? "" }))))
+      .then((r) => {
+        membersRef.current = r.members.map((m) => ({ userId: m.userId, displayName: m.displayName, email: m.email ?? "" }));
+        setMembers(membersRef.current);
+      })
       .catch(() => setMembers([]));
   }, []);
-  const people = () => (members?.length ? members : [...dir.byId.values()].map((x) => ({ userId: x.userId, displayName: x.displayName, email: x.email ?? "" })));
+  // Read through a ref: a file read that awaited while the list arrived still matches against it, not the render it began in.
+  const people = () => {
+    const list = membersRef.current;
+    return list?.length ? list : [...dir.byId.values()].map((x) => ({ userId: x.userId, displayName: x.displayName, email: x.email ?? "" }));
+  };
 
   const replan = (text: string, system: ImportSystem | undefined, columns: Partial<Record<Field, number>>) => {
     setCsv({ text, system, columns });

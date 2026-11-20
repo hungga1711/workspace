@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { Children, useCallback, useEffect, useRef, useState } from "react";
 import { useT } from "@/lib/i18n/client";
 import { Avatar, useDirectory } from "@/lib/people";
 import { cx } from "@/lib/ui";
@@ -38,6 +38,7 @@ export function PersonTrigger({ userId, className, children }: { userId: string;
   // Leaving the trigger or the card: close unless it was clicked open or the pointer came back.
   const leave = () => !pinned.current && later(() => setAnchor(null), CLOSE_MS);
   const onHover = (inside: boolean) => (inside ? clear() : leave());
+  const showsText = Children.toArray(children).some((c) => typeof c === "string" || typeof c === "number");
   useEffect(() => clear, []);
   return (
     <>
@@ -45,7 +46,9 @@ export function PersonTrigger({ userId, className, children }: { userId: string;
         type="button"
         aria-haspopup="dialog"
         aria-expanded={!!anchor}
-        aria-label={t("chat.person.open", { name: dir.name(userId) })}
+        // A face alone is named "View Lan's profile"; a trigger that shows text ("Owner: Lan") is named by that text,
+        // since what a button shows must be part of its name (WCAG 2.5.3, label in name).
+        aria-label={showsText ? undefined : t("chat.person.open", { name: dir.name(userId) })}
         // Round by default (an avatar); a caller that sets its own corners (a list row) keeps them.
         className={cx("cursor-pointer text-left", !/\brounded/.test(className ?? "") && "rounded-full", className)}
         // A touch held on the row opens the message sheet; a tap on the author is theirs, not the message's.

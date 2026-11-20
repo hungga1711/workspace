@@ -460,10 +460,13 @@ function Dock({
       {p === "people" ? (
         <span
           aria-hidden="true"
-          className={cx("absolute right-1.5 top-1.5 rounded-sm px-1.5 text-xs tabular-nums", waiting ? "bg-accent text-on-brand" : "bg-selected text-ink-2")}
-        >
-          {waiting ? `+${waiting}` : people}
-        </span>
+          // The count is drawn by CSS: text inside the button would have to be part of its name (WCAG 2.5.3).
+          data-count={waiting ? `+${waiting}` : people}
+          className={cx(
+            "absolute right-1.5 top-1.5 rounded-sm px-1.5 text-xs tabular-nums before:content-[attr(data-count)]",
+            waiting ? "bg-accent text-on-brand" : "bg-selected text-ink-2",
+          )}
+        />
       ) : null}
     </button>
   );
@@ -560,7 +563,11 @@ function ChatPanel({ messages, send }: { messages: ReturnType<typeof useChat>["c
   const t = useT();
   const [text, setText] = useState("");
   const end = useRef<HTMLDivElement>(null);
-  useEffect(() => end.current?.scrollIntoView({ block: "end" }), [messages.length]);
+  // A block, not `() => el.scrollIntoView()`: newer Chromium returns a promise from it, and React would call that
+  // promise as the effect's cleanup and crash the page.
+  useEffect(() => {
+    end.current?.scrollIntoView({ block: "end" });
+  }, [messages.length]);
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     const v = text.trim();

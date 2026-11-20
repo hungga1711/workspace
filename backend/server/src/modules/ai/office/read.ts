@@ -15,10 +15,7 @@ export { unxml } from "./xml.js";
  */
 
 export type DocBlock =
-  | { type: "heading"; level: number; text: string }
-  | { type: "p"; text: string; list?: "bullet" | "number" }
-  | { type: "table"; rows: string[][] }
-  | { type: "break" };
+  { type: "heading"; level: number; text: string } | { type: "p"; text: string; list?: "bullet" | "number" } | { type: "table"; rows: string[][] } | { type: "break" };
 export interface Cell {
   ref: string;
   value: CellValue;

@@ -414,9 +414,7 @@ function Composer({
 }
 
 type Item =
-  | { kind: "round"; i: number; round: AskRound }
-  | { kind: "rework"; i: number; note: string; by: string; at: string }
-  | { kind: "approved"; i: number; at?: string; note?: string };
+  { kind: "round"; i: number; round: AskRound } | { kind: "rework"; i: number; note: string; by: string; at: string } | { kind: "approved"; i: number; at?: string; note?: string };
 
 /**
  * A run's conversation for what it needs from people (/app/chat/ask/<run>, docs/architecture/agent-questions.md), built

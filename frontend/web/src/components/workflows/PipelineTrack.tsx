@@ -73,7 +73,9 @@ export function PipelineTrack({
   };
   const now = useNow(run.steps.some((s) => s.state === "running"));
   const picked = useRef<HTMLButtonElement>(null);
-  useEffect(() => picked.current?.scrollIntoView({ inline: "center", block: "nearest" }), [selected]);
+  useEffect(() => {
+    picked.current?.scrollIntoView({ inline: "center", block: "nearest" });
+  }, [selected]);
   const stateText = (s: Pick<RunStep, "kind" | "state">) =>
     s.state === "waiting" && s.kind === "ai" ? t("workflows.status.waiting_input") : t(`workflows.pipeline.state.${s.state}`);
   const envState: RunStep["state"] = env?.state === "ready" ? "done" : env?.state === "failed" ? "failed" : "running";

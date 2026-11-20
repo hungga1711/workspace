@@ -41,6 +41,10 @@ export class S3Storage implements ObjectStorage {
       region: cfg.region,
       forcePathStyle: true,
       credentials: { accessKeyId: cfg.accessKeyId, secretAccessKey: cfg.secretAccessKey },
+      // Since 3.729 the SDK signs a CRC32 checksum into every upload, presigned PUTs included; the browser cannot
+      // send it, and SeaweedFS, MinIO and R2 answer 403. Checksums only where the API requires them, as before.
+      requestChecksumCalculation: "WHEN_REQUIRED",
+      responseChecksumValidation: "WHEN_REQUIRED",
     });
   }
 

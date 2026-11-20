@@ -67,7 +67,8 @@ export async function handleMcp(req: Request, res: Response, ctx: ToolContext): 
   server.setRequestHandler(types.ListResourcesRequestSchema, async () => ({ resources: await listResources(ctx) }));
   server.setRequestHandler(types.ListResourceTemplatesRequestSchema, async () => ({ resourceTemplates: RESOURCE_TEMPLATES }));
   server.setRequestHandler(types.ReadResourceRequestSchema, async (r) => readResource(r.params.uri, ctx));
-  const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined, enableJsonResponse: true });
+  // No sessionIdGenerator: stateless, one transport per request.
+  const transport = new StreamableHTTPServerTransport({ enableJsonResponse: true });
   res.on("close", () => {
     void transport.close();
     void server.close();
