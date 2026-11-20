@@ -117,8 +117,13 @@ ask() {
 previous=""
 # The compose project: COMPOSE_PROJECT_NAME from the environment or .env, else the `name:` in docker-compose.yml.
 project=${COMPOSE_PROJECT_NAME:-$(get COMPOSE_PROJECT_NAME)}
+# The image the stack runs (set into .env further down): a .env just copied from .env.example names none yet, and
+# compose would fall back to workspace:local, which a server does not have.
+default_image() { if [ "$FROM_CHECKOUT" = 1 ]; then echo workspace:local; else echo "ghcr.io/$OWNER/workspace:${VERSION:-latest}"; fi; }
 if [ -n "$(docker volume ls -q --filter "label=com.docker.compose.project=${project:-workspace-prod}" --filter label=com.docker.compose.volume=secrets)" ]; then
-  previous=$(docker compose run --rm --no-deps -T --entrypoint cat init /run/workspace/secrets.env 2> /dev/null || true)
+  read_image=${WORKSPACE_IMAGE:-$(get WORKSPACE_IMAGE)}
+  previous=$(WORKSPACE_IMAGE=${read_image:-$(default_image)} docker compose run --rm --no-deps -T --entrypoint cat init /run/workspace/secrets.env 2> /dev/null || true)
+  [ -z "$previous" ] || say "Found the secrets of an earlier install in its Docker volume: reusing them in .env"
 fi
 for v in INTERNAL_TOKEN_SECRET SESSION_SECRET AUTH_SECRET POSTGRES_PASSWORD PG_OWNER_PASSWORD PG_APP_PASSWORD S3_ACCESS_KEY_ID S3_SECRET_ACCESS_KEY; do
   [ -z "$(get "$v")" ] || continue
@@ -184,7 +189,7 @@ set_var COMPOSE_PROFILES "$(echo $keep | tr ' ' ',')"
 
 image=$(get WORKSPACE_IMAGE)
 if [ -z "$image" ]; then
-  if [ "$FROM_CHECKOUT" = 1 ]; then image=workspace:local; else image="ghcr.io/$OWNER/workspace:${VERSION:-latest}"; fi
+  image=$(default_image)
   set_var WORKSPACE_IMAGE "$image"
 fi
 say "Configured $DIR/.env (APP_URL=$url, files: ${files:-local disk}, profiles: $(get COMPOSE_PROFILES))"
@@ -199,6 +204,19 @@ if ! docker image inspect "$image" > /dev/null 2>&1; then
     docker compose build
   fi
 fi
+# Keep the `secrets` volume in step with .env. The volume outlives the install directory, so when .env is deleted the
+# next run rebuilds it from there (above) with the passwords the database already has, instead of new ones it refuses.
+secret_names="INTERNAL_TOKEN_SECRET SESSION_SECRET AUTH_SECRET POSTGRES_PASSWORD PG_OWNER_PASSWORD PG_APP_PASSWORD S3_ACCESS_KEY_ID S3_SECRET_ACCESS_KEY"
+for v in $secret_names; do printf '%s=%s\n' "$v" "$(get "$v")"; done |
+  docker compose run --rm --no-deps -T --entrypoint sh init -c '
+    f=/run/workspace/secrets.env
+    umask 022
+    cat > "$f.new"
+    # Lines this script does not manage stay as they are.
+    [ ! -f "$f" ] || grep -v -E "^($(echo "$0" | tr " " "|"))=" "$f" >> "$f.new" || true
+    mv "$f.new" "$f"' "$secret_names" > /dev/null 2>&1 ||
+  echo "  (could not copy the secrets into the secrets volume; keep $DIR/.env safe)"
+
 docker compose up -d --remove-orphans
 
 # ── Wait: one line per container (redrawn in place on a terminal), until the app answers ──────────────────
@@ -252,11 +270,43 @@ EOF
 # A database whose first start failed before its init script ran (an install.sh before this check, or init.sh without
 # its execute bit) has no workspace roles, and Postgres never runs init scripts again: create them now. Only when
 # neither the owner role nor the database exists, so a working database is never touched.
+# The database's roles exist but refuse the passwords in .env: .env was replaced or deleted while the volumes stayed
+# (an install directory removed and installed again). .env is what the app connects with, so the roles follow it.
+resync_passwords() {
+  echo "  ${c_wait}The database refused the passwords in .env (was .env deleted or replaced?): setting them to the ones in .env.${c_off}"
+  docker compose exec -T -e OWNER_PW="$(get PG_OWNER_PASSWORD)" -e APP_PW="$(get PG_APP_PASSWORD)" \
+    -e SUPER_PW="$(get POSTGRES_PASSWORD)" postgres sh -c \
+    'psql -v ON_ERROR_STOP=1 -q -U postgres -d postgres -v owner_pw="$OWNER_PW" -v app_pw="$APP_PW" -v super_pw="$SUPER_PW"' << 'SQL' > /dev/null ||
+ALTER ROLE workspace_owner PASSWORD :'owner_pw';
+ALTER ROLE postgres PASSWORD :'super_pw';
+SELECT set_config('workspace.app_pw', :'app_pw', false);
+DO $$
+DECLARE m text;
+BEGIN
+  FOREACH m IN ARRAY ARRAY['identity', 'platform', 'chat', 'work', 'home', 'employee', 'ai', 'search', 'web'] LOOP
+    EXECUTE format('ALTER ROLE %I PASSWORD %L', 'workspace_' || m, current_setting('workspace.app_pw'));
+  END LOOP;
+END
+$$;
+SQL
+    die "could not update the database passwords: docker compose logs postgres"
+  echo "  If AUTH_SECRET changed too, everyone signs in again, and two-factor codes and SSO client secrets set before"
+  echo "  must be set up again. Keep $DIR/.env (backup.sh saves it) to avoid this."
+  docker compose restart app > /dev/null 2>&1 || true
+  drawn=0
+}
+
 check_database() {
   found=$(docker compose exec -T postgres psql -U postgres -d postgres -Atc \
     "select (select count(*) from pg_roles where rolname = 'workspace_owner') || ',' || (select count(*) from pg_database where datname = 'workspace')" 2> /dev/null || true)
   case "$found" in
-    1,1) db_checked=1 ;;
+    1,1)
+      # Over the container's own address: loopback is trusted without a password, the app's network is not.
+      if ! docker compose exec -T -e PGPASSWORD="$(get PG_OWNER_PASSWORD)" postgres sh -c \
+        'psql -h "$(hostname -i | cut -d" " -f1)" -U workspace_owner -d workspace -Atc "select 1"' > /dev/null 2>&1; then
+        resync_passwords
+      fi
+      db_checked=1 ;;
     0,0)
       echo "  The database has no workspace roles (an earlier first start did not finish): creating them now."
       init_path=/usr/local/share/wx-pg-init.sh
@@ -298,15 +348,58 @@ while :; do
   sleep 3
 done
 
+# ── What to open, and where everything is ─────────────────────────────────────────────────────────────────
+row() { printf '  %-12s %s\n' "$1" "$2"; }
+bind=$(get BIND_ADDRESS)
+bind=${bind:-127.0.0.1}
+[ "$bind" = 0.0.0.0 ] && local_host=localhost || local_host=$bind
+[ "$bind" = 127.0.0.1 ] && reach="this machine only" || reach="reachable on $bind"
+# Host part of SMTP_URL only: the user and password stay in .env.
+mail_host=$(printf '%s' "$smtp" | sed -E 's#^[a-z+]+://##; s#^[^@]*@##; s#[/?].*$##')
+
 echo
 say "workspace is running."
+echo
 if docker compose exec -T app wget -q -O - http://127.0.0.1:4000/api/setup 2> /dev/null | grep -q '"setUp":true'; then
-  echo "  Open      $url"
+  say "Open"
+  row "Web" "$url"
 else
   token=$(get SETUP_TOKEN)
   [ -n "$token" ] || token=$(docker compose exec -T app cat /data/setup-token 2> /dev/null || true)
-  echo "  Open      $url/setup"
-  echo "  Token     ${token:-docker compose logs app | grep 'setup token'}"
+  say "Next: create the company and its first admin"
+  row "Open" "$url/setup"
+  row "Setup token" "${token:-docker compose logs app | grep 'setup token'}"
 fi
-[ "$tls" = off ] || echo "  HTTPS     the certificate arrives within a minute once DNS for $app points here"
-echo "  Backups   $DIR/backup.sh (see docs/runbooks/backup-restore.md)"
+[ "$tls" = off ] || row "HTTPS" "the certificate arrives within a minute once DNS for $app points here"
+
+echo
+say "Services"
+if [ "$tls" = off ]; then caddy_ports="port ${http_port:-80}"; else caddy_ports="ports ${http_port:-80} and $(get HTTPS_PORT | grep . || echo 443)"; fi
+row "Web" "$url (through Caddy, $caddy_ports)"
+row "Web app" "http://$local_host:3000 (direct, $reach)"
+row "API" "http://$local_host:4000 (direct, $reach)$([ -n "$(get API_DOCS)" ] && echo "; docs at $url/api/docs")"
+row "Database" "Postgres 16, inside Docker only (not published). Database workspace, user workspace_owner,"
+row "" "password PG_OWNER_PASSWORD in .env. Shell: docker compose exec postgres psql -U postgres -d workspace"
+if [ -n "$files" ]; then
+  row "Files" "S3 at $(get S3_ENDPOINT) (bucket $(get S3_BUCKET | grep . || echo workspace-files))"
+else
+  row "Files" "on this server's disk (Docker volume ${project:-workspace-prod}_data)"
+fi
+if [ -n "$mail_host" ]; then
+  row "Email" "via $mail_host, from $(get MAIL_FROM)"
+else
+  row "Email" "not set: invitations and password resets are shared as links (SMTP_URL in .env)"
+fi
+case ",$(get COMPOSE_PROFILES)," in *,meet,*) row "Meetings" "LiveKit at $(get LIVEKIT_URL | grep . || echo "LIVEKIT_URL, not set in .env yet")" ;; esac
+row "AI" "none until an admin connects one in Admin > AI connections"
+
+echo
+say "Manage (in $DIR)"
+row "Settings" "$DIR/.env (keep it: it holds every password and secret)"
+row "Status" "docker compose ps"
+row "Logs" "docker compose logs -f app"
+row "Restart" "docker compose restart app"
+row "Stop" "docker compose down (data stays in the Docker volumes)"
+row "Upgrade" "./upgrade.sh"
+row "Backups" "./backup.sh (see docs/runbooks/backup-restore.md)"
+row "Start over" "docker compose down -v (deletes every volume: the database and files too)"
