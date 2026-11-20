@@ -1317,7 +1317,11 @@ export const vi: Catalog = {
       getCode: "Tạo mã kết nối",
       newCode: "Tạo mã mới",
       codeLabel: "Dán mã này vào tiện ích",
-      extSteps: "Giải nén, mở chrome://extensions, bật Developer mode, chọn “Load unpacked”, rồi dán mã.",
+      howTitle: "Cách cài vào Chrome hoặc Edge",
+      how1: "Bấm “Tải tiện ích” rồi giải nén file workspace-ai.zip vừa tải.",
+      how2: "Mở chrome://extensions (Edge: edge://extensions) và bật Developer mode (Chế độ dành cho nhà phát triển).",
+      how3: "Bấm “Load unpacked” (Tải tiện ích đã giải nén) và chọn thư mục workspace-ai vừa giải nén.",
+      how4: "Bấm “Tạo mã kết nối”, mở tiện ích từ biểu tượng mảnh ghép trên thanh công cụ rồi dán mã.",
     },
     sitesMore: "và {count} trang khác",
     admin: {

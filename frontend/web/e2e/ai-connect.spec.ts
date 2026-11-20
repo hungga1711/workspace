@@ -56,6 +56,11 @@ test("AI connect: one line connects a computer; workflows, answers, tokens and t
     await expect(owner.getByRole("heading", { name: "Kết nối AI trong máy của bạn" })).toBeVisible();
     for (const id of ["connect-workflow", "connect-ask", "connect-usage", "connect-guard"]) await expect(owner.getByTestId(id)).toBeVisible();
     await expect(owner.getByTestId("connect-workflow").getByText("Chưa kết nối")).toBeVisible();
+    // No extension yet: how to load the downloaded zip, step by step.
+    const how = owner.getByTestId("ext-how");
+    await expect(how.getByText("Cách cài vào Chrome hoặc Edge")).toBeVisible();
+    await expect(how.getByRole("listitem")).toHaveCount(4);
+    await expect(how.getByText(/chrome:\/\/extensions/)).toBeVisible();
     await shot(owner, "1-empty");
 
     // One button, one line.

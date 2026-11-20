@@ -1356,7 +1356,11 @@ export const zh: Catalog = {
       getCode: "创建连接码",
       newCode: "创建新的连接码",
       codeLabel: "把它粘贴到扩展中",
-      extSteps: "解压，打开 chrome://extensions，开启开发者模式，选择“加载已解压的扩展程序”，然后粘贴连接码。",
+      howTitle: "如何安装到 Chrome 或 Edge",
+      how1: "点击“下载扩展”，解压下载的 workspace-ai.zip。",
+      how2: "打开 chrome://extensions（Edge：edge://extensions），开启开发者模式。",
+      how3: "点击“加载已解压的扩展程序”，选择解压后的 workspace-ai 文件夹。",
+      how4: "点击“创建连接码”，从工具栏的拼图图标打开扩展并粘贴连接码。",
     },
     sitesMore: "以及另外 {count} 个网站",
     admin: {
