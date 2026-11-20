@@ -63,7 +63,8 @@ x-app-env: &app-env
 services:
   # ── Secrets ─────────────────────────────────────────────────────────────────────────────────────
   # One-shot: generates every secret .env leaves empty, once, into the `secrets` volume (kept across upgrades;
-  # backup.sh saves it with the database). install.sh writes them into .env instead.
+  # backup.sh saves it with the database). install.sh writes them into .env and copies them here, so a deleted .env
+  # is rebuilt with the passwords the database already has.
   init:
     <<: *app
     command: ["init-secrets"]
