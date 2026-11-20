@@ -57,8 +57,9 @@ test("AI oversight: company assistant + ChatGPT per person and department, polic
   await lan.getByRole("button", { name: "Gửi", exact: true }).click();
   await expect(lan.locator("[data-role=assistant]").first()).not.toHaveAttribute("aria-busy", "true", { timeout: 60_000 });
   await expect(lan).toHaveURL(/\/app\/ai\/ask\?c=/);
-  // One conversation: no history rail yet; the conversation's title heads the thread.
-  await expect(lan.getByRole("heading", { name: /Soạn email báo giá/ })).toBeVisible();
+  // One conversation already has the history rail (the page keeps its shape between it and "New"), the open one marked.
+  const rail = lan.getByRole("complementary", { name: "Lịch sử trò chuyện" });
+  await expect(rail.getByRole("link", { name: /Soạn email báo giá/ })).toHaveAttribute("aria-current", "page");
 
   await lan.goto("/app/me?tab=ai");
   await lan.getByRole("button", { name: "Tạo mã kết nối" }).click();
