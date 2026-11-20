@@ -534,7 +534,7 @@ export async function project(e: EventEnvelope, c: PoolClient): Promise<void> {
       return;
     case "ai.extension.reminded.v1":
       for (const userId of p.recipients as string[])
-        await notify(c, e, userId, { grp: "action", kind: "ai.extension", title: msg("aiExtension"), body: msg("aiExtensionBody"), url: "/app/me?tab=ai" });
+        await notify(c, e, userId, { grp: "action", kind: "ai.extension", title: msg("aiExtension"), body: msg("aiExtensionBody"), url: "/app/ai/connect" });
       return;
     case "employee.announcement.published.v1":
       // Every targeted employee, once (refId dedups a replayed event); read on Thông báo công ty.

@@ -12,7 +12,7 @@
     "message": "Código de conexión"
   },
   "optCodePlaceholder": {
-    "message": "Pega el código de workspace › Yo › IA"
+    "message": "Pega el código de workspace › IA › Conectar (/app/ai/connect)"
   },
   "optConnect": {
     "message": "Conectar"
@@ -78,7 +78,7 @@
     "message": "Ver la política y lo que se registró"
   },
   "noticeConnect": {
-    "message": "Abre la extensión y pega el código de conexión de workspace › Yo › IA."
+    "message": "Abre la extensión y pega el código de conexión de workspace › IA › Conectar (/app/ai/connect)."
   },
   "confirmSensitive": {
     "message": "Este mensaje parece contener $kinds$.\n\nEnviarlo a una IA externa puede incumplir las normas de la empresa. ¿Enviar de todos modos?",

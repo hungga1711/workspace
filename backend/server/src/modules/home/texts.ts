@@ -113,7 +113,7 @@ const vi = {
   announcement: (t: string) => `Thông báo mới: ${t}`,
   leaveReminder: (name: string, days: number) => `Nhắc: đơn nghỉ ${days} ngày của ${name} vẫn chờ bạn duyệt`,
   aiExtension: "Công ty đề nghị bạn cài tiện ích workspace AI",
-  aiExtensionBody: "Chỉ mất khoảng 1 phút: tải tiện ích rồi dán mã kết nối lấy ở Của tôi › AI. Bạn luôn xem được mọi thứ tiện ích ghi lại.",
+  aiExtensionBody: "Chỉ mất khoảng 1 phút: tải tiện ích rồi dán mã kết nối lấy ở AI › Kết nối. Bạn luôn xem được mọi thứ tiện ích ghi lại.",
   aiPolicyBody: (detail: string, answers: boolean, days: number): string =>
     `Quản lý được xem: ${detail === "topic" ? "chỉ chủ đề" : detail === "summary" ? "chủ đề và tóm tắt" : "quản trị viên đọc được toàn bộ nội dung"}; ${answers ? "có" : "không"} lưu câu trả lời của AI; dữ liệu tự xoá sau ${days} ngày. Chi tiết ở Của tôi › AI.`,
   quota: (pct: number): string => (pct >= 100 ? "Đã dùng hết hạn mức AI tháng này" : `Đã dùng ${pct}% hạn mức AI tháng này`),
@@ -206,7 +206,7 @@ const en: Texts = {
   announcement: (t: string) => `New announcement: ${t}`,
   leaveReminder: (name: string, days: number) => `Reminder: ${name}'s ${days}-day leave request is still waiting for you`,
   aiExtension: "Your company asks you to install the workspace AI extension",
-  aiExtensionBody: "It takes about a minute: download it and paste the connection code from Me › AI. You can always see everything it records.",
+  aiExtensionBody: "It takes about a minute: download it and paste the connection code from AI › Connect. You can always see everything it records.",
   aiPolicyBody: (detail, answers, days) =>
     `Managers see: ${detail === "topic" ? "topics only" : detail === "summary" ? "topics and summaries" : "admins can read the full text"}; AI answers ${answers ? "are" : "are not"} kept; data is deleted after ${days} days. Details in Me › AI.`,
   quota: (pct) => (pct >= 100 ? "This month's AI quota is used up" : `${pct}% of this month's AI quota used`),
@@ -311,7 +311,7 @@ const zh: Texts = {
   announcement: (t: string) => `新公告：${t}`,
   leaveReminder: (name: string, days: number) => `提醒：${name} 的 ${days} 天休假申请仍在等你审批`,
   aiExtension: "公司请你安装 workspace AI 浏览器扩展",
-  aiExtensionBody: "大约一分钟：下载扩展，再粘贴 我的 › AI 中的连接码。你随时可以查看它记录的全部内容。",
+  aiExtensionBody: "大约一分钟：下载扩展，再粘贴 AI › 连接 中的连接码。你随时可以查看它记录的全部内容。",
   aiPolicyBody: (detail, answers, days) =>
     `管理者可见：${detail === "topic" ? "仅主题" : detail === "summary" ? "主题和摘要" : "管理员可阅读全文"}；${answers ? "保存" : "不保存"} AI 的回答；数据 ${days} 天后删除。详情见 我的 › AI。`,
   quota: (pct) => (pct >= 100 ? "本月 AI 额度已用完" : `本月 AI 额度已使用 ${pct}%`),
@@ -398,7 +398,7 @@ const es: Texts = {
   announcement: (t: string) => `Nuevo anuncio: ${t}`,
   leaveReminder: (name: string, days: number) => `Recordatorio: la solicitud de ausencia de ${days} ${days === 1 ? "día" : "días"} de ${name} sigue esperando tu aprobación`,
   aiExtension: "Tu empresa te pide instalar la extensión de IA de workspace",
-  aiExtensionBody: "Lleva un minuto: descárgala y pega el código de conexión de Yo › IA. Siempre puedes ver todo lo que registra.",
+  aiExtensionBody: "Lleva un minuto: descárgala y pega el código de conexión de IA › Conectar. Siempre puedes ver todo lo que registra.",
   aiPolicyBody: (detail, answers, days) =>
     `Los responsables ven: ${detail === "topic" ? "solo temas" : detail === "summary" ? "temas y resúmenes" : "los administradores pueden leer el texto completo"}; las respuestas de la IA ${answers ? "se guardan" : "no se guardan"}; los datos se borran a los ${days} días. Detalles en Yo › IA.`,
   quota: (pct) => (pct >= 100 ? "Se agotó la cuota de IA de este mes" : `Usado el ${pct}% de la cuota de IA de este mes`),
