@@ -98,6 +98,15 @@ export default tseslint.config(
   { files: ["backend/server/src/**/*.ts"], plugins: { workspace: { rules: { "module-boundaries": moduleBoundaries } } }, rules: { "workspace/module-boundaries": "error" } },
   { files: ["**/*.mjs", "**/*.config.*"], languageOptions: { globals: NODE } },
   // k6 load-test scripts (tooling/loadtest): k6's own globals.
+  // The live demo's browser runtime (D: the manifest build.mjs puts before it) and its Node preload.
+  {
+    files: ["tooling/live-demo/runtime.js"],
+    languageOptions: {
+      sourceType: "script",
+      globals: { ...BROWSER, ...ro(["D", "Response", "Request", "Headers", "Error", "EventTarget", "HTMLImageElement", "history", "matchMedia", "addEventListener"]) },
+    },
+  },
+  { files: ["tooling/live-demo/preload.cjs"], languageOptions: { sourceType: "commonjs", globals: NODE } },
   { files: ["tooling/loadtest/**/*.js"], languageOptions: { globals: { ...NODE, __ENV: "readonly", __VU: "readonly", __ITER: "readonly", open: "readonly" } } },
   // The browser extension (plain scripts loaded by Chrome).
   // `WORKSPACE_AI_SITES` is sites.js's list, loaded before the other scripts; `module` is there only under `require` (tests).

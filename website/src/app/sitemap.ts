@@ -11,5 +11,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
     changeFrequency: "monthly" as const,
     priority: page.url === "/docs" ? 0.8 : 0.6,
   }));
-  return [{ url: `${SITE.url}/`, changeFrequency: "weekly", priority: 1 }, ...docs];
+  return [{ url: `${SITE.url}/`, changeFrequency: "weekly", priority: 1 }, { url: SITE.demo, changeFrequency: "monthly", priority: 0.7 }, ...docs];
 }

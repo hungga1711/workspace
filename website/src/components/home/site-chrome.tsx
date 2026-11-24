@@ -21,6 +21,14 @@ export function SiteHeader() {
         <HeaderNav />
         <div className="ml-auto flex items-center gap-2">
           <a
+            href={SITE.demo}
+            target="_blank"
+            rel="noreferrer"
+            className={`${small} hidden bg-panel text-ink shadow-[0_0_0_1px_var(--color-hair)] hover:bg-[var(--color-muted)] sm:inline-flex`}
+          >
+            Live demo
+          </a>
+          <a
             href={SITE.repo}
             target="_blank"
             rel="noreferrer"
@@ -42,7 +50,7 @@ export function SiteHeader() {
               </svg>
             </summary>
             <div className="absolute right-0 mt-2 w-56 rounded-xl bg-panel p-1.5 shadow-[0_0_0_1px_var(--color-hair),0_8px_24px_rgba(0,0,0,0.08)]">
-              {[...NAV, { label: "GitHub", href: SITE.repo }].map((n) => (
+              {[...NAV, { label: "Live demo", href: SITE.demo }, { label: "GitHub", href: SITE.repo }].map((n) => (
                 <Link
                   key={n.href}
                   href={n.href}
@@ -64,6 +72,7 @@ const FOOTER = [
   {
     title: "Product",
     links: [
+      { label: "Live demo", href: SITE.demo },
       { label: "Agent workflows", href: "/#workflows" },
       { label: "How it fits", href: "/#overview" },
       { label: "Measure AI", href: "/#measure" },

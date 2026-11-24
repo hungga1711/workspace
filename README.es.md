@@ -30,6 +30,9 @@ Para el responsable: **Inicio** muestra quién está bloqueado y por qué, qué 
 semana. **Avance** muestra cada persona y departamento. No se nos envía nada ni a nosotros ni a terceros; todo
 funciona sin IA. En inglés, vietnamita, chino y español.
 
+**Demo en línea: [workspace.hungga1711.dev/live-demo](https://workspace.hungga1711.dev/live-demo)** · recorre toda la aplicación en el navegador, sin registrarte. Es la interfaz real con
+datos de una empresa inventada; no hay servidor detrás, así que no se guarda nada (en inglés).
+
 https://github.com/user-attachments/assets/2c138cb5-2642-4455-aca1-fa205fef1153
 
 ## Instalación
