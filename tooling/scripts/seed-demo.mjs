@@ -22,11 +22,13 @@
 
 import { randomBytes } from "node:crypto";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
-import { fileURLToPath } from "node:url";
-import { join } from "node:path";
+import { fileURLToPath, pathToFileURL } from "node:url";
+import { join, resolve } from "node:path";
 import { aiInsightsSql, lit, prng, runSql } from "./seed-demo-ai.mjs";
 import { balanceSql } from "./seed-demo-balance.mjs";
-import {
+
+// Another company with the same exports, e.g. the live demo's (tooling/live-demo/company.mjs).
+const {
   ANNOUNCEMENTS,
   APPROVALS,
   CELEBRATE,
@@ -42,7 +44,8 @@ import {
   company,
   deptName,
   taskDescriptions,
-} from "./seed-demo-company.mjs";
+  WORKFLOW_TASK = [/launch post for v1\.0/i, "ship-change", "trinh"],
+} = await import(process.env.SEED_COMPANY ? pathToFileURL(resolve(process.env.SEED_COMPANY)).href : "./seed-demo-company.mjs");
 
 const GW = process.env.GATEWAY_URL ?? "http://localhost:4000";
 // The public demo locks invitations and activation for visitors; its seed gets through with the server's secret.
@@ -465,7 +468,7 @@ async function approvals() {
       approverId: uid(approver),
       kind,
       amount: amount ?? null,
-      currency: amount == null ? null : "USD",
+      currency: amount == null ? null : (process.env.SEED_CURRENCY ?? "USD"),
     });
     bump("approvals");
     if (decision) {
@@ -646,10 +649,11 @@ async function workflows() {
     byKey.set(t.key, w.id);
     bump("workflows");
   }
-  const ship = byKey.get("ship-change");
-  const launch = seededTasks.find((t) => /launch post for v1\.0/i.test(t.title));
-  if (!ship || !launch) throw new Error(`could not attach Ship a change (workflow=${ship}, task=${launch?.id})`);
-  await api("trinh", "PUT", `/api/work/tasks/${launch.id}/workflow`, { workflowId: ship });
+  const [title, template, who] = WORKFLOW_TASK;
+  const ship = byKey.get(template);
+  const launch = seededTasks.find((t) => title.test(t.title));
+  if (!ship || !launch) throw new Error(`could not attach ${template} (workflow=${ship}, task=${launch?.id})`);
+  await api(who, "PUT", `/api/work/tasks/${launch.id}/workflow`, { workflowId: ship });
   bump("tasks with workflow");
 }
 

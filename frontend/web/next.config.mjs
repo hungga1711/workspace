@@ -4,6 +4,8 @@ import { fileURLToPath } from "node:url";
 const nextConfig = {
   // A separate output dir lets a production build run next to `next dev` (e.g. NEXT_DIST_DIR=.next-prod).
   distDir: process.env.NEXT_DIST_DIR || ".next",
+  // The static live demo (tooling/live-demo) lives under a folder of the public site; installations have no base path.
+  ...(process.env.NEXT_BASE_PATH ? { basePath: process.env.NEXT_BASE_PATH } : {}),
   // Docker image (infra/docker/Dockerfile): a self-contained server with only the files it needs, traced from
   // the monorepo root so workspace packages and pnpm's symlinked node_modules are included.
   ...(process.env.NEXT_OUTPUT === "standalone" ? { output: "standalone", outputFileTracingRoot: fileURLToPath(new URL("../..", import.meta.url)) } : {}),

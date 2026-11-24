@@ -90,6 +90,9 @@ function Hero() {
           <Button href="/docs/quick-start">
             Get started <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
           </Button>
+          <Button href={SITE.demo} variant="secondary">
+            Live demo
+          </Button>
           <Button href={SITE.repo} variant="secondary">
             <GitHubIcon /> GitHub
           </Button>
@@ -325,6 +328,9 @@ function SelfHosting() {
           <div className="mt-6 flex flex-wrap items-center gap-2.5">
             <Button href="/docs/quick-start">
               Get started <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
+            </Button>
+            <Button href={SITE.demo} variant="secondary">
+              Try the live demo
             </Button>
             <Button href={SITE.repo} variant="secondary">
               <GitHubIcon /> Star on GitHub

@@ -9,7 +9,7 @@
   <a href="https://github.com/hungga1711/workspace/pkgs/container/workspace"><img alt="Container image" src="https://img.shields.io/badge/ghcr.io-hungga1711%2Fworkspace-blue?logo=docker"></a>
 </p>
 
-<p align="center"><a href="#what-it-is-for">What it is for</a> · <a href="#video">Video</a> · <a href="#install">Install</a> · <a href="#before-you-go-live">Before you go live</a> · <a href="#contributing">Contributing</a></p>
+<p align="center"><a href="https://workspace.hungga1711.dev/live-demo"><strong>Live demo</strong></a> · <a href="#what-it-is-for">What it is for</a> · <a href="#video">Video</a> · <a href="#install">Install</a> · <a href="#before-you-go-live">Before you go live</a> · <a href="#contributing">Contributing</a></p>
 
 <p align="center"><a href="README.vi.md">Tiếng Việt</a> · <a href="README.zh.md">中文</a> · <a href="README.es.md">Español</a></p>
 
@@ -34,6 +34,11 @@ One installation runs one company's work on its own server:
 For the owner: **Home** shows who is stuck and why, what waits for your decision, and AI use this week.
 **Progress** shows each person and department. Nothing is sent to us or to any third party; every feature works
 without AI. English, Tiếng Việt, 中文 and Español.
+
+## Live demo
+
+**[workspace.hungga1711.dev/live-demo](https://workspace.hungga1711.dev/live-demo)**: click through the whole app in your browser, no sign-up. It is the real
+interface with sample data from a made-up company; there is no server behind it, so nothing you do is saved.
 
 ## Video
 

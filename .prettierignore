@@ -8,3 +8,4 @@ pnpm-lock.yaml
 *.md
 **/src-tauri/target/**
 **/.next-*/**
+tooling/live-demo/fixtures.json

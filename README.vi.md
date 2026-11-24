@@ -30,6 +30,9 @@ Cho chủ doanh nghiệp: **Trang chủ** cho thấy ai đang kẹt và vì sao,
 **Tiến độ** cho thấy từng người và từng phòng ban. Không gì được gửi cho chúng tôi hay bên thứ ba; mọi tính năng chạy
 được khi không có AI. Có tiếng Anh, tiếng Việt, tiếng Trung và tiếng Tây Ban Nha.
 
+**Xem thử: [workspace.hungga1711.dev/live-demo](https://workspace.hungga1711.dev/live-demo)** · bấm xem toàn bộ ứng dụng ngay trên trình duyệt, không cần đăng ký. Đây là giao diện thật với
+dữ liệu mẫu của một công ty hư cấu; phía sau không có máy chủ nên mọi thao tác đều không được lưu (tiếng Anh).
+
 https://github.com/user-attachments/assets/2c138cb5-2642-4455-aca1-fa205fef1153
 
 ## Cài đặt

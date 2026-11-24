@@ -4,9 +4,9 @@ name: website
 on:
   push:
     branches: [main]
-    paths: ["website/**", ".github/workflows/website.yml"]
+    paths: ["website/**", "tooling/live-demo/**", "frontend/web/**", ".github/workflows/website.yml"]
   pull_request:
-    paths: ["website/**", ".github/workflows/website.yml"]
+    paths: ["website/**", "tooling/live-demo/**", "frontend/web/**", ".github/workflows/website.yml"]
   workflow_dispatch:
 
 permissions:
@@ -19,7 +19,7 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 25
     defaults:
       run:
         working-directory: website
@@ -32,6 +32,12 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm types:check
       - run: pnpm build
+      # The static live demo (/live-demo): the product's web app rendered from recorded sample data, into website/out.
+      - name: Live demo
+        working-directory: .
+        run: |
+          pnpm install --frozen-lockfile --filter @workspace/web...
+          node tooling/live-demo/build.mjs
       - uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b # v4.0.0
         if: github.event_name != 'pull_request'
         with: { path: website/out }
