@@ -31,8 +31,9 @@ const BASE = `http://localhost:${WEB_PORT}`;
 const MODEL_PORT = 4620;
 
 // ── the recording gateway ────────────────────────────────────────────────
-const get = {}; // "/api/…?query" → { s: status, t: content type (when not JSON), b: body, e: "base64" when binary }
-const post = {}; // "POST /api/…" → same, writes a page makes by itself while loading
+const get = new Map(); // "/api/…?query" → { s: status, t: content type (when not JSON), b: body, e: "base64" when binary }
+const post = new Map(); // "POST /api/…" → same, writes a page makes by itself while loading
+const keep = (map, key, entry) => map.has(key) || map.set(key, entry);
 let recordWrites = false;
 const PRIVATE = /^\/api\/(auth|realtime\/ticket|signup|setup)(\/|\?|$)/;
 const recorder = createServer(async (req, res) => {
@@ -50,8 +51,8 @@ const recorder = createServer(async (req, res) => {
       ...(/json|text|svg/.test(type) || !buf.length ? { b: buf.toString() } : { b: buf.toString("base64"), e: "base64" }),
     };
     if (up.status !== 429 && up.status < 500) {
-      if (req.method === "GET" && (!PRIVATE.test(req.url) || req.url === "/api/setup")) get[req.url] ??= entry;
-      else if (recordWrites && req.method !== "GET" && !PRIVATE.test(req.url) && up.ok) post[`${req.method} ${req.url}`] ??= entry;
+      if (req.method === "GET" && (!PRIVATE.test(req.url) || req.url === "/api/setup")) keep(get, req.url, entry);
+      else if (recordWrites && req.method !== "GET" && !PRIVATE.test(req.url) && up.ok) keep(post, `${req.method} ${req.url}`, entry);
     }
     res.writeHead(up.status, { ...(type ? { "content-type": type } : {}) });
     res.end(buf);
@@ -216,7 +217,7 @@ try {
     console.log("AI connection:", (await call("ai/connections", "POST", { mode: "selfhost", baseUrl: `http://localhost:${MODEL_PORT}`, modelSmart: "qwen3:8b" })).status);
   await first.waitForTimeout(31_000); // lib/ai.ts keeps the AI status half a minute
   // From here on, what the app reads is what visitors get: forget the half-configured answers.
-  for (const k of Object.keys(get)) delete get[k];
+  get.clear();
   recordWrites = true;
 
   SEEDS.forEach(add);
@@ -241,7 +242,7 @@ try {
     await page.close();
   };
   await Promise.all([work(), work(), work(), work()]);
-  console.log(`pass 1: ${urls.size} addresses, ${Object.keys(get).length} answers`);
+  console.log(`pass 1: ${urls.size} addresses, ${get.size} answers`);
   // Pass 2: click through a couple of screens of each kind, writes refused.
   recordWrites = false;
   readOnly = true;
@@ -284,7 +285,7 @@ try {
   const ids = new Map(); // parent segment → ids
   const isId = (s) => /\d/.test(s) && s.length > 2 && !/^v\d|^\d{4}/.test(s);
   const templates = new Map();
-  for (const k of Object.keys(get)) {
+  for (const k of get.keys()) {
     const [p, q] = k.split("?");
     const seg = p.split("/");
     const at = seg.findIndex((s, i) => i > 2 && isId(s));
@@ -293,13 +294,13 @@ try {
     if (!ids.has(parent)) ids.set(parent, new Set());
     ids.get(parent).add(seg[at]);
     if (q && /cursor|before|after|since/.test(q)) continue;
-    if (get[k].s === 200) templates.set(parent + "\0" + seg.slice(at + 1).join("/") + (q ? "?" + q : ""), { parent, rest: seg.slice(at + 1).join("/"), q });
+    if (get.get(k).s === 200) templates.set(parent + "\0" + seg.slice(at + 1).join("/") + (q ? "?" + q : ""), { parent, rest: seg.slice(at + 1).join("/"), q });
   }
   const jobs = [];
   for (const { parent, rest, q } of templates.values())
     for (const id of ids.get(parent)) {
       const path = `${parent}/${id}${rest ? `/${rest}` : ""}${q ? `?${q}` : ""}`;
-      if (!get[path]) jobs.push(path.replace("/api/", ""));
+      if (!get.has(path)) jobs.push(path.replace("/api/", ""));
     }
   console.log(`expanding ${jobs.length} answers`);
   const expand = async () => {
@@ -309,7 +310,7 @@ try {
 
   // The search box: every hit the words of the company's titles find; the browser filters them as people type.
   const words = new Set(
-    Object.values(get).flatMap((a) =>
+    [...get.values()].flatMap((a) =>
       a.e
         ? []
         : [...a.b.matchAll(/"(?:title|displayName|name)":"([^"\\]{3,120})"/g)].flatMap((m) =>
@@ -322,10 +323,10 @@ try {
   );
   const search = new Map();
   for (const w of words) for (const h of (await call(`chat/search?q=${encodeURIComponent(w)}`)).body?.hits ?? []) search.set(`${h.entity_type}:${h.entity_id}`, h);
-  for (const k of Object.keys(get)) if (k.startsWith("/api/chat/search?")) delete get[k];
+  for (const k of get.keys()) if (k.startsWith("/api/chat/search?")) get.delete(k);
 
-  const ok = (o) => Object.fromEntries(Object.entries(o).sort(([a], [b]) => (a < b ? -1 : 1)));
-  const me = JSON.parse(get["/api/me"]?.b ?? "{}");
+  const ok = (o) => Object.fromEntries([...o].sort(([a], [b]) => (a < b ? -1 : 1)));
+  const me = JSON.parse(get.get("/api/me")?.b ?? "{}");
   const out = {
     recordedAt: new Date().toISOString(),
     user: { id: me.principal?.id, email: process.env.SEED_OWNER_EMAIL },
@@ -340,7 +341,7 @@ try {
     file,
     JSON.stringify(out, null, 1).replaceAll(`Self-host (localhost:${MODEL_PORT})`, "Company AI").replaceAll(`http://localhost:${MODEL_PORT}`, "http://ai.internal") + "\n",
   );
-  console.log(`${file}: ${out.pages.length} pages, ${Object.keys(get).length} answers, ${Object.keys(post).length} writes`);
+  console.log(`${file}: ${out.pages.length} pages, ${get.size} answers, ${post.size} writes`);
 } finally {
   await browser.close();
   next.kill();

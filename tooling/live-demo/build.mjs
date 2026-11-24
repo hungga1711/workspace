@@ -204,7 +204,7 @@ try {
   const dead = new Set();
   for (const k of linked) {
     const path = k.split("?")[0];
-    if (!(k in D.pages) && !(k in D.redirects) && !THIN.test(path) && !/^\/app\/(ai\/ask\?|files\/)|\/export\b/.test(k)) dead.add(k);
+    if (!(k in D.pages) && !(k in D.redirects) && !THIN.test(path) && !/^\/app\/(ai\/ask\?|files\/)/.test(k) && !/\/export$/.test(path)) dead.add(k);
   }
   if (dead.size) console.log(`links to pages not built (${dead.size}):\n  ${[...dead].sort().join("\n  ")}`);
   if (misses.size) console.log(`reads without a fixture (${misses.size}):\n  ${[...misses].slice(0, 25).join("\n  ")}`);
