@@ -52,7 +52,7 @@ const today = new Date().toISOString().slice(0, 10);
 /** `n` working days from today (negative: back) at HH:MM, as a Date. */
 function when(n, time = "12:00") {
   let t = Date.parse(`${today}T${time}:00Z`);
-  for (let left = Math.abs(n); left > 0; ) {
+  for (let left = Math.abs(n); left > 0;) {
     t += Math.sign(n) * DAY;
     if (![0, 6].includes(new Date(t).getUTCDay())) left--;
   }

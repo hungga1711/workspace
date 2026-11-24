@@ -22,13 +22,8 @@ globalThis.Date = class Date extends RealDate {
 };
 
 const session = { accessToken: "demo", refreshToken: "demo", expiresAt: 8e15, userId: demo.user.id, name: demo.user.name, givenName: demo.user.givenName, email: demo.user.email };
-class Pool {
-  on() {}
-  async query(sql) {
-    return /SELECT data FROM sessions/.test(sql) ? { rows: [{ data: session }], rowCount: 1 } : { rows: [], rowCount: 0 };
-  }
-}
-const load = Module._load;
-Module._load = function (id, ...rest) {
-  return id === "pg" ? { default: { Pool }, Pool } : load.call(this, id, ...rest);
-};
+// On the class itself, which `import` and `require` share: newer Node does not call a patched loader for an import.
+const pg = Module.createRequire(`${process.cwd()}/package.json`)("pg");
+pg.Pool.prototype.query = async (sql) =>
+  /SELECT data FROM sessions/.test(typeof sql === "string" ? sql : sql?.text) ? { rows: [{ data: session }], rowCount: 1 } : { rows: [], rowCount: 0 };
+pg.Pool.prototype.connect = async () => ({ query: pg.Pool.prototype.query, release() {} });

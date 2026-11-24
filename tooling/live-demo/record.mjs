@@ -223,7 +223,7 @@ try {
   // Pass 1: every page reachable by links.
   const work = async () => {
     const page = await context.newPage();
-    for (let idle = 0; idle < 20; ) {
+    for (let idle = 0; idle < 20;) {
       const url = queue.shift();
       if (!url) {
         idle++;
@@ -253,7 +253,7 @@ try {
   });
   const click = async () => {
     const page = await context.newPage();
-    for (let url; (url = todo.shift()); ) {
+    for (let url; (url = todo.shift());) {
       await page.goto(BASE + url, { waitUntil: "domcontentloaded", timeout: 30_000 }).catch(() => {});
       await settle(page);
       await Promise.race([clickThrough(page, url).catch((e) => console.log(url, e.message.split("\n")[0])), page.waitForTimeout(150_000)]).catch(() => {});
@@ -303,7 +303,7 @@ try {
     }
   console.log(`expanding ${jobs.length} answers`);
   const expand = async () => {
-    for (let p; (p = jobs.shift()); ) await call(p).catch(() => {});
+    for (let p; (p = jobs.shift());) await call(p).catch(() => {});
   };
   await Promise.all(Array.from({ length: 8 }, expand));
 

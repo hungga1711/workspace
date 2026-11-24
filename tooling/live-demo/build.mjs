@@ -148,7 +148,7 @@ try {
   const failed = [];
   const linked = new Set();
   const render = async () => {
-    for (let page; (page = queue.shift()); ) {
+    for (let page; (page = queue.shift());) {
       const key = keyOf(page);
       const area = page.split("/")[1].split("?")[0];
       const r = await get(page);
