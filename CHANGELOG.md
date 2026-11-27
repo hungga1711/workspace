@@ -8,6 +8,14 @@ previous release. Add anything an operator must do by hand before upgrading unde
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-11-27
+
+### Commits
+
+**Live demo at /live-demo**
+
+- the web app with sample data, as static files (#42)
+
 ## [1.0.3] - 2026-11-20
 
 ### Commits

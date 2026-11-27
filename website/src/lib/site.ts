@@ -5,7 +5,7 @@ export const SITE = {
   demo: "https://workspace.hungga1711.dev/live-demo",
   repo: "https://github.com/hungga1711/workspace",
   image: "ghcr.io/hungga1711/workspace",
-  version: "1.0.3",
+  version: "1.1.0",
   license: "MIT",
   install: "curl -fsSL https://raw.githubusercontent.com/hungga1711/workspace/main/infra/production/install.sh | sh",
 };

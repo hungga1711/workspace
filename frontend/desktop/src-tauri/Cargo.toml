@@ -1,6 +1,6 @@
 [package]
 name = "workspace-desktop"
-version = "1.0.3"
+version = "1.1.0"
 description = "workspace desktop app"
 license = "MIT"
 edition = "2021"

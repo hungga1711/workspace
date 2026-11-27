@@ -2,7 +2,7 @@
   "name": "@workspace/service-kit",
   "description": "NestJS service toolkit: principal middleware, migrations, in-process events over the outbox, object storage, email",
   "license": "MIT",
-  "version": "1.0.3",
+  "version": "1.1.0",
   "private": true,
   "type": "module",
   "main": "./dist/index.js",

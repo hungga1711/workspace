@@ -27,7 +27,7 @@ import {
  */
 
 /** The release the document describes; bump with the release (CHANGELOG.md). */
-export const API_VERSION = "1.0.3";
+export const API_VERSION = "1.1.0";
 
 export type HttpMethod = "GET" | "POST" | "PATCH" | "PUT" | "DELETE";
 
